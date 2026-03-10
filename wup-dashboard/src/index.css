@@ -1,31 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  --bg:         #f0f2f7;          /* tło strony — jasny niebieskoszary */
-  --bg2:        #ffffff;           /* sidebar, topbar, karty */
-  --bg3:        #e8ebf3;          /* hover, wtórne tła */
-  --border:     rgba(0,0,0,0.08);
-  --accent:     #c0392b;          /* czerwony — stonowany */
-  --accent2:    #e07b20;          /* pomarańczowy */
-  --blue:       #2563eb;          /* niebieski — wykresy */
-  --green:      #16a34a;          /* zielony */
-  --nav-active: #1e3a6e;          /* granat — aktywne menu */
-  --text:       #1e293b;          /* ciemny tekst */
-  --muted:      #64748b;          /* szary */
-  --muted2:     #94a3b8;          /* jaśniejszy szary */
-  --card-bg:    #ffffff;
-  --card-br:    rgba(0,0,0,0.07);
-  --card-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 8px rgba(0,0,0,0.04);
+  --bg:         #0a0a0a;          /* main dark background */
+  --bg2:        #111111;          /* sidebar, topbar, cards */
+  --bg3:        #1a1a1a;          /* hover, secondary backgrounds */
+  --border:     rgba(255,255,255,0.08);
+  --accent:     #c9082a;          /* NBA red */
+  --accent2:    #1d428a;          /* NBA blue */
+  --blue:       #1d428a;          /* blue for charts */
+  --green:      #00a651;          /* win/positive green */
+  --orange:     #f9a01b;          /* golden accent */
+  --nav-active: #c9082a;          /* active menu - NBA red */
+  --text:       #ffffff;          /* white text */
+  --muted:      #a0a0a0;          /* gray */
+  --muted2:     #6b6b6b;          /* darker gray */
+  --card-bg:    #111111;
+  --card-br:    rgba(255,255,255,0.08);
+  --card-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 40px rgba(201,8,42,0.05);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body, #root { height: 100%; overflow: hidden; }
 body {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', 'Outfit', sans-serif;
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
 }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 4px; }
