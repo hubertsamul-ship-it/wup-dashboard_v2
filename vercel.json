@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "wup-dashboard/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "wup-dashboard/dist" }
+    },
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "api/index.py" },
+    { "src": "/health",   "dest": "api/index.py" },
+    { "src": "/(.*)",     "dest": "wup-dashboard/dist/$1" }
+  ]
+}
