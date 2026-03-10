@@ -17,17 +17,23 @@ const Ctx = createContext(null);
 // Mock data for demo/preview mode
 const MOCK_DATA = {
   pulpit: {
-    kpi: {
-      bezrobotni: { value: 98234, delta: -2.3, label: "Bezrobotni" },
-      stopa_maz: { value: 4.2, delta: -0.1, label: "Stopa Mazowieckie" },
-      stopa_pl: { value: 5.1, delta: -0.2, label: "Stopa Polska" },
-      oferty: { value: 12543, delta: 5.2, label: "Oferty pracy" }
-    },
-    trend_37m: Array.from({ length: 37 }, (_, i) => ({
-      date: `2023-${String((i % 12) + 1).padStart(2, '0')}`,
-      maz: 95000 + Math.random() * 10000,
-      pl: 850000 + Math.random() * 100000
-    })),
+    bezr_razem: 98234,
+    bezr_delta: -2345,
+    bezr_pl: 798000,
+    bezr_pl_delta: -12300,
+    stopa_maz: 4.2,
+    stopa_maz_delta: -0.1,
+    stopa_pl: 5.1,
+    trend_37m: Array.from({ length: 37 }, (_, i) => {
+      const month = (i % 12) + 1;
+      const year = 2023 + Math.floor(i / 12);
+      const labels = ['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru'];
+      return {
+        label: `${labels[month-1]} ${year}`,
+        bezr: 95000 + Math.sin(i * 0.3) * 8000 + Math.random() * 2000,
+        stopa: 4.0 + Math.sin(i * 0.3) * 0.5 + Math.random() * 0.2
+      };
+    }),
     mapa_maz: [
       { wgm: "1465", nazwa: "m. st. Warszawa", stopa: 1.8 },
       { wgm: "1434", nazwa: "pruszkowski", stopa: 2.5 },
