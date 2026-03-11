@@ -24,13 +24,13 @@ export default function Card({ title, badge, badgeLive, children, style: extraSt
           marginBottom: '10px', flexShrink: 0,
         }}>
           {title && (
-            <div style={{ fontSize: '0.76rem', fontWeight: 600, color: 'var(--text)', letterSpacing: '0.01em' }}>
+            <div style={{ fontSize: 'var(--font-sm)', fontWeight: 600, color: 'var(--text)', letterSpacing: '0.01em' }}>
               {title}
             </div>
           )}
           {badge && (
             <div style={{
-              fontSize: '0.6rem',
+              fontSize: 'var(--font-xs)',
               background: badgeLive ? 'rgba(22,163,74,0.10)' : 'rgba(0,0,0,0.05)',
               color: badgeLive ? 'var(--green)' : 'var(--muted)',
               border: badgeLive ? '1px solid rgba(22,163,74,0.25)' : '1px solid rgba(0,0,0,0.07)',
@@ -52,10 +52,10 @@ export default function Card({ title, badge, badgeLive, children, style: extraSt
 export function SectionHeader({ title, sub }) {
   return (
     <div style={{ marginBottom: '10px', flexShrink: 0 }}>
-      <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '1.35rem', color: 'var(--text)', letterSpacing: '-0.01em' }}>
+      <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 'var(--font-xl)', color: 'var(--text)', letterSpacing: '-0.01em' }}>
         {title}
       </div>
-      {sub && <div style={{ fontSize: '0.7rem', color: 'var(--muted)', marginTop: '2px' }}>{sub}</div>}
+      {sub && <div style={{ fontSize: 'var(--font-sm)', color: 'var(--muted)', marginTop: '3px', lineHeight: 1.5 }}>{sub}</div>}
       <div style={{ width: '32px', height: '2px', background: 'var(--accent)', marginTop: '5px', borderRadius: '1px' }} />
     </div>
   );

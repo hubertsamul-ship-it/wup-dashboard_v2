@@ -36,14 +36,14 @@ function RangeSelector({ labels, from, to, onChange }) {
     borderRadius: '6px',
     color: 'var(--text)',
     padding: '4px 8px',
-    fontSize: '0.75rem',
+    fontSize: 'var(--font-sm)',
     fontFamily: 'Outfit, sans-serif',
     cursor: 'pointer',
   };
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-      <span style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>Od:</span>
+      <span style={{ fontSize: 'var(--font-xs)', color: 'var(--muted)' }}>Od:</span>
       <select
         value={from}
         onChange={e => onChange(e.target.value, to)}
@@ -51,7 +51,7 @@ function RangeSelector({ labels, from, to, onChange }) {
       >
         {labels.map(l => <option key={l} value={l}>{l}</option>)}
       </select>
-      <span style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>Do:</span>
+      <span style={{ fontSize: 'var(--font-xs)', color: 'var(--muted)' }}>Do:</span>
       <select
         value={to}
         onChange={e => onChange(from, e.target.value)}
@@ -73,7 +73,7 @@ export default function Zwolnienia() {
   const [rangeFrom, setRangeFrom] = useState(null);
   const [rangeTo,   setRangeTo]   = useState(null);
 
-  const from = rangeFrom ?? labels[0]  ?? '';
+  const from = rangeFrom ?? labels.find(l => l.includes('Sty 2025')) ?? labels[0] ?? '';
   const to   = rangeTo   ?? labels[labels.length - 1] ?? '';
 
   const rangeSum = useMemo(() => {

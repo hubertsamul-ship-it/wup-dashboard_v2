@@ -41,16 +41,24 @@ export default function KpiCard({
   target, decimals = 0, suffix = '',
   label, delta, deltaType = 'up',
   variant,   // 'red' | 'green' | 'blue' | undefined
+  compact,   // smaller padding + font for dense layouts
   style: extraStyle = {},
 }) {
   const displayed = useCountUp(target, decimals);
   const accentRgba = ACCENT_MAP[variant]?.after || ACCENT_MAP.blue.after;
 
+  const pad     = compact ? '12px 14px' : '26px 28px';
+  const numSize = compact ? '1.8rem'    : '3.1rem';
+  const sufSize = compact ? '0.85rem'   : '1.0rem';
+  const flagMb  = compact ? '6px'       : '10px';
+  const labelMt = compact ? '5px'       : '8px';
+  const deltaMt = compact ? '7px'       : '10px';
+
   return (
     <div style={{
       background: 'var(--card-bg)',
       border: '1px solid var(--card-br)',
-      borderRadius: '16px', padding: '32px',
+      borderRadius: '16px', padding: pad,
       boxShadow: 'var(--card-shadow)',
       position: 'relative', overflow: 'hidden',
       transition: 'border-color 0.2s, box-shadow 0.2s, transform 0.2s',
@@ -70,10 +78,10 @@ export default function KpiCard({
 
       {/* flag — region label */}
       <div style={{
-        fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.14em',
+        fontSize: 'var(--font-xs)', fontWeight: 700, letterSpacing: '0.14em',
         textTransform: 'uppercase',
         color: FLAG_COLORS[flagColor] || 'var(--muted)',
-        marginBottom: '10px',
+        marginBottom: flagMb,
         display: 'flex', alignItems: 'center', gap: '6px',
       }}>
         <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: 'currentColor', display: 'inline-block' }} />
@@ -83,17 +91,17 @@ export default function KpiCard({
       {/* number */}
       <div style={{
         fontFamily: "'JetBrains Mono', monospace",
-        fontSize: '3.5rem', fontWeight: 800, color: 'var(--text)',
+        fontSize: numSize, fontWeight: 800, color: 'var(--text)',
         lineHeight: 1, letterSpacing: '-0.03em',
       }}>
         {displayed}
-        {suffix && <span style={{ fontSize: '1.1rem', color: 'var(--muted)', fontWeight: 500, marginLeft: '5px' }}>{suffix}</span>}
+        {suffix && <span style={{ fontSize: sufSize, color: 'var(--muted)', fontWeight: 500, marginLeft: '5px' }}>{suffix}</span>}
       </div>
 
       {/* label — analytic caption */}
       <div style={{
-        fontSize: '0.62rem', color: 'var(--muted)',
-        marginTop: '8px', fontWeight: 600,
+        fontSize: 'var(--font-xs)', color: 'var(--muted)',
+        marginTop: labelMt, fontWeight: 600,
         textTransform: 'uppercase', letterSpacing: '0.07em',
         lineHeight: 1.4,
       }}>
@@ -104,8 +112,8 @@ export default function KpiCard({
       {delta && (
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: '4px',
-          marginTop: '10px', padding: '4px 11px', borderRadius: '999px',
-          fontSize: '0.66rem', fontWeight: 600,
+          marginTop: deltaMt, padding: '4px 11px', borderRadius: '999px',
+          fontSize: 'var(--font-xs)', fontWeight: 600,
           fontFamily: "'JetBrains Mono', monospace",
           ...(deltaType === 'up'
             ? { background: 'rgba(192,57,43,0.08)', color: '#b03020', border: '1px solid rgba(192,57,43,0.15)' }

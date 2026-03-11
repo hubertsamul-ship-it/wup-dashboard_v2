@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
+import { Clock, Users, GraduationCap, Briefcase } from 'lucide-react';
 
 const TABS = [
-  { id: 'czas', label: 'Czas bezrobocia', color: '#f3a683' },
-  { id: 'wiek', label: 'Wiek',             color: '#4895ef' },
-  { id: 'wyk',  label: 'Wykształcenie',    color: '#52b788' },
-  { id: 'staz', label: 'Staż pracy',       color: '#9b8ccc' },
+  { id: 'czas', label: 'Czas bezrobocia', color: '#f3a683', Icon: Clock },
+  { id: 'wiek', label: 'Wiek',             color: '#4895ef', Icon: Users },
+  { id: 'wyk',  label: 'Wykształcenie',    color: '#52b788', Icon: GraduationCap },
+  { id: 'staz', label: 'Staż pracy',       color: '#9b8ccc', Icon: Briefcase },
 ];
 
 /**
  * Słupek z animacją 0% → targetPct%.
- * Działa w flex-container z określoną wysokością.
  */
 function AnimatedBar({ targetPct, color, delay = 0 }) {
   const [pct, setPct] = useState(0);
@@ -41,7 +41,7 @@ function BarChart({ data, color }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
 
-      {/* Słupki — wypełniają dostępną przestrzeń */}
+      {/* Słupki */}
       <div style={{
         flex: 1, display: 'flex', alignItems: 'flex-end',
         gap: '5px', minHeight: 0,
@@ -60,7 +60,6 @@ function BarChart({ data, color }) {
                 height: '100%',
               }}
             >
-              {/* Procent nad słupkiem */}
               <div style={{
                 fontSize: '0.59rem',
                 fontFamily: "'JetBrains Mono', monospace",
@@ -70,15 +69,13 @@ function BarChart({ data, color }) {
               }}>
                 {pct}%
               </div>
-
-              {/* Słupek — wysokość procentowa relative do kontenera */}
               <AnimatedBar targetPct={barPct} color={color} delay={i * 30} />
             </div>
           );
         })}
       </div>
 
-      {/* Etykiety pod słupkami */}
+      {/* Etykiety */}
       <div style={{ display: 'flex', gap: '5px', marginTop: '7px', flexShrink: 0 }}>
         {data.map((d, i) => (
           <div
@@ -101,23 +98,24 @@ function BarChart({ data, color }) {
 export default function StatsSelector({ czasData, wiekData, wykData, stazData }) {
   const [active, setActive] = useState('czas');
 
-  const datasets = { czas: czasData, wiek: wiekData, wyk: wykData, staz: stazData };
-  const activeTab   = TABS.find(t => t.id === active);
+  const datasets   = { czas: czasData, wiek: wiekData, wyk: wykData, staz: stazData };
+  const activeTab  = TABS.find(t => t.id === active);
   const currentData = datasets[active] || [];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
 
-      {/* ── Taby ────────────────────────────────────────────────────── */}
+      {/* ── Taby z ikonami ──────────────────────────────────────────── */}
       <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '12px', flexShrink: 0 }}>
-        {TABS.map(tab => {
-          const isActive = active === tab.id;
+        {TABS.map(({ id, label, Icon }) => {
+          const isActive = active === id;
           return (
             <button
-              key={tab.id}
-              onClick={() => setActive(tab.id)}
+              key={id}
+              onClick={() => setActive(id)}
               style={{
-                padding: '5px 12px', borderRadius: '20px',
+                display: 'flex', alignItems: 'center', gap: '5px',
+                padding: '5px 11px', borderRadius: '20px',
                 fontSize: '0.64rem',
                 fontWeight: isActive ? 700 : 500,
                 color: isActive ? '#ffffff' : '#64748b',
@@ -129,7 +127,8 @@ export default function StatsSelector({ czasData, wiekData, wykData, stazData })
                 letterSpacing: '0.01em', whiteSpace: 'nowrap',
               }}
             >
-              {tab.label}
+              <Icon size={11} strokeWidth={2} />
+              {label}
             </button>
           );
         })}

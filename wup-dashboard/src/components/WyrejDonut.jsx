@@ -1,130 +1,108 @@
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-
-/** Granat / Koral / Złoty / Szary */
-const PALETTE = ['#2c3e50', '#c0392b', '#d4af37', '#94a3b8', '#7c8fa8'];
+import { useEffect, useState } from 'react';
+import { Briefcase, UserX, UserMinus, MoreHorizontal, History } from 'lucide-react';
 
 function fmt(n) {
   if (n == null) return '—';
   return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
 }
 
-function CustomTooltip({ active, payload }) {
-  if (!active || !payload?.length) return null;
-  const d = payload[0].payload;
+const ICON_MAP = [
+  { key: 'kontakt',    Icon: UserX,          color: '#4895ef' },
+  { key: 'podjęcie',   Icon: Briefcase,       color: '#52b788' },
+  { key: 'pracy',      Icon: Briefcase,       color: '#52b788' },
+  { key: 'rezygnacja', Icon: UserMinus,       color: '#e63946' },
+  { key: 'wiek',       Icon: History,         color: '#9b8ccc' },
+  { key: 'emery',      Icon: History,         color: '#9b8ccc' },
+];
+function getMeta(label) {
+  const l = label.toLowerCase();
+  for (const m of ICON_MAP) if (l.includes(m.key)) return m;
+  return { Icon: MoreHorizontal, color: '#f4a261' };
+}
+
+function AnimatedBar({ targetPct, color }) {
+  const [pct, setPct] = useState(0);
+  useEffect(() => {
+    const id = setTimeout(() => requestAnimationFrame(() => setPct(targetPct)), 60);
+    return () => clearTimeout(id);
+  }, [targetPct]);
+
   return (
     <div style={{
-      background: '#ffffff', border: '1.5px solid #2c3e50',
-      borderRadius: '8px', padding: '7px 11px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.10)',
+      height: '8px',
+      background: `${color}1a`,
+      borderRadius: '99px',
+      overflow: 'hidden',
     }}>
-      <div style={{ fontSize: '0.75rem', color: '#475569', marginBottom: '3px', maxWidth: '180px', lineHeight: 1.3 }}>
-        {d.name}
-      </div>
-      <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '1rem', fontWeight: 800, color: d.color }}>
-        {fmt(d.value)}
-        <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#64748b', marginLeft: '5px' }}>
-          ({d.pct.toFixed(1).replace('.', ',')}%)
-        </span>
-      </div>
+      <div style={{
+        height: '100%',
+        width: `${pct}%`,
+        background: color,
+        borderRadius: '99px',
+        transition: 'width 0.65s cubic-bezier(0.4, 0, 0.2, 1)',
+      }} />
     </div>
   );
 }
 
-/**
- * Donut wypełniający całą kartę (grow).
- * Donut: stała szerokość 180px, skaluje się przez aspect-ratio Recharts.
- * Legenda: reszta szerokości, justify-content: space-evenly.
- */
 export default function WyrejDonut({ data = [] }) {
   if (data.length === 0) return null;
 
-  const total = data.reduce((s, d) => s + d.value, 0) || 1;
-
-  const chartData = data.map((d, i) => ({
-    name:  d.label,
-    value: d.value,
-    pct:   d.pct != null ? d.pct : (d.value / total * 100),
-    color: PALETTE[i % PALETTE.length],
-  }));
+  const maxPct = Math.max(...data.map(d => d.pct ?? 0));
 
   return (
-    <div style={{ display: 'flex', gap: '16px', alignItems: 'stretch', flex: 1, minHeight: 0 }}>
+    <div style={{
+      flex: 1, display: 'flex', flexDirection: 'column',
+      justifyContent: 'space-evenly', gap: '8px', minHeight: 0,
+    }}>
+      {data.map((item, i) => {
+        const { Icon, color } = getMeta(item.label);
+        const pct = item.pct ?? 0;
+        const barPct = maxPct ? (pct / maxPct) * 100 : 0;
 
-      {/* ── Donut — stała szerokość, aspect=1 → kwadrat ────────────── */}
-      <div style={{ flexShrink: 0, width: '175px', position: 'relative', alignSelf: 'center' }}>
-        <ResponsiveContainer width="100%" aspect={1}>
-          <PieChart>
-            <Pie
-              data={chartData}
-              cx="50%" cy="50%"
-              innerRadius="44%" outerRadius="70%"
-              paddingAngle={2}
-              dataKey="value"
-              strokeWidth={0}
-            >
-              {chartData.map((entry, i) => (
-                <Cell key={i} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip content={<CustomTooltip />} />
-          </PieChart>
-        </ResponsiveContainer>
+        return (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
 
-        {/* Suma w środku */}
-        <div style={{
-          position: 'absolute', top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)',
-          textAlign: 'center', pointerEvents: 'none',
-        }}>
-          <div style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '1.8rem', fontWeight: 700, color: '#1e293b', lineHeight: 1,
-          }}>
-            {fmt(total)}
-          </div>
-          <div style={{
-            fontSize: '0.6rem', color: '#94a3b8', marginTop: '4px',
-            textTransform: 'uppercase', letterSpacing: '0.1em',
-          }}>
-            wyrej.
-          </div>
-        </div>
-      </div>
-
-      {/* ── Legenda — równomiernie rozłożona ──────────────────────── */}
-      <div style={{
-        flex: 1, display: 'flex', flexDirection: 'column',
-        justifyContent: 'space-evenly', minWidth: 0,
-      }}>
-        {chartData.map((d, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+            {/* Ikona w kółku */}
             <div style={{
-              width: '10px', height: '10px', borderRadius: '2px',
-              background: d.color, flexShrink: 0, marginTop: '3px',
-            }} />
+              width: '32px', height: '32px', borderRadius: '50%',
+              background: `${color}18`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <Icon size={14} color={color} strokeWidth={2} />
+            </div>
+
+            {/* Nazwa + pasek */}
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{
-                fontSize: '0.75rem', color: '#475569', lineHeight: 1.35,
+                fontSize: '0.7rem', color: '#475569',
+                lineHeight: 1.3, marginBottom: '5px',
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}>
-                {d.name}
+                {item.label}
               </div>
+              <AnimatedBar targetPct={barPct} color={color} />
             </div>
-            <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: '8px' }}>
+
+            {/* Liczba + procent */}
+            <div style={{ textAlign: 'right', flexShrink: 0, minWidth: '68px' }}>
               <div style={{
                 fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '0.9rem', fontWeight: 700, color: '#1e293b', lineHeight: 1,
+                fontSize: '0.85rem', fontWeight: 700, color: '#1e293b', lineHeight: 1,
               }}>
-                {fmt(d.value)}
+                {fmt(item.value)}
               </div>
-              <div style={{ fontSize: '0.68rem', color: d.color, fontWeight: 600, marginTop: '1px' }}>
-                {d.pct.toFixed(1).replace('.', ',')}%
+              <div style={{
+                fontSize: '0.62rem', color, fontWeight: 600, marginTop: '2px',
+              }}>
+                {pct.toFixed(1).replace('.', ',')}%
               </div>
             </div>
-          </div>
-        ))}
-      </div>
 
+          </div>
+        );
+      })}
     </div>
   );
 }

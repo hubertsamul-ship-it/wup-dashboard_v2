@@ -48,7 +48,7 @@ const POW_MAP = {
   'm. Warszawa':         'powiat Warszawa',
 };
 
-const SVG_W = 540, SVG_H = 460;
+const SVG_W = 500, SVG_H = 390;
 const MID_LAT_RAD = 52 * Math.PI / 180;
 
 function calcBbox(features) {

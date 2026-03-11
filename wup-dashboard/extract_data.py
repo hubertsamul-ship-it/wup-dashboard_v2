@@ -109,20 +109,20 @@ def load_stopa_xlsx(rok: str, miesiac: str) -> tuple:
     fpath = os.path.join(STOPA_DIR, rok, f'{rok}_{miesiac}.xlsx')
     if not os.path.exists(fpath):
         print(f"  WARN stopa: brak pliku {os.path.relpath(fpath, BASE)}")
-        return {}, None
+        return {}, None, None, {}, None
 
     try:
         import openpyxl
     except ImportError:
         print("  WARN: brak openpyxl — pip install openpyxl")
-        return {}, None
+        return {}, None, None, {}, None
 
     try:
         wb = openpyxl.load_workbook(fpath, read_only=True, data_only=True)
         if 'Tabl.1a' not in wb.sheetnames:
             print(f"  WARN stopa: brak arkusza Tabl.1a w {os.path.basename(fpath)}")
             wb.close()
-            return {}, None
+            return {}, None, None, {}, None
 
         ws = wb['Tabl.1a']
         result    = {}    # {wgm: stopa} dla powiatów mazowieckich
@@ -167,7 +167,7 @@ def load_stopa_xlsx(rok: str, miesiac: str) -> tuple:
 
     except Exception as e:
         print(f"  WARN stopa: błąd czytania {os.path.basename(fpath)}: {e}")
-        return {}, None
+        return {}, None, None, {}, None
 
 
 # ─── Odkrywanie plików DBF ─────────────────────────────────────────────────
@@ -426,7 +426,21 @@ def extract_wynagrodzenia(filename: str) -> dict:
         k = _row(5)
         p_top, p_bot  = _pairs(52, 56)
         z_prac, z_uop = _pairs(61, 65)
-        c_pow,  z_dg  = _pairs(69, 73)
+        _,      z_dg  = _pairs(69, 73)
+
+        # Nowa tabela: TOP 5 ZAWODÓW Z DOMINACJĄ UMÓW CYWILNOPRAWNYCH (R84-90, kol A/B/C)
+        c_pow = []
+        for row in ws3.iter_rows(min_row=84, max_row=90, values_only=True):
+            rank = row[0] if len(row) > 0 else None
+            lbl  = row[1] if len(row) > 1 else None
+            val  = row[2] if len(row) > 2 else None
+            if not isinstance(rank, (int, float)) or lbl is None:
+                continue  # pomiń nagłówek i puste wiersze
+            # Excel przechowuje % jako ułamek dziesiętny (np. 0.8431) → przelicz na 0-100
+            if isinstance(val, float) and 0 < val <= 1.0:
+                val = round(val * 100, 2)
+            c_pow.append({'label': str(lbl).strip(), 'value': val})
+
         result['pracujacy'] = {
             'razem': int(k[2] or 0),
             'pct_uop': k[4], 'n_uop':   int(k[8] or 0),
@@ -559,6 +573,18 @@ def extract_zwolnienia() -> dict:
             wb = openpyxl.load_workbook(fpath, read_only=True, data_only=True)
             ws = wb['dane'] if 'dane' in wb.sheetnames else wb.active
 
+            # Odczytaj właściwy miesiąc (D2) i rok (E2) z nagłówka arkusza
+            for hdr in ws.iter_rows(min_row=2, max_row=2, min_col=4, max_col=5, values_only=True):
+                d2, e2 = hdr[0], hdr[1]
+                if isinstance(d2, (int, float)) and isinstance(e2, (int, float)) \
+                        and 1 <= int(d2) <= 12 and int(e2) >= 2020:
+                    new_key = (int(e2), int(d2))
+                    if new_key != key:
+                        del months_data[key]
+                        key = new_key
+                    months_data[key] = {'zgl': 0, 'wyd': 0, 'fakt': 0, 'mon': 0, 'pkd': {}, 'pkd_fakt': {}}
+                break
+
             for row in ws.iter_rows(min_row=8, values_only=True):
                 if not row or len(row) < 10: continue
 
@@ -572,15 +598,8 @@ def extract_zwolnienia() -> dict:
                 v_wyd  = int(row[8])  if len(row) > 8  and isinstance(row[8],  (int, float)) and row[8]  > 0 else 0
                 v_fakt = int(row[10]) if len(row) > 10 and isinstance(row[10], (int, float)) and row[10] > 0 else 0
                 v_mon  = int(row[11]) if len(row) > 11 and isinstance(row[11], (int, float)) and row[11] > 0 else 0
-                v_date = row[14] if len(row) > 14 else None
 
-                dt = parse_date(v_date)
-
-                # Pomiń wiersze carryforward (data z innego miesiąca)
-                if dt is not None and dt != (rok, mc_int):
-                    continue
-
-                # Zlicz ten wiersz
+                # Zlicz ten wiersz (miesiąc określa nagłówek D2/E2, data z kol. O nie jest używana)
                 months_data[key]['zgl']  += v_zgl
                 months_data[key]['wyd']  += v_wyd
                 months_data[key]['fakt'] += v_fakt
@@ -594,7 +613,7 @@ def extract_zwolnienia() -> dict:
 
             wb.close()
             d = months_data[key]
-            print(f"  zwolnienia {rok}-{mc_int:02d}: zgl={d['zgl']:,}  wyd={d['wyd']:,}  fakt={d['fakt']:,}  mon={d['mon']:,}")
+            print(f"  zwolnienia {key[0]}-{key[1]:02d}: zgl={d['zgl']:,}  wyd={d['wyd']:,}  fakt={d['fakt']:,}  mon={d['mon']:,}")
 
         except Exception as e:
             print(f"  WARN zwolnienia: {os.path.basename(fpath)}: {e}")
@@ -603,7 +622,7 @@ def extract_zwolnienia() -> dict:
         return {}
 
     sorted_keys = sorted(months_data.keys())
-    last_13 = sorted_keys[-13:]
+    last_13 = sorted_keys[-14:]
 
     trend_13m = []
     for (rok, mc) in last_13:
@@ -657,8 +676,8 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
         print("  WARN build_dashboard_final: zbyt mało okresów")
         return {}
 
-    cur = periods[-1]   # '2026-01'
-    prv = periods[-2]   # '2025-12'
+    cur = periods[-1]   # '2026-02' (najnowszy DBF)
+    prv = periods[-2]   # '2026-01'
 
     MIESIACE = ['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru']
 
@@ -678,6 +697,18 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
     def meta(p, field):
         return mrpips_data[p].get('_meta', {}).get(field)
 
+    # ── Fallback stopy: GUS publikuje z opóźnieniem — szukaj ostatniego okresu ze stopą ──
+    stopa_cur_period = next(
+        (p for p in reversed(periods) if meta(p, 'stopa_maz') is not None),
+        prv
+    )
+    stopa_prev_period = next(
+        (p for p in reversed(periods) if p != stopa_cur_period and meta(p, 'stopa_maz') is not None),
+        None
+    )
+    if stopa_cur_period != cur:
+        print(f"  INFO stopa: brak stopy dla {cur}, używam {stopa_cur_period}")
+
     # ── Agregaty bieżący vs poprzedni ───────────────────────────────────────
     bezr_cur   = s(cur, 'bezr_razem')
     bezr_prev  = s(prv, 'bezr_razem')
@@ -687,22 +718,34 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
     zarej_prev = s(prv, 'zarej_razem')
     oferty_cur = s(cur, 'oferty_pracy')
     oferty_prev= s(prv, 'oferty_pracy')
-    stopa_cur  = meta(cur, 'stopa_maz')
-    stopa_prev = meta(prv, 'stopa_maz')
+    stopa_cur  = meta(stopa_cur_period,  'stopa_maz')
+    stopa_prev = meta(stopa_prev_period, 'stopa_maz') if stopa_prev_period else None
 
     stopa_delta = (round(stopa_cur - stopa_prev, 1)
                    if stopa_cur is not None and stopa_prev is not None else None)
 
-    stopa_pl_cur  = meta(cur, 'stopa_pl')
-    stopa_pl_prev = meta(prv, 'stopa_pl')
+    stopa_pl_cur  = meta(stopa_cur_period,  'stopa_pl')
+    stopa_pl_prev = meta(stopa_prev_period, 'stopa_pl') if stopa_prev_period else None
     stopa_pl_delta = (round(stopa_pl_cur - stopa_pl_prev, 1)
                       if stopa_pl_cur is not None and stopa_pl_prev is not None else None)
 
-    bezr_pl_tys_cur  = meta(cur, 'bezr_pl_tys')
-    bezr_pl_tys_prev = meta(prv, 'bezr_pl_tys')
+    bezr_pl_tys_cur  = meta(stopa_cur_period,  'bezr_pl_tys')
+    bezr_pl_tys_prev = meta(stopa_prev_period, 'bezr_pl_tys') if stopa_prev_period else None
     bezr_pl_cur  = round(bezr_pl_tys_cur  * 1000) if bezr_pl_tys_cur  is not None else None
     bezr_pl_prev = round(bezr_pl_tys_prev * 1000) if bezr_pl_tys_prev is not None else None
     bezr_pl_delta = (bezr_pl_cur - bezr_pl_prev) if (bezr_pl_cur is not None and bezr_pl_prev is not None) else None
+
+    # ── Lookup stopy powiatów z okresu ze stopą (fallback dla powiaty/mapy) ──
+    stopa_pow_lookup = {
+        wgm: v.get('stopa')
+        for wgm, v in mrpips_data[stopa_cur_period].items()
+        if wgm != '_meta' and isinstance(v, dict) and v.get('stopa') is not None
+    }
+
+    def get_stopa_pow(wgm):
+        """Stopa dla powiatu — z cur jeśli dostępna, fallback z stopa_cur_period."""
+        v = mrpips_data[cur].get(wgm, {})
+        return v.get('stopa') if v.get('stopa') is not None else stopa_pow_lookup.get(wgm)
 
     # ── Kategorie bezrobotnych ───────────────────────────────────────────────
     def kategoria(label, field):
@@ -755,8 +798,8 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
 
     # ── Rankingi powiatów (stopa) ────────────────────────────────────────────
     pow_with_stopa = [
-        {'wgm': v['wgm'], 'nazwa': v['nazwa'], 'stopa': v['stopa']}
-        for v in pow_cur if v.get('stopa') is not None
+        {'wgm': v['wgm'], 'nazwa': v['nazwa'], 'stopa': get_stopa_pow(v['wgm'])}
+        for v in pow_cur if get_stopa_pow(v['wgm']) is not None
     ]
     pow_sorted = sorted(pow_with_stopa, key=lambda x: x['stopa'], reverse=True)
 
@@ -804,7 +847,7 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
         '26': 'Świętokrzyskie','28': 'Warmińsko-maz.',
         '30': 'Wielkopolskie', '32': 'Zachodniopom.',
     }
-    woj_stopy_cur = dict(meta(cur, 'woj_stopy') or {})
+    woj_stopy_cur = dict(meta(stopa_cur_period, 'woj_stopy') or {})
     woj_stopy_cur['14'] = stopa_cur   # Mazowieckie z agregatu GUS
     woj_stopa_list = sorted(
         [{'n': WOJ_NAMES[k], 's': v}
@@ -816,13 +859,13 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
     # ── Mapa Mazowsza ────────────────────────────────────────────────────────
     mapa_maz = [
         {'wgm': v['wgm'], 'nazwa': v['nazwa'],
-         'stopa': v.get('stopa'), 'bezr_razem': v.get('bezr_razem')}
+         'stopa': get_stopa_pow(v['wgm']), 'bezr_razem': v.get('bezr_razem')}
         for v in pow_cur
     ]
 
     # ── Powiaty lista z trendem 13 mies. + pełne dane na wzór Bezrobotni ────
     def normalize_name(s):
-        return s.lower().replace('m. ', '').replace('m.st. ', '').replace('.', '').strip()
+        return s.lower().replace('m. ', '').replace('m.st. ', '').replace('powiat ', '').replace('.', '').strip()
 
     wynagr_pow_lookup = {}
     for pw in wynagr_data.get('powiaty', []):
@@ -854,7 +897,7 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
             'wgm':   wgm,
             'nazwa': nazwa,
             # KPI
-            'stopa':           v.get('stopa'),
+            'stopa':           get_stopa_pow(wgm),
             'bezr_razem':      v.get('bezr_razem'),
             'bezr_kobiety':    v.get('bezr_kobiety'),
             'zarej_razem':     v.get('zarej_razem'),

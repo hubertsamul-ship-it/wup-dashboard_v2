@@ -146,13 +146,14 @@ export default function MapPoland() {
             Ładowanie mapy…
           </text>
         )}
-        {paths.map((p, i) => (
+        {/* non-Mazowieckie first, then Mazowieckie on top for clean stroke */}
+        {[...paths.filter(p => !p.isMaz), ...paths.filter(p => p.isMaz)].map((p, i) => (
           <path
             key={i}
             d={p.d}
             fill={p.stopa !== null ? mazostColor(p.stopa, minS, maxS) : '#eef0f3'}
-            stroke={p.isMaz ? '#2c3e50' : 'white'}
-            strokeWidth={p.isMaz ? 1.5 : 0.5}
+            stroke={p.isMaz ? '#4895ef' : 'rgba(255,255,255,0.85)'}
+            strokeWidth={p.isMaz ? 3 : 0.5}
             opacity={1}
             style={{ cursor: 'pointer', transition: 'opacity 0.12s' }}
             onMouseEnter={e => {
@@ -172,7 +173,10 @@ export default function MapPoland() {
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         marginTop: '6px', padding: '0 4px',
       }}>
-        <div style={{ fontSize: '0.65rem', color: 'var(--muted)' }}>Najazd = szczegóły · Mazowieckie = granatowa obwódka</div>
+        <div style={{ fontSize: '0.65rem', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '2px', border: '2.5px solid #4895ef', flexShrink: 0 }} />
+          Mazowieckie · najazd = szczegóły
+        </div>
         <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
           <div style={{ width: '60px', height: '5px', borderRadius: '3px', background: 'linear-gradient(to right, #fdf2f0, #f3a683, #2c3e50)' }} />
           <span style={{ fontSize: '0.62rem', color: 'var(--muted)' }}>{minS.toFixed(1).replace('.', ',')}% — {maxS.toFixed(1).replace('.', ',')}%</span>

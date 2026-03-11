@@ -2,7 +2,7 @@
   "name": "wup-mazowsze",
   "private": true,
   "scripts": {
-    "dev:backend":  "python -m uvicorn backend.api.main:app --reload --port 8000",
+    "dev:backend":  "C:/Users/HSamul/AppData/Local/Python/bin/python.exe -m uvicorn backend.api.main:app --reload --port 8000",
     "dev:frontend": "cd wup-dashboard && npm run dev",
     "dev":          "concurrently -n backend,frontend -c cyan,magenta \"npm run dev:backend\" \"npm run dev:frontend\"",
     "build:vercel": "cd wup-dashboard && npm install && npm run build",

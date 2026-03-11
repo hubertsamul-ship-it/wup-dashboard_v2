@@ -11,7 +11,7 @@ const NAV = [
   { id: 'stopa',         Icon: TrendingDown,    label: 'Stopa bezrobocia',  section: null },
   { id: 'pracujacy',     Icon: Briefcase,       label: 'Pracujący',         section: null },
   { id: 'wynagrodzenia', Icon: Wallet,          label: 'Wynagrodzenia',     section: null },
-  { id: 'zwolnienia',    Icon: FileBarChart,    label: 'Raporty',           section: null },
+  { id: 'zwolnienia',    Icon: FileBarChart,    label: 'Zwolnienia',        section: null },
   { id: 'powiaty',       Icon: Map,             label: 'Powiaty',           section: 'Analityka' },
 ];
 
@@ -61,7 +61,7 @@ export default function Sidebar({ active, onNav, collapsed, onToggle }) {
               style={{ width: '224px', maxHeight: '66px', objectFit: 'contain', marginBottom: '8px' }}
             />
             <div style={{
-              fontSize: '0.62rem', color: 'var(--muted)', textAlign: 'center',
+              fontSize: 'var(--font-xs)', color: 'var(--muted)', textAlign: 'center',
               lineHeight: 1.55, letterSpacing: '0.07em',
             }}>
               Wojewódzki Urząd Pracy<br />w Warszawie
@@ -76,7 +76,7 @@ export default function Sidebar({ active, onNav, collapsed, onToggle }) {
           <React.Fragment key={item.id}>
             {item.section && !collapsed && (
               <div style={{
-                fontSize: '0.54rem', fontWeight: 700, letterSpacing: '0.18em',
+                fontSize: 'var(--font-xs)', fontWeight: 700, letterSpacing: '0.18em',
                 textTransform: 'uppercase', color: 'var(--muted2)',
                 margin: `${i === 0 ? '0' : '12px'} 6px 5px`,
               }}>
@@ -108,7 +108,7 @@ export default function Sidebar({ active, onNav, collapsed, onToggle }) {
               width: '100%', padding: '7px',
               background: 'var(--bg3)',
               border: '1px solid var(--border)', borderRadius: '8px',
-              color: 'var(--muted)', fontSize: '0.7rem', fontWeight: 500,
+              color: 'var(--muted)', fontSize: 'var(--font-sm)', fontWeight: 500,
               cursor: 'pointer', fontFamily: 'Outfit, sans-serif',
               transition: 'all 0.2s',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
@@ -118,7 +118,7 @@ export default function Sidebar({ active, onNav, collapsed, onToggle }) {
             </button>
             <div style={{ marginTop: '7px', display: 'flex', flexDirection: 'column', gap: '3px' }}>
               {['Osoby bezrobotne · Sty 2026', 'Stopa bezrobocia · Sty 2026', 'Raporty · Gru 2025'].map(s => (
-                <div key={s} style={{ fontSize: '0.6rem', color: 'var(--muted2)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div key={s} style={{ fontSize: 'var(--font-xs)', color: 'var(--muted2)', display: 'flex', alignItems: 'center', gap: '5px' }}>
                   <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'var(--green)', flexShrink: 0, display: 'inline-block' }} />
                   {s}
                 </div>

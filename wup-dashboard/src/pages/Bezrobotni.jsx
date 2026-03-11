@@ -1,10 +1,28 @@
+import { useRef, useState, useEffect } from 'react';
 import { Home, Clock, GraduationCap, Heart, Users, Shield } from 'lucide-react';
+import GenderFigure from '../components/GenderFigures';
 import KpiCard from '../components/KpiCard';
 import Card, { SectionHeader } from '../components/Card';
 import LineChartSVG from '../components/LineChartSVG';
 import WyrejDonut from '../components/WyrejDonut';
 import StatsSelector from '../components/StatsSelector';
 import { useAppData } from '../context/DataContext';
+
+// Hook mierzący rozmiar kontenera — chart wypełnia dostępną przestrzeń
+function useContainerSize(defaultW = 560, defaultH = 200) {
+  const ref = useRef(null);
+  const [size, setSize] = useState({ w: defaultW, h: defaultH });
+  useEffect(() => {
+    if (!ref.current) return;
+    const ro = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      setSize({ w: Math.round(width), h: Math.round(height) });
+    });
+    ro.observe(ref.current);
+    return () => ro.disconnect();
+  }, []);
+  return [ref, size];
+}
 
 const CZAS_LABELS = ['do 1 mies.', '1–3 mies.', '3–6 mies.', '6–12 mies.', '12–24 mies.', 'pow. 24 mies.'];
 const WIEK_LABELS = ['18–24 lat', '25–34 lat', '35–44 lat', '45–54 lat', '55–59 lat', '60+ lat'];
@@ -25,128 +43,7 @@ function dtType(d) {
   return d >= 0 ? 'up' : 'dn';
 }
 
-// ── SVG Sylwetki — bardziej realistyczne ─────────────────────────────────────
-
-function FemaleSvg({ color, size = 80 }) {
-  const h = Math.round(size * 130 / 60);
-  return (
-    <svg viewBox="0 0 60 130" width={size} height={h} fill={color} style={{ display: 'block' }}>
-      {/* Kok / włosy */}
-      <ellipse cx="30" cy="8" rx="10" ry="7" />
-      {/* Głowa */}
-      <ellipse cx="30" cy="20" rx="12" ry="13" />
-      {/* Szyja */}
-      <rect x="26.5" y="32" width="7" height="6" rx="2" />
-      {/* Górna część ciała — talia */}
-      <path d="M 17,38 C 12,44 13,52 15,56 L 45,56 C 47,52 48,44 43,38 C 38,33 22,33 17,38 Z" />
-      {/* Sukienka / spódnica — trapez */}
-      <path d="M 15,56 C 8,71 4,104 3,123 L 57,123 C 56,104 52,71 45,56 Z" />
-      {/* Lewa ręka */}
-      <path d="M 17,42 C 11,54 9,65 10,74" fill="none" stroke={color} strokeWidth="8" strokeLinecap="round" />
-      {/* Prawa ręka */}
-      <path d="M 43,42 C 49,54 51,65 50,74" fill="none" stroke={color} strokeWidth="8" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function MaleSvg({ color, size = 80 }) {
-  const h = Math.round(size * 130 / 60);
-  return (
-    <svg viewBox="0 0 60 130" width={size} height={h} fill={color} style={{ display: 'block' }}>
-      {/* Głowa */}
-      <ellipse cx="30" cy="14" rx="13" ry="13" />
-      {/* Szyja */}
-      <rect x="26.5" y="26" width="7" height="6" rx="2" />
-      {/* Tors — szerokie ramiona */}
-      <path d="M 9,32 C 7,42 8,57 9,65 L 51,65 C 52,57 53,42 51,32 C 44,27 16,27 9,32 Z" />
-      {/* Lewa noga */}
-      <path d="M 9,65 L 10,123 L 28,123 L 30,65 Z" />
-      {/* Prawa noga */}
-      <path d="M 30,65 L 32,123 L 50,123 L 51,65 Z" />
-      {/* Lewa ręka */}
-      <path d="M 9,36 C 4,51 3,65 4,77" fill="none" stroke={color} strokeWidth="9" strokeLinecap="round" />
-      {/* Prawa ręka */}
-      <path d="M 51,36 C 56,51 57,65 56,77" fill="none" stroke={color} strokeWidth="9" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-// ── GenderTile — pionowy, sylwetka jako tło ───────────────────────────────────
-function GenderTile({ label, n, total, color, isFemale }) {
-  const pct  = total ? (n / total * 100) : 0;
-  const pctStr = pct.toFixed(1).replace('.', ',');
-  const r    = 24;
-  const circ = 2 * Math.PI * r;
-  const dash = (pct / 100) * circ;
-
-  return (
-    <div style={{
-      position: 'relative',
-      display: 'flex', flexDirection: 'column',
-      justifyContent: 'space-between',
-      padding: '10px',
-      background: `${color}0e`, borderRadius: '12px',
-      border: `1.5px solid ${color}28`,
-      overflow: 'hidden', flex: 1,
-    }}>
-      {/* Sylwetka — dekoracyjne tło */}
-      <div style={{
-        position: 'absolute', right: '-4px', bottom: '-8px',
-        opacity: 0.13, pointerEvents: 'none', userSelect: 'none',
-      }}>
-        {isFemale
-          ? <FemaleSvg color={color} size={96} />
-          : <MaleSvg   color={color} size={88} />
-        }
-      </div>
-
-      {/* Etykieta */}
-      <div style={{
-        fontSize: '0.6rem', textTransform: 'uppercase',
-        letterSpacing: '0.14em', color: `${color}cc`, fontWeight: 800,
-        lineHeight: 1, zIndex: 1,
-      }}>
-        {label}
-      </div>
-
-      {/* Liczba */}
-      <div style={{
-        fontFamily: "'JetBrains Mono', monospace",
-        fontSize: '1.55rem', fontWeight: 900,
-        color, lineHeight: 1, letterSpacing: '-0.03em', zIndex: 1,
-      }}>
-        {fmt(n)}
-        <span style={{ fontSize: '0.55rem', fontWeight: 600, color: '#94a3b8', marginLeft: '4px' }}>os.</span>
-      </div>
-
-      {/* Kółko procentowe */}
-      <div style={{ position: 'relative', zIndex: 1, alignSelf: 'flex-start' }}>
-        <svg viewBox="0 0 60 60" width="58" height="58" style={{ display: 'block' }}>
-          <circle cx="30" cy="30" r={r} fill="none" stroke={`${color}22`} strokeWidth="5.5" />
-          <circle
-            cx="30" cy="30" r={r}
-            fill="none" stroke={color} strokeWidth="5.5"
-            strokeDasharray={`${dash.toFixed(2)} ${circ.toFixed(2)}`}
-            strokeLinecap="round"
-            transform="rotate(-90 30 30)"
-          />
-        </svg>
-        <div style={{
-          position: 'absolute', top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)',
-          textAlign: 'center',
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: '0.72rem', fontWeight: 800, color, lineHeight: 1.1,
-          whiteSpace: 'nowrap', zIndex: 1,
-        }}>
-          {pctStr}<span style={{ fontSize: '0.5rem' }}>%</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Pasek kategorii ───────────────────────────────────────────────────────────
+// ── Kategorie — ikony ────────────────────────────────────────────────────────
 const CAT_MAP = [
   { key: 'wsi',           Icon: Home,          color: '#16a34a' },
   { key: 'ługotrwale',    Icon: Clock,         color: '#d97706' },
@@ -161,26 +58,27 @@ function getCatMeta(label) {
   for (const m of CAT_MAP) if (l.includes(m.key.toLowerCase())) return m;
   return { Icon: Users, color: '#64748b' };
 }
+
 function CategoryRow({ item }) {
   const { Icon, color } = getCatMeta(item.label);
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: '8px',
-      padding: '7px 10px', flex: 1,
+      padding: '5px 8px', flex: 1, minHeight: 0,
       background: `${color}08`, borderRadius: '8px',
       outline: `1px solid ${color}18`,
     }}>
       <div style={{
-        width: '26px', height: '26px', borderRadius: '6px',
+        width: '24px', height: '24px', borderRadius: '6px',
         background: `${color}18`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         flexShrink: 0,
       }}>
-        <Icon size={12} color={color} strokeWidth={1.8} />
+        <Icon size={11} color={color} strokeWidth={1.8} />
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
-          fontSize: '0.66rem', color: '#475569', lineHeight: 1.3,
+          fontSize: '0.62rem', color: '#475569', lineHeight: 1.3,
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {item.label}
@@ -189,11 +87,11 @@ function CategoryRow({ item }) {
       <div style={{ textAlign: 'right', flexShrink: 0 }}>
         <div style={{
           fontFamily: "'JetBrains Mono', monospace",
-          fontSize: '0.84rem', fontWeight: 700, color: '#1e293b', lineHeight: 1,
+          fontSize: '0.8rem', fontWeight: 700, color: '#1e293b', lineHeight: 1.2,
         }}>
           {fmt(item.value)}
         </div>
-        <div style={{ fontSize: '0.58rem', color, fontWeight: 600 }}>
+        <div style={{ fontSize: 'var(--font-xs)', color, fontWeight: 600 }}>
           {item.pct?.toFixed(1).replace('.', ',')}%
         </div>
       </div>
@@ -204,6 +102,7 @@ function CategoryRow({ item }) {
 // ── Główna strona ─────────────────────────────────────────────────────────────
 export default function Bezrobotni() {
   const { bezrobotni, loading } = useAppData();
+  const [chartRef, chartSize] = useContainerSize();
 
   if (!bezrobotni) return null;
 
@@ -225,7 +124,8 @@ export default function Bezrobotni() {
   const wykData  = wyk.map((n, i)  => ({ label: WYK_LABELS[i],  value: n }));
   const stazData = staz.map((n, i) => ({ label: STAZ_LABELS[i], value: n }));
 
-  const top3Kat = [...kategorie].sort((a, b) => b.n - a.n).slice(0, 2)
+  // Wszystkie kategorie, posortowane malejąco
+  const allKat = [...kategorie].sort((a, b) => b.n - a.n)
     .map(k => ({ label: k.label, value: k.n, pct: k.pct }));
 
   const trendLabels = trend_13m.map(t => t.label);
@@ -234,19 +134,16 @@ export default function Bezrobotni() {
   const wyrejTop5   = wyrej_reasons.slice(0, 5);
   const total       = kobiety + mezczyzni;
 
-  /* Kolory płci — teal dla kobiet, niebieski dla mężczyzn */
-  const COLOR_F = '#29b6a8';
-  const COLOR_M = '#4895ef';
+  const COLOR_F = '#29b6a8';  // teal — kobiety
+  const COLOR_M = '#4895ef';  // niebieski — mężczyźni
 
   return (
-    /* Outer: 100vh - TopBar/padding, flex column, brak gap — marginBottomy spójne 10px */
     <div style={{
       height: 'calc(100vh - 90px)',
       display: 'flex', flexDirection: 'column',
       overflow: 'hidden',
     }}>
 
-      {/* Nagłówek (ma własny marginBottom: 10px z Card.jsx) */}
       <SectionHeader
         title="Bezrobotni"
         sub="MRPiPS-01 · rejestrowane bezrobocie · województwo mazowieckie"
@@ -281,39 +178,44 @@ export default function Bezrobotni() {
         />
       </div>
 
-      {/* ── Wiersz 2: Kategorie | Charakterystyka ───────────────────── */}
+      {/* ── Wiersz 2: Płeć (1/4) | Kategorie (3/8) | Charakterystyka (3/8) ── */}
       <div style={{
-        display: 'grid', gridTemplateColumns: '1fr 1fr',
+        display: 'grid', gridTemplateColumns: '1fr 1.5fr 1.5fr',
         gap: '10px', flex: 1, minHeight: 0, marginBottom: '10px',
       }}>
 
-        {/* LEWA: sylwetki płci + 3 kategorie */}
-        <Card title="Kategorie bezrobotnych · Sty 2026" grow>
-          {/* flex: 1 fill — grow wrapper jest teraz flex column */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-
-            {/* Kafle płci — 58% wysokości */}
+        {/* PŁEĆ */}
+        <Card title="Płeć · Sty 2026" grow>
+          <div style={{
+            flex: 1, display: 'flex', flexDirection: 'row',
+            minHeight: 0,
+          }}>
+            <GenderFigure
+              label="Kobiety" n={kobiety} total={total}
+              color={COLOR_F} isFemale
+            />
             <div style={{
-              display: 'grid', gridTemplateColumns: '1fr 1fr',
-              gap: '8px', flex: '0 0 58%', minHeight: 0,
-              /* grid stretch → GenderTile.flex:1 działa */
-              alignItems: 'stretch',
-            }}>
-              <GenderTile label="Kobiety"   n={kobiety}   total={total} color={COLOR_F} isFemale />
-              <GenderTile label="Mężczyźni" n={mezczyzni} total={total} color={COLOR_M} isFemale={false} />
-            </div>
-
-            {/* Kategorie — reszta wysokości, równomierne rozłożenie */}
-            <div style={{
-              flex: 1, display: 'flex', flexDirection: 'column',
-              gap: '6px', minHeight: 0,
-            }}>
-              {top3Kat.map((item, i) => <CategoryRow key={i} item={item} />)}
-            </div>
+              width: '1px', background: 'rgba(0,0,0,0.06)',
+              margin: '4px 0', flexShrink: 0,
+            }} />
+            <GenderFigure
+              label="Mężczyźni" n={mezczyzni} total={total}
+              color={COLOR_M} isFemale={false}
+            />
           </div>
         </Card>
 
-        {/* PRAWA: zakładki charakterystyki */}
+        {/* KATEGORIE */}
+        <Card title="Kategorie bezrobotnych · Sty 2026" grow>
+          <div style={{
+            flex: 1, display: 'flex', flexDirection: 'column',
+            gap: '6px', minHeight: 0,
+          }}>
+            {allKat.map((item, i) => <CategoryRow key={i} item={item} />)}
+          </div>
+        </Card>
+
+        {/* CHARAKTERYSTYKA */}
         <Card title="Charakterystyka bezrobotnych" grow>
           <StatsSelector
             czasData={czasData} wiekData={wiekData}
@@ -330,15 +232,15 @@ export default function Bezrobotni() {
       }}>
 
         <Card title="Napływ i odpływ bezrobotnych — ostatnie 13 miesięcy" grow>
-          {/* flex: 1 → chart fills card, height prop ~90% of container */}
-          <div style={{ flex: 1, minHeight: 0 }}>
+          <div ref={chartRef} style={{ flex: 1, minHeight: 0 }}>
             <LineChartSVG
               datasets={[
                 { data: trendZarej, color: '#e63946', label: 'Zarejestrowani' },
                 { data: trendWyrej, color: '#4895ef', label: 'Wyrejestrowani' },
               ]}
               labels={trendLabels}
-              height={160}
+              height={Math.max(chartSize.h - 4, 100)}
+              width={chartSize.w}
             />
           </div>
         </Card>

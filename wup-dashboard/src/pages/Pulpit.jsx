@@ -28,9 +28,11 @@ export default function Pulpit({ onNavPowiaty }) {
 
   if (!pulpit) return null;
 
-  const trendLabels   = pulpit.trend_37m.map(t => t.label);
-  const trendBezrData = [{ data: pulpit.trend_37m.map(t => t.bezr),  color: '#e63946' }];
-  const trendStopaData= [{ data: pulpit.trend_37m.map(t => t.stopa), color: '#4895ef' }];
+  // Ukryj miesiące bez stopy (np. luty 2026, gdy brak danych GUS)
+  const trendValid    = pulpit.trend_37m.filter(t => t.stopa != null);
+  const trendLabels   = trendValid.map(t => t.label);
+  const trendBezrData = [{ data: trendValid.map(t => t.bezr),  color: '#e63946' }];
+  const trendStopaData= [{ data: trendValid.map(t => t.stopa), color: '#4895ef' }];
   const trendData     = trendMode === 'bezr' ? trendBezrData : trendStopaData;
 
   const bezrDelta  = pulpit.bezr_delta;
@@ -73,7 +75,7 @@ export default function Pulpit({ onNavPowiaty }) {
         />
       </Grid>
 
-      <Grid cols={2} style={{ gridTemplateColumns: '1fr 1.1fr' }}>
+      <Grid cols={2} style={{ gridTemplateColumns: '1fr 1fr' }}>
         <Card title="Stopa bezrobocia — Polska" badge="Sty 2026" badgeLive>
           <MapPoland />
         </Card>
