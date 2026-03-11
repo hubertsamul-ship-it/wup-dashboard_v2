@@ -16,7 +16,8 @@ venv/
 # Dane surowe (duże pliki DBF/xlsx)
 dane/
 wup-dashboard/dane/
-wup-dashboard/public/data/
+wup-dashboard/public/data/mrpips_data.json
+wup-dashboard/public/data/wynagr_data.json
 
 # OS
 .DS_Store
