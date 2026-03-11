@@ -1,0 +1,6 @@
+api/
+backend/
+requirements.txt
+dane/
+wup-dashboard/dane/
+tests/
