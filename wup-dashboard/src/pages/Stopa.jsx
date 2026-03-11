@@ -116,9 +116,25 @@ function WojSelector({ selected, onChange, options = [] }) {
 
 // ── Strona ─────────────────────────────────────────────────────────────────
 
+const MONTHS_NOM = [
+  'styczeń','luty','marzec','kwiecień','maj','czerwiec',
+  'lipiec','sierpień','wrzesień','październik','listopad','grudzień',
+];
+function miesiacNom(s) {
+  if (!s) return 'poprzedni';
+  const m = parseInt(s.split('-')[1], 10);
+  return MONTHS_NOM[m - 1] ?? 'poprzedni';
+}
+function fmtDeltaStopa(d, prevOkres) {
+  if (d == null || isNaN(d)) return null;
+  const abs = Math.abs(d).toFixed(1).replace('.', ',');
+  const label = miesiacNom(prevOkres);
+  return d >= 0 ? `↑ +${abs} pp vs. ${label}` : `↓ −${abs} pp vs. ${label}`;
+}
+
 export default function Stopa() {
   const [selWojs, setSelWojs] = useState(['Mazowieckie']);
-  const { stopa } = useAppData();
+  const { stopa, meta } = useAppData();
 
   if (!stopa) return null;
 
@@ -129,7 +145,8 @@ export default function Stopa() {
     trend_pl_13m = [],  // [{label, stopa}] 13 miesięcy Polska — GUS BDL
   } = stopa;
 
-  const stopa_pl_val = stopa.stopa_pl ?? 5.4;
+  const stopa_pl_val   = stopa.stopa_pl ?? 5.4;
+  const stopaLabel     = miesiacNom(meta?.stopa_poprzedni_okres);
 
   // Rankingi województw (woj_stopa posortowane desc z JSON)
   const WOJ_TOP5 = woj_stopa.slice(0, 5).map(d => ({ label: d.n, value: d.s }));
@@ -175,11 +192,15 @@ export default function Stopa() {
           flag="Polska" flagColor="pl"
           target={Math.round(stopa_pl_val * 10)} decimals={1} suffix="%"
           label="Ogółem kraj"
+          delta={fmtDeltaStopa(stopa.stopa_pl_delta, meta?.stopa_poprzedni_okres)}
+          deltaType={stopa.stopa_pl_delta != null ? (stopa.stopa_pl_delta >= 0 ? 'up' : 'dn') : 'eq'}
         />
         <KpiCard
           flag="Mazowieckie" flagColor="maz"
           target={Math.round(stopa.stopa_maz * 10)} decimals={1} suffix="%"
           label="Najniższa w PL"
+          delta={fmtDeltaStopa(stopa.stopa_maz_delta, meta?.stopa_poprzedni_okres)}
+          deltaType={stopa.stopa_maz_delta != null ? (stopa.stopa_maz_delta >= 0 ? 'up' : 'dn') : 'eq'}
           variant="green"
         />
         <KpiCard

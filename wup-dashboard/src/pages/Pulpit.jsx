@@ -81,7 +81,7 @@ export default function Pulpit({ onNavPowiaty }) {
         <KpiCard
           flag="Polska" flagColor="pl"
           target={pulpit.bezr_pl} label="Bezrobotnych ogółem"
-          delta={formatDelta(pulpit.bezr_pl_delta, meta?.poprzedni_okres)}
+          delta={formatDelta(pulpit.bezr_pl_delta, meta?.stopa_poprzedni_okres)}
           deltaType={pulpit.bezr_pl_delta != null ? (pulpit.bezr_pl_delta >= 0 ? 'up' : 'dn') : 'eq'}
         />
         <KpiCard

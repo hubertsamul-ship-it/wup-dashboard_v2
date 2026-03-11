@@ -880,7 +880,8 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
         trend_s = [mrpips_data[p].get(wgm, {}).get('stopa') for p in last_13]
         trend_z = [mrpips_data[p].get(wgm, {}).get('zarej_razem') for p in last_13]
         trend_w = [mrpips_data[p].get(wgm, {}).get('wyrej_razem') for p in last_13]
-        v = mrpips_data[cur].get(wgm, {})
+        v     = mrpips_data[cur].get(wgm, {})
+        v_prv = mrpips_data.get(prv, {}).get(wgm, {})
         bezr = v.get('bezr_razem') or 0
         wyrej = v.get('wyrej_razem') or 0
         wyn = find_wyn(nazwa)
@@ -930,6 +931,11 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
                 wr_r('Wiek/prawa emery.',      'wyrej_wiek_emet'),
                 wr_r('Inne przyczyny',         'wyrej_inne'),
             ], key=lambda x: x['n'], reverse=True),
+            # Deltas vs poprzedni miesiąc (MRPiPS)
+            'bezr_delta':   (v.get('bezr_razem')  or 0) - (v_prv.get('bezr_razem')  or 0),
+            'zarej_delta':  (v.get('zarej_razem') or 0) - (v_prv.get('zarej_razem') or 0),
+            'wyrej_delta':  (v.get('wyrej_razem') or 0) - (v_prv.get('wyrej_razem') or 0),
+            'oferty_delta': (v.get('oferty_pracy') or 0) - (v_prv.get('oferty_pracy') or 0),
             # Trendy 13 mies.
             'trend_stopa_13m': trend_s,
             'trend_zarej_13m': trend_z,

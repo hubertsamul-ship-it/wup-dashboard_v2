@@ -174,9 +174,31 @@ function PowiatSelector({ selected, onChange, allPowiaty, max = 6 }) {
   );
 }
 
+const MONTHS_NOM = [
+  'styczeń','luty','marzec','kwiecień','maj','czerwiec',
+  'lipiec','sierpień','wrzesień','październik','listopad','grudzień',
+];
+const MONTHS_ABBR = ['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru'];
+
+function miesiacNom(s) {
+  if (!s) return 'poprzedni';
+  const m = parseInt(s.split('-')[1], 10);
+  return MONTHS_NOM[m - 1] ?? 'poprzedni';
+}
+function formatOkresAbbr(s) {
+  if (!s) return '';
+  const [y, m] = s.split('-').map(Number);
+  return `${MONTHS_ABBR[m - 1]} ${y}`;
+}
+function fmtDelta(d, label = 'poprzedni') {
+  if (d == null || isNaN(d)) return null;
+  const abs = Math.abs(d).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+  return d >= 0 ? `↑ +${abs} vs. ${label}` : `↓ −${abs} vs. ${label}`;
+}
+
 // ── Główna strona ─────────────────────────────────────────────────────────────
 export default function Powiaty({ initialPowiat = null }) {
-  const { powiaty, stopa } = useAppData();
+  const { powiaty, stopa, meta } = useAppData();
   const [chartRef, chartSize] = useContainerSize();
 
   const options = (powiaty || [])
@@ -199,6 +221,9 @@ export default function Powiaty({ initialPowiat = null }) {
 
   const bezr  = d.bezr_razem || 0;
   const wyrej = d.wyrej_razem || 0;
+
+  const prevLabel  = miesiacNom(meta?.poprzedni_okres);
+  const okresAbbr  = formatOkresAbbr(meta?.okres);
 
   // Charakterystyka
   const czasData = (d.d5_czas || []).map((n, i) => ({ label: CZAS_LABELS[i], value: n }));
@@ -242,7 +267,7 @@ export default function Powiaty({ initialPowiat = null }) {
     <div className="page-scroll">
       <SectionHeader
         title="Analiza powiatowa"
-        sub="MRPiPS-01 · ZUS · województwo mazowieckie · Styczeń 2026"
+        sub={`MRPiPS-01 · ZUS · województwo mazowieckie · ${okresAbbr}`}
       />
 
       {/* Selector powiatu */}
@@ -278,10 +303,26 @@ export default function Powiaty({ initialPowiat = null }) {
         display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)',
         gap: '10px', flexShrink: 0, marginBottom: '10px',
       }}>
-        <KpiCard compact flag="Stan końcowy"            flagColor="maz"   target={bezr}                    label="Zarejestrowanych" />
-        <KpiCard compact flag="Zarejestrowani"          flagColor="pl"    target={d.zarej_razem || 0}      label="w miesiącu" />
-        <KpiCard compact flag="Wyrejestrowani"          flagColor="green" target={wyrej}                   label="w miesiącu"        variant="green" />
-        <KpiCard compact flag="Oferty pracy"            flagColor="green" target={d.oferty_pracy || 0}     label="wolne miejsca"     variant="green" />
+        <KpiCard compact flag="Stan końcowy"            flagColor="maz"
+          target={bezr}               label="Zarejestrowanych"
+          delta={fmtDelta(d.bezr_delta,   prevLabel)}
+          deltaType={d.bezr_delta != null ? (d.bezr_delta >= 0 ? 'up' : 'dn') : 'eq'}
+        />
+        <KpiCard compact flag="Zarejestrowani"          flagColor="pl"
+          target={d.zarej_razem || 0} label="w miesiącu"
+          delta={fmtDelta(d.zarej_delta,  prevLabel)}
+          deltaType={d.zarej_delta != null ? (d.zarej_delta >= 0 ? 'up' : 'dn') : 'eq'}
+        />
+        <KpiCard compact flag="Wyrejestrowani"          flagColor="green"
+          target={wyrej}              label="w miesiącu"   variant="green"
+          delta={fmtDelta(d.wyrej_delta,  prevLabel)}
+          deltaType={d.wyrej_delta != null ? (d.wyrej_delta >= 0 ? 'up' : 'dn') : 'eq'}
+        />
+        <KpiCard compact flag="Oferty pracy"            flagColor="green"
+          target={d.oferty_pracy || 0} label="wolne miejsca" variant="green"
+          delta={fmtDelta(d.oferty_delta, prevLabel)}
+          deltaType={d.oferty_delta != null ? (d.oferty_delta >= 0 ? 'up' : 'dn') : 'eq'}
+        />
         <KpiCard compact flag="Pracujący ogółem"        flagColor="green" target={d.wyn_pracujacy || 0}    label="ZUS · I poł. 2025" variant="green" />
         <KpiCard compact flag="Śr. wynagrodzenie (UoP)" flagColor="green" target={Math.round(d.wyn_brutto || 0)} suffix=" zł" label="ZUS · I poł. 2025" variant="green" />
       </div>
