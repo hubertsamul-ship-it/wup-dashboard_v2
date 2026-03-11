@@ -4,7 +4,7 @@
     {
       "src": "wup-dashboard/package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "wup-dashboard/dist" }
+      "config": { "distDir": "dist" }
     },
     {
       "src": "api/index.py",
