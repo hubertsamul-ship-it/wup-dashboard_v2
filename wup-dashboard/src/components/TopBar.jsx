@@ -1,3 +1,5 @@
+import { useAppData } from '../context/DataContext';
+
 const TITLES = {
   pulpit:       'Przegląd — rynek pracy',
   bezrobotni:   'Osoby bezrobotne — MRPiPS-01',
@@ -8,7 +10,28 @@ const TITLES = {
   powiaty:      'Analityka powiatowa',
 };
 
+const MONTHS_FULL = [
+  'Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec',
+  'Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień',
+];
+
+function formatOkres(s) {
+  if (!s) return '';
+  const [y, m] = s.split('-').map(Number);
+  return `${MONTHS_FULL[m - 1]} ${y}`;
+}
+
+function getPagePeriod(page, meta) {
+  if (!meta) return '';
+  if (page === 'stopa') return formatOkres(meta.stopa_okres);
+  if (page === 'pracujacy' || page === 'wynagrodzenia') return 'I półrocze 2025';
+  return formatOkres(meta.okres);
+}
+
 export default function TopBar({ page }) {
+  const { meta } = useAppData();
+  const period = getPagePeriod(page, meta);
+
   return (
     <div style={{
       height: '52px',
@@ -28,7 +51,7 @@ export default function TopBar({ page }) {
           fontSize: 'var(--font-xs)', color: 'var(--muted)',
           fontFamily: "'JetBrains Mono', monospace",
         }}>
-          Styczeń 2026
+          {period}
         </div>
         <div style={{
           background: 'rgba(22,163,74,0.10)',

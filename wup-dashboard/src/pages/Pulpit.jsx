@@ -6,25 +6,53 @@ import MapPoland from '../components/MapPoland';
 import MapMazowieckie from '../components/MapMazowieckie';
 import { useAppData } from '../context/DataContext';
 
+const MONTHS_FULL = [
+  'Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec',
+  'Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień',
+];
+const MONTHS_NOM = [
+  'styczeń','luty','marzec','kwiecień','maj','czerwiec',
+  'lipiec','sierpień','wrzesień','październik','listopad','grudzień',
+];
+const MONTHS_ABBR = ['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru'];
+
+function formatOkres(s) {
+  if (!s) return '';
+  const [y, m] = s.split('-').map(Number);
+  return `${MONTHS_FULL[m - 1]} ${y}`;
+}
+function formatOkresAbbr(s) {
+  if (!s) return '';
+  const [y, m] = s.split('-').map(Number);
+  return `${MONTHS_ABBR[m - 1]} ${y}`;
+}
+function miesiacNom(s) {
+  if (!s) return 'poprzedni';
+  const m = parseInt(s.split('-')[1], 10);
+  return MONTHS_NOM[m - 1] ?? 'poprzedni';
+}
+
 function fmtLiczba(n) {
   return Math.abs(Math.round(n))
     .toString()
     .replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
 }
-function formatDelta(n) {
+function formatDelta(n, prevOkres) {
   if (n == null || isNaN(n)) return '…';
   const abs = fmtLiczba(n);
-  return n >= 0 ? `↑ +${abs} vs. grudzień` : `↓ −${abs} vs. grudzień`;
+  const label = miesiacNom(prevOkres);
+  return n >= 0 ? `↑ +${abs} vs. ${label}` : `↓ −${abs} vs. ${label}`;
 }
-function formatDeltaStopa(n) {
+function formatDeltaStopa(n, prevOkres) {
   if (n == null || isNaN(n)) return '…';
   const abs = Math.abs(n).toFixed(1).replace('.', ',');
-  return n >= 0 ? `↑ +${abs} pp vs. grudzień` : `↓ −${abs} pp vs. grudzień`;
+  const label = miesiacNom(prevOkres);
+  return n >= 0 ? `↑ +${abs} pp vs. ${label}` : `↓ −${abs} pp vs. ${label}`;
 }
 
 export default function Pulpit({ onNavPowiaty }) {
   const [trendMode, setTrendMode] = useState('bezr');
-  const { pulpit, loading } = useAppData();
+  const { pulpit, meta, loading } = useAppData();
 
   if (!pulpit) return null;
 
@@ -38,24 +66,28 @@ export default function Pulpit({ onNavPowiaty }) {
   const bezrDelta  = pulpit.bezr_delta;
   const stopaDelta = pulpit.stopa_maz_delta;
 
+  // Etykiety okresu z meta
+  const stopaOkresAbbr = formatOkresAbbr(meta?.stopa_okres);
+  const mrpipsOkres    = formatOkres(meta?.okres);
+
   return (
     <div className="page-scroll">
       <SectionHeader
         title="Rynek pracy w liczbach"
-        sub="Najświeższe dane · Polska i Województwo Mazowieckie · Styczeń 2026"
+        sub={`Najświeższe dane · Polska i Województwo Mazowieckie · ${mrpipsOkres}`}
       />
 
       <Grid cols={4}>
         <KpiCard
           flag="Polska" flagColor="pl"
           target={pulpit.bezr_pl} label="Bezrobotnych ogółem"
-          delta={formatDelta(pulpit.bezr_pl_delta)}
+          delta={formatDelta(pulpit.bezr_pl_delta, meta?.poprzedni_okres)}
           deltaType={pulpit.bezr_pl_delta != null ? (pulpit.bezr_pl_delta >= 0 ? 'up' : 'dn') : 'eq'}
         />
         <KpiCard
           flag="Mazowieckie" flagColor="maz"
           target={loading ? 0 : pulpit.bezr_razem} label="Bezrobotnych w województwie"
-          delta={loading ? '…' : formatDelta(bezrDelta)}
+          delta={loading ? '…' : formatDelta(bezrDelta, meta?.poprzedni_okres)}
           deltaType={bezrDelta != null ? (bezrDelta >= 0 ? 'up' : 'dn') : 'eq'}
           variant="red"
         />
@@ -63,23 +95,24 @@ export default function Pulpit({ onNavPowiaty }) {
           flag="Polska · GUS" flagColor="pl"
           target={Math.round(pulpit.stopa_pl * 10)} decimals={1} suffix="%"
           label="Stopa bezrobocia Polska"
-          delta="↑ +0,3 pp vs. grudzień" deltaType="up"
+          delta={formatDeltaStopa(pulpit.stopa_pl_delta, meta?.stopa_poprzedni_okres)}
+          deltaType={pulpit.stopa_pl_delta != null ? (pulpit.stopa_pl_delta >= 0 ? 'up' : 'dn') : 'eq'}
         />
         <KpiCard
           flag="Mazowieckie · GUS" flagColor="maz"
           target={loading ? 0 : Math.round((pulpit.stopa_maz ?? 4.5) * 10)} decimals={1} suffix="%"
           label="Stopa bezrobocia woj."
-          delta={loading ? '…' : formatDeltaStopa(stopaDelta)}
+          delta={loading ? '…' : formatDeltaStopa(stopaDelta, meta?.stopa_poprzedni_okres)}
           deltaType={stopaDelta != null ? (stopaDelta >= 0 ? 'up' : 'dn') : 'eq'}
           variant="green"
         />
       </Grid>
 
       <Grid cols={2} style={{ gridTemplateColumns: '1fr 1fr' }}>
-        <Card title="Stopa bezrobocia — Polska" badge="Sty 2026" badgeLive>
+        <Card title="Stopa bezrobocia — Polska" badge={stopaOkresAbbr} badgeLive>
           <MapPoland />
         </Card>
-        <Card title="Stopa bezrobocia — powiaty mazowieckie" badge="Sty 2026" badgeLive>
+        <Card title="Stopa bezrobocia — powiaty mazowieckie" badge={stopaOkresAbbr} badgeLive>
           <MapMazowieckie onPowiatClick={onNavPowiaty} />
         </Card>
       </Grid>

@@ -48,6 +48,7 @@ export function DataProvider({ children }) {
   }, [retryKey]);
 
   const value = {
+    meta:              data?.meta              ?? null,
     pulpit:            data?.pulpit            ?? null,
     bezrobotni:        data?.bezrobotni        ?? null,
     stopa:             data?.stopa             ?? null,

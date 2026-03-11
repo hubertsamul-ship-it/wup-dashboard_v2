@@ -950,9 +950,11 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
 
     return {
         'meta': {
-            'okres':            cur,
-            'poprzedni_okres':  prv,
-            'data_aktualizacji': data_akt,
+            'okres':                  cur,
+            'poprzedni_okres':        prv,
+            'stopa_okres':            stopa_cur_period,
+            'stopa_poprzedni_okres':  stopa_prev_period,
+            'data_aktualizacji':      data_akt,
         },
         'pulpit': {
             'bezr_razem':      bezr_cur,
@@ -960,6 +962,7 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
             'stopa_maz':       stopa_cur,
             'stopa_maz_delta': stopa_delta,
             'stopa_pl':        stopa_pl_cur if stopa_pl_cur is not None else 5.4,
+            'stopa_pl_delta':  stopa_pl_delta,
             'bezr_pl':         bezr_pl_cur,
             'bezr_pl_delta':   bezr_pl_delta,
             'trend_37m':       trend_37m,

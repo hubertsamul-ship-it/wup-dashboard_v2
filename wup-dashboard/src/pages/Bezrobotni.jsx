@@ -33,7 +33,24 @@ const STAZ_LABELS = ['do 1 roku', '1–5 lat', '5–10 lat', '10–20 lat', '20�
 function fmt(n) {
   return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
 }
-function fmtDelta(d, label = 'grudzień') {
+const MONTHS_NOM = [
+  'styczeń','luty','marzec','kwiecień','maj','czerwiec',
+  'lipiec','sierpień','wrzesień','październik','listopad','grudzień',
+];
+const MONTHS_ABBR = ['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru'];
+
+function miesiacNom(s) {
+  if (!s) return 'poprzedni';
+  const m = parseInt(s.split('-')[1], 10);
+  return MONTHS_NOM[m - 1] ?? 'poprzedni';
+}
+function formatOkresAbbr(s) {
+  if (!s) return '';
+  const [y, m] = s.split('-').map(Number);
+  return `${MONTHS_ABBR[m - 1]} ${y}`;
+}
+
+function fmtDelta(d, label = 'poprzedni') {
   if (d == null || isNaN(d)) return '…';
   const abs = Math.abs(d).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
   return d >= 0 ? `↑ +${abs} vs. ${label}` : `↓ −${abs} vs. ${label}`;
@@ -101,10 +118,13 @@ function CategoryRow({ item }) {
 
 // ── Główna strona ─────────────────────────────────────────────────────────────
 export default function Bezrobotni() {
-  const { bezrobotni, loading } = useAppData();
+  const { bezrobotni, meta, loading } = useAppData();
   const [chartRef, chartSize] = useContainerSize();
 
   if (!bezrobotni) return null;
+
+  const prevLabel    = miesiacNom(meta?.poprzedni_okres);
+  const okresAbbr    = formatOkresAbbr(meta?.okres);
 
   const {
     bezr_razem, bezr_delta,
@@ -157,23 +177,23 @@ export default function Bezrobotni() {
         <KpiCard
           flag="Stan końcowy" flagColor="maz"
           target={loading ? 0 : bezr_razem} label="Zarejestrowanych"
-          delta={loading ? '…' : fmtDelta(bezr_delta)} deltaType={dtType(bezr_delta)}
+          delta={loading ? '…' : fmtDelta(bezr_delta, prevLabel)} deltaType={dtType(bezr_delta)}
         />
         <KpiCard
           flag="Wyrejestrowani" flagColor="green"
           target={loading ? 0 : wyrej_razem} label="w miesiącu"
-          delta={loading ? '…' : fmtDelta(wyrej_delta)} deltaType={dtType(wyrej_delta)}
+          delta={loading ? '…' : fmtDelta(wyrej_delta, prevLabel)} deltaType={dtType(wyrej_delta)}
           variant="green"
         />
         <KpiCard
           flag="Zarejestrowani" flagColor="pl"
           target={loading ? 0 : zarej_razem} label="w miesiącu"
-          delta={loading ? '…' : fmtDelta(zarej_delta)} deltaType={dtType(zarej_delta)}
+          delta={loading ? '…' : fmtDelta(zarej_delta, prevLabel)} deltaType={dtType(zarej_delta)}
         />
         <KpiCard
           flag="Oferty pracy" flagColor="green"
           target={loading ? 0 : oferty_razem} label="w województwie"
-          delta={loading ? '…' : fmtDelta(oferty_delta)} deltaType={dtType(oferty_delta)}
+          delta={loading ? '…' : fmtDelta(oferty_delta, prevLabel)} deltaType={dtType(oferty_delta)}
           variant="green"
         />
       </div>
@@ -185,7 +205,7 @@ export default function Bezrobotni() {
       }}>
 
         {/* PŁEĆ */}
-        <Card title="Płeć · Sty 2026" grow>
+        <Card title={`Płeć · ${okresAbbr}`} grow>
           <div style={{
             flex: 1, display: 'flex', flexDirection: 'row',
             minHeight: 0,
@@ -206,7 +226,7 @@ export default function Bezrobotni() {
         </Card>
 
         {/* KATEGORIE */}
-        <Card title="Kategorie bezrobotnych · Sty 2026" grow>
+        <Card title={`Kategorie bezrobotnych · ${okresAbbr}`} grow>
           <div style={{
             flex: 1, display: 'flex', flexDirection: 'column',
             gap: '6px', minHeight: 0,
@@ -245,7 +265,7 @@ export default function Bezrobotni() {
           </div>
         </Card>
 
-        <Card title="Przyczyny wyrejestrowania · Sty 2026" grow>
+        <Card title={`Przyczyny wyrejestrowania · ${okresAbbr}`} grow>
           <WyrejDonut
             data={wyrejTop5.map(r => ({ label: r.label, value: r.n, pct: r.pct }))}
           />

@@ -2,6 +2,8 @@
   "meta": {
     "okres": "2026-02",
     "poprzedni_okres": "2026-01",
+    "stopa_okres": "2026-01",
+    "stopa_poprzedni_okres": "2025-12",
     "data_aktualizacji": "2026-02-28"
   },
   "pulpit": {
@@ -10,6 +12,7 @@
     "stopa_maz": 4.5,
     "stopa_maz_delta": 0.2,
     "stopa_pl": 6.0,
+    "stopa_pl_delta": 0.3,
     "bezr_pl": 934100,
     "bezr_pl_delta": 46200,
     "trend_37m": [
@@ -9960,7 +9963,7 @@
         "label": "Wrz 25",
         "zgl": 212,
         "wyd": 0,
-        "fakt": 1411,
+        "fakt": 1414,
         "mon": 0
       },
       {
