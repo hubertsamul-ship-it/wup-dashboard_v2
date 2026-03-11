@@ -32,7 +32,7 @@ export function DataProvider({ children }) {
 
     async function fetchSummary() {
       try {
-        const res = await fetch('/api/summary', { signal: controller.signal });
+        const res = await fetch('/data/dashboard_final.json', { signal: controller.signal });
         if (!res.ok) throw new Error(`Serwer zwrócił błąd ${res.status}`);
         const d = await res.json();
         setData(d);
