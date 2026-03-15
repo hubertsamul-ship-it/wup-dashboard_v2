@@ -1,6 +1,6 @@
 import {
   ChefHat, Salad, Briefcase, Users, Building2, Code, Terminal,
-  Scissors, Flower2, Sparkles, Shovel, Hammer,
+  Scissors, Flower, Flower2, Sparkles, Shovel, Hammer,
   Truck, ShoppingCart, Stethoscope, GraduationCap, Wrench,
   HardHat, Utensils, Landmark, Shield, Factory,
 } from 'lucide-react';
@@ -20,7 +20,7 @@ const ZAWOD_MAP = [
   { keys: ['informatyk', 'it ', 'ict', 'systemy inf'],         Icon: Terminal,      color: '#22d3ee' },
   { keys: ['fryzjer', 'fryzjers'],                             Icon: Scissors,      color: '#f472b6' },
   { keys: ['kamieniarz', 'kamieniar'],                         Icon: Hammer,        color: '#78716c' },
-  { keys: ['florist', 'florysta', 'kwiac'],                    Icon: Flower2,       color: '#4ade80' },
+  { keys: ['florist', 'florysta', 'kwiac'],                    Icon: Flower2,       color: '#f472b6' },
   { keys: ['niekonwencjonaln', 'terapii', 'alternatyw', 'bioenergoterapeut', 'naturoterap'], Icon: Sparkles, color: '#a78bfa' },
   { keys: ['brukarz', 'brukar', 'chodnikarz'],                 Icon: Shovel,        color: '#d97706' },
   // Ogólne kategorie jako fallback
@@ -39,8 +39,16 @@ const ZAWOD_MAP = [
 function getZawodIcon(label) {
   const l = label.toLowerCase();
   for (const m of ZAWOD_MAP) {
-    if (m.keys.some(k => l.includes(k)))
+    if (m.keys.some(k => l.includes(k))) {
+      // floryści — dwa kwiatki
+      if (m.Icon === Flower2) return (
+        <span style={{ display: 'inline-flex', gap: '1px' }}>
+          <Flower2 size={11} color="#f472b6" strokeWidth={2} />
+          <Flower  size={10} color="#fb7185" strokeWidth={2} />
+        </span>
+      );
       return <m.Icon size={12} color={m.color} strokeWidth={2} />;
+    }
   }
   return <Briefcase size={12} color="#94a3b8" strokeWidth={2} />;
 }
