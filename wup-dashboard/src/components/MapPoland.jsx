@@ -64,7 +64,7 @@ function geoToPath(geometry, project) {
 }
 
 const CHOROPLETH_COLORS = [
-  '#30123b', '#466be3', '#28bceb', '#32f298', '#a4fc3c', '#eecf3a', '#fb7e21',
+  '#caf0f8', '#90e0ef', '#48cae4', '#00b4d8', '#0077b6', '#023e8a', '#03045e',
 ];
 
 function jenksBreaks(values, k = 7) {
