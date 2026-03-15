@@ -134,7 +134,7 @@ function fmtDeltaStopa(d, prevOkres) {
 
 export default function Stopa() {
   const [selWojs, setSelWojs] = useState(['Mazowieckie']);
-  const { stopa, meta } = useAppData();
+  const { stopa, meta, pulpit } = useAppData();
 
   if (!stopa) return null;
 
@@ -159,26 +159,28 @@ export default function Stopa() {
     ...woj_stopa.filter(w => w.n !== 'Mazowieckie').sort((a, b) => a.n.localeCompare(b.n, 'pl')),
   ];
 
+  const trend37 = useMemo(() =>
+    (pulpit?.trend_37m || []).filter(t => t.stopa != null),
+    [pulpit]
+  );
+  const trend37Labels = trend37.map(t => t.label);
+  const maz37Stopa    = trend37.map(t => t.stopa);
+
   const trendDatasets = useMemo(() => {
-    const polskaTrend = trend_pl_13m.map(t => t.stopa);
     function genWojTrend(currentStopa) {
       const scale = currentStopa / (stopa_pl_val || 5.4);
-      return polskaTrend.map(v => Math.round(v * scale * 10) / 10);
+      return maz37Stopa.map(v => Math.round(v * scale * 10) / 10);
     }
     return selWojs.map((woj, i) => ({
       color: CHART_COLORS[i % CHART_COLORS.length],
       label: woj,
       data: woj === 'Mazowieckie'
-        ? trend_maz_13m.map(t => t.stopa)
-        : woj === 'Polska'
-          ? polskaTrend
-          : genWojTrend(woj_stopa.find(w => w.n === woj)?.s ?? stopa_pl_val),
+        ? maz37Stopa
+        : genWojTrend(woj_stopa.find(w => w.n === woj)?.s ?? stopa_pl_val),
     }));
-  }, [selWojs, trend_maz_13m, trend_pl_13m, woj_stopa, stopa_pl_val]);
+  }, [selWojs, maz37Stopa, woj_stopa, stopa_pl_val]);
 
-  const trendLabels = selWojs.includes('Mazowieckie')
-    ? trend_maz_13m.map(t => t.label)
-    : trend_pl_13m.map(t => t.label);
+  const trendLabels = trend37Labels;
 
   return (
     <div className="page-enter">
@@ -238,11 +240,11 @@ export default function Stopa() {
       </Grid>
 
       {/* Trend z wyborem do 3 województw */}
-      <Card title="Trend stopy bezrobocia 2025–2026" grow>
+      <Card title="Trend stopy bezrobocia 2023–2026" grow>
         <div style={{ marginBottom: '8px' }}>
           <WojSelector selected={selWojs} onChange={setSelWojs} options={WOJ_OPTIONS} />
         </div>
-        <LineChartSVG datasets={trendDatasets} labels={trendLabels} height={110} width={760} />
+        <LineChartSVG datasets={trendDatasets} labels={trendLabels} height={180} width={900} />
       </Card>
     </div>
   );

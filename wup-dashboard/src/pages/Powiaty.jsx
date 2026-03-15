@@ -430,7 +430,7 @@ export default function Powiaty({ initialPowiat = null }) {
           />
         </div>
         <div style={{ overflow: 'hidden' }}>
-          <LineChartSVG datasets={stopaDatasets} labels={trendLabels.slice(-SHOW_N)} height={130} width={900} />
+          <LineChartSVG datasets={stopaDatasets} labels={trendLabels} height={180} width={900} />
         </div>
       </Card>
 
