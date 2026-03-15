@@ -41,25 +41,17 @@ export default function Sidebar({ active, onNav, collapsed, onToggle }) {
 
       {/* Brand / Logo */}
       <div style={{
-        padding: collapsed ? '12px 0' : '20px 16px 16px',
+        padding: collapsed ? '10px 0' : '12px 16px',
         borderBottom: '1px solid var(--border)',
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
-        minHeight: '82px', flexShrink: 0,
+        minHeight: '56px', flexShrink: 0,
         transition: 'padding 0.22s ease',
       }}>
         {collapsed ? (
-          <LogoIcon size={36} />
+          <LogoIcon size={32} />
         ) : (
-          <>
-            <LogoFull width={210} />
-            <div style={{
-              fontSize: 'var(--font-xs)', color: 'var(--muted)', textAlign: 'center',
-              lineHeight: 1.55, letterSpacing: '0.07em', marginTop: '10px',
-            }}>
-              Wojewódzki Urząd Pracy<br />w Warszawie
-            </div>
-          </>
+          <LogoFull width={130} />
         )}
       </div>
 
