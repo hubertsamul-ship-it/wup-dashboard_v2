@@ -6,7 +6,6 @@ import Card, { SectionHeader } from '../components/Card';
 import LineChartSVG from '../components/LineChartSVG';
 import WyrejDonut from '../components/WyrejDonut';
 import StatsSelector from '../components/StatsSelector';
-import GenderFigure from '../components/GenderFigures';
 import { useAppData } from '../context/DataContext';
 
 // Hook mierzący rozmiar kontenera — chart wypełnia dostępną przestrzeń
@@ -51,6 +50,12 @@ function formatOkresAbbr(s) {
   return `${MONTHS_ABBR[m - 1]} ${y}`;
 }
 
+function formatDeltaStopa(n, prevOkres) {
+  if (n == null || isNaN(n)) return null;
+  const abs = Math.abs(n).toFixed(1).replace('.', ',');
+  const label = miesiacNom(prevOkres);
+  return n >= 0 ? `↑ +${abs} pp vs. ${label}` : `↓ −${abs} pp vs. ${label}`;
+}
 function fmtDelta(d, label = 'poprzedni') {
   if (d == null || isNaN(d)) return '…';
   const abs = Math.abs(d).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
