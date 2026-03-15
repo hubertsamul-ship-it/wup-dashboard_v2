@@ -366,7 +366,7 @@ export default function Powiaty({ initialPowiat = null }) {
       }}>
 
         <Card title="Napływ i odpływ — ostatnie 13 miesięcy" grow>
-          <div ref={chartRef} style={{ flex: 1, minHeight: 0 }}>
+          <div ref={chartRef} style={{ height: '240px' }}>
             {trendZarej.some(v => v != null) && (
               <LineChartSVG
                 datasets={[

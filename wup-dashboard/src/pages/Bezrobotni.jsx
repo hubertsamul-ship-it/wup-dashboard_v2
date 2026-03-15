@@ -159,9 +159,7 @@ export default function Bezrobotni() {
 
   return (
     <div style={{
-      height: 'calc(100vh - 90px)',
       display: 'flex', flexDirection: 'column',
-      overflow: 'hidden',
     }}>
 
       <SectionHeader
@@ -201,14 +199,13 @@ export default function Bezrobotni() {
       {/* ── Wiersz 2: Płeć (1/4) | Kategorie (3/8) | Charakterystyka (3/8) ── */}
       <div style={{
         display: 'grid', gridTemplateColumns: '1fr 1.5fr 1.5fr',
-        gap: '10px', flex: 1, minHeight: 0, marginBottom: '10px',
+        gap: '10px', marginBottom: '10px',
       }}>
 
         {/* PŁEĆ */}
         <Card title={`Płeć · ${okresAbbr}`} grow>
           <div style={{
-            flex: 1, display: 'flex', flexDirection: 'row',
-            minHeight: 0,
+            display: 'flex', flexDirection: 'row',
           }}>
             <GenderFigure
               label="Kobiety" n={kobiety} total={total}
@@ -228,8 +225,8 @@ export default function Bezrobotni() {
         {/* KATEGORIE */}
         <Card title={`Kategorie bezrobotnych · ${okresAbbr}`} grow>
           <div style={{
-            flex: 1, display: 'flex', flexDirection: 'column',
-            gap: '6px', minHeight: 0,
+            display: 'flex', flexDirection: 'column',
+            gap: '6px',
           }}>
             {allKat.map((item, i) => <CategoryRow key={i} item={item} />)}
           </div>
@@ -248,11 +245,11 @@ export default function Bezrobotni() {
       {/* ── Wiersz 3: Napływ/Odpływ | Przyczyny ────────────────────── */}
       <div style={{
         display: 'grid', gridTemplateColumns: '1fr 1fr',
-        gap: '10px', flex: 1, minHeight: 0,
+        gap: '10px', marginBottom: '10px',
       }}>
 
         <Card title="Napływ i odpływ bezrobotnych — ostatnie 13 miesięcy" grow>
-          <div ref={chartRef} style={{ flex: 1, minHeight: 0 }}>
+          <div ref={chartRef} style={{ height: '200px' }}>
             <LineChartSVG
               datasets={[
                 { data: trendZarej, color: '#e63946', label: 'Zarejestrowani' },

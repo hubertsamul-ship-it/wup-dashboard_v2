@@ -12,7 +12,7 @@ export default function Card({ title, badge, badgeLive, children, style: extraSt
         padding: '12px 14px',
         boxShadow: 'var(--card-shadow)',
         transition: 'border-color 0.2s, box-shadow 0.2s',
-        ...(grow ? { display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' } : {}),
+        ...(grow ? { display: 'flex', flexDirection: 'column' } : {}),
         ...extraStyle,
       }}
       onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.14)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.09)'; }}
@@ -41,10 +41,7 @@ export default function Card({ title, badge, badgeLive, children, style: extraSt
           )}
         </div>
       )}
-      {grow
-        ? <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>{children}</div>
-        : children
-      }
+      {children}
     </div>
   );
 }
@@ -72,7 +69,7 @@ export function Grid({ cols = 2, children, style: extraStyle = {}, grow = false 
       gridTemplateColumns: `repeat(${cols}, 1fr)`,
       gap: '8px',
       marginBottom: grow ? 0 : '8px',
-      ...(grow ? { flex: 1, minHeight: 0, alignItems: 'stretch' } : {}),
+      ...(grow ? { alignItems: 'stretch' } : {}),
       ...extraStyle,
     }}>
       {children}

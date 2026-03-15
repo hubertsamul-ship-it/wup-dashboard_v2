@@ -43,13 +43,11 @@ body {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-/* Każda strona = flex column wypełniający dostępną wysokość */
+/* Każda strona = flex column */
 .page-enter {
   animation: fadeIn 0.3s ease;
-  height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 /* Strony z przewijaniem (Powiaty) — bez ograniczenia wysokości */
