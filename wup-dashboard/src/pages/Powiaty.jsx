@@ -5,13 +5,10 @@ import Card, { SectionHeader, Grid } from '../components/Card';
 import LineChartSVG from '../components/LineChartSVG';
 import WyrejDonut from '../components/WyrejDonut';
 import StatsSelector from '../components/StatsSelector';
-import GenderFigure from '../components/GenderFigures';
 import { useAppData } from '../context/DataContext';
 
 const POW_COLORS = ['#e63946', '#4895ef', '#f4a261', '#52b788', '#a78bfa', '#fbbf24'];
 
-const COLOR_F = '#29b6a8';
-const COLOR_M = '#4895ef';
 
 const CZAS_LABELS = ['do 1 mies.', '1–3 mies.', '3–6 mies.', '6–12 mies.', '12–24 mies.', 'pow. 24 mies.'];
 const WIEK_LABELS = ['18–24 lat', '25–34 lat', '35–44 lat', '45–54 lat', '55–59 lat', '60+ lat'];
@@ -266,6 +263,19 @@ export default function Powiaty({ initialPowiat = null }) {
   const trendWyrej = d.trend_wyrej_13m || [];
   const wyrejTop5  = (d.wyrej_reasons || []).slice(0, 5);
 
+  // Stopa bezrobocia powiatu + delta vs poprzedni miesiąc
+  const stopaArr   = (d.trend_stopa_13m || []).filter(v => v != null);
+  const stopaCur   = d.stopa ?? null;
+  const stopaPrev  = stopaArr.length >= 2 ? stopaArr[stopaArr.length - 2] : null;
+  const stopaDelta = (stopaCur != null && stopaPrev != null)
+    ? +(stopaCur - stopaPrev).toFixed(1) : null;
+  const stopaDeltaType = stopaDelta == null ? 'eq' : stopaDelta >= 0 ? 'up' : 'dn';
+  const stopaDeltaStr  = stopaDelta == null ? null
+    : stopaDelta >= 0
+      ? `↑ +${Math.abs(stopaDelta).toFixed(1).replace('.', ',')} pp vs. ${prevLabel}`
+      : `↓ −${Math.abs(stopaDelta).toFixed(1).replace('.', ',')} pp vs. ${prevLabel}`;
+  const stopaOkresAbbr = formatOkresAbbr(meta?.stopa_okres);
+
   return (
     <div className="page-scroll">
       <SectionHeader
@@ -330,20 +340,28 @@ export default function Powiaty({ initialPowiat = null }) {
         <KpiCard compact flag="Śr. wynagrodzenie (UoP)" flagColor="green" target={Math.round(d.wyn_brutto || 0)} suffix=" zł" label="ZUS · I poł. 2025" variant="green" />
       </div>
 
-      {/* ── Wiersz 2: Płeć (1/4) | Kategorie (3/8) | Charakterystyka (3/8) ──── */}
+      {/* ── Wiersz 2: Stopa (1/4) | Kategorie (3/8) | Charakterystyka (3/8) ──── */}
       <div style={{
         display: 'grid', gridTemplateColumns: '1fr 1.5fr 1.5fr',
-        gap: '10px', height: '280px', marginBottom: '10px',
+        gap: '10px', minHeight: '280px', marginBottom: '10px',
       }}>
 
-        {/* PŁEĆ */}
-        <Card title={`Płeć · ${d.nazwa || ''}`} grow>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'row', minHeight: 0 }}>
-            <GenderFigure label="Kobiety"   n={kobiety}   total={total} color={COLOR_F} isFemale />
-            <div style={{ width: '1px', background: 'rgba(0,0,0,0.06)', margin: '4px 0', flexShrink: 0 }} />
-            <GenderFigure label="Mężczyźni" n={mezczyzni} total={total} color={COLOR_M} isFemale={false} />
-          </div>
-        </Card>
+        {/* STOPA + KOBIETY/MĘŻCZYŹNI */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <KpiCard
+            flag={stopaOkresAbbr || 'Stopa bezrobocia'} flagColor="maz"
+            target={Math.round((stopaCur || 0) * 10)} decimals={1} suffix="%"
+            label={`stopa bezrobocia · ${d.nazwa || ''}`}
+            delta={stopaDeltaStr} deltaType={stopaDeltaType}
+            variant={stopaDelta != null && stopaDelta > 0 ? 'red' : 'green'}
+          />
+          <KpiCard
+            flag="Struktura płci" flagColor="pl"
+            target={kobiety} suffix=""
+            label={`kobiety · ${mezczyzni > 0 ? ((kobiety / total * 100).toFixed(0) + '% K / ' + (mezczyzni / total * 100).toFixed(0) + '% M') : '—'}`}
+            delta={null}
+          />
+        </div>
 
         {/* KATEGORIE */}
         <Card title={`Kategorie bezrobotnych · ${d.nazwa || ''}`} grow>
@@ -365,7 +383,7 @@ export default function Powiaty({ initialPowiat = null }) {
       {/* ── Wiersz 3: Napływ/Odpływ | Przyczyny ─────────────────────────────── */}
       <div style={{
         display: 'grid', gridTemplateColumns: '1fr 1fr',
-        gap: '10px', height: '290px', marginBottom: '10px',
+        gap: '10px', minHeight: '290px', marginBottom: '10px',
       }}>
 
         <Card title="Napływ i odpływ — ostatnie 13 miesięcy" grow>
