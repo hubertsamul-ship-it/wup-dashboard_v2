@@ -189,8 +189,13 @@ export default function Zwolnienia() {
   const faktData = trend12.map(t => t.fakt);
   const monData  = trend12.map(t => t.mon);
 
-  // Selektor miesiąca dla PKD — domyślnie ostatni dostępny miesiąc
-  const pkdMonth = pkdMiesiac ?? tLabels[tLabels.length - 1] ?? '';
+  // Selektor miesiąca dla PKD — domyślnie Sty 25 (pierwszy z pkd_monthly)
+  const pkdMonthlyKeys = pkd_monthly ? Object.keys(pkd_monthly) : [];
+  const pkdSelectorLabels = [
+    ...pkdMonthlyKeys,
+    ...tLabels.filter(l => !pkdMonthlyKeys.includes(l)),
+  ];
+  const pkdMonth = pkdMiesiac ?? pkdMonthlyKeys[0] ?? tLabels[0] ?? '';
 
   // Dane PKD: jeśli są dane miesięczne — filtruj po wybranym miesiącu,
   // w przeciwnym razie pokaż agregat roczny
@@ -290,7 +295,7 @@ export default function Zwolnienia() {
             backgroundPosition: 'right 8px center',
           }}
         >
-          {tLabels.map(l => (
+          {pkdSelectorLabels.map(l => (
             <option key={l} value={l}
               style={{ background: 'var(--card-bg)', color: 'var(--text)' }}
             >{l}</option>

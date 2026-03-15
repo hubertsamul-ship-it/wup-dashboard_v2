@@ -26,7 +26,7 @@ export default function LineChartSVG({
 
   const W = width, H = height;
   const hasLabels = showLegend && datasets.some(d => d.label);
-  const pad = { t: hasLabels ? 34 : 16, b: 32, l: 52, r: 16 };
+  const pad = { t: hasLabels ? 38 : 16, b: 32, l: 52, r: 16 };
   const iW = W - pad.l - pad.r;
   const iH = H - pad.t - pad.b;
 
@@ -205,21 +205,23 @@ export default function LineChartSVG({
         );
       })}
 
-      {/* Legend — top right */}
+      {/* Legend — top left */}
       {hasLabels && (() => {
-        const totalW = datasets.reduce((acc, ds) => acc + (ds.label?.length ?? 0) * 6.5 + 22, 0);
-        let curX = W - pad.r - totalW;
+        let curX = pad.l;
         return datasets.map((ds, di) => {
           const col = ds.color || '#4895ef';
           const lbl = ds.label || '';
           const x = curX;
-          curX += lbl.length * 6.5 + 22;
+          const charW = 7.2;
+          curX += lbl.length * charW + 30;
           return (
             <g key={di}>
-              <circle cx={x + 5} cy={8} r="4.5" fill={col} opacity="0.9" />
+              {/* Linia legendy */}
+              <line x1={x} y1={12} x2={x + 14} y2={12} stroke={col} strokeWidth="2.5" strokeLinecap="round" />
+              <circle cx={x + 7} cy={12} r="3" fill={col} />
               <text
-                x={x + 14} y={12}
-                fontSize="9.5" fill="#64748b"
+                x={x + 19} y={16}
+                fontSize="11" fill="#334155"
                 fontFamily="Outfit, sans-serif"
                 fontWeight="600"
               >
