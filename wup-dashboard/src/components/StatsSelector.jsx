@@ -103,7 +103,7 @@ function BarChart({ data, color }) {
             }}
           >
             <span style={{
-              fontSize: '0.63rem', color: '#e2e8f0',
+              fontSize: '0.63rem', color: '#334155',
               fontWeight: 700,
               wordBreak: 'break-word', hyphens: 'auto',
             }}>

@@ -50,7 +50,7 @@ export default function WyrejDonut({ data = [] }) {
             }}>
               {/* Nazwa */}
               <span style={{
-                fontSize: '0.78rem', color: '#cbd5e1', fontWeight: 600,
+                fontSize: '0.78rem', color: '#334155', fontWeight: 600,
                 whiteSpace: 'nowrap', flexShrink: 0,
               }}>
                 {item.label}
@@ -59,7 +59,7 @@ export default function WyrejDonut({ data = [] }) {
               {/* Linia kropkowana */}
               <div style={{
                 flex: 1,
-                borderBottom: '1px dotted rgba(148,163,184,0.35)',
+                borderBottom: '1px dotted rgba(100,116,139,0.4)',
                 marginBottom: '3px',
               }} />
 
@@ -74,7 +74,7 @@ export default function WyrejDonut({ data = [] }) {
               {/* Liczba */}
               <span style={{
                 fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '0.82rem', fontWeight: 700, color: '#e2e8f0',
+                fontSize: '0.82rem', fontWeight: 700, color: '#1e293b',
                 whiteSpace: 'nowrap', flexShrink: 0, minWidth: '52px', textAlign: 'right',
               }}>
                 {fmt(item.value)}
