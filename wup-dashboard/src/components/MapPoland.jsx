@@ -64,7 +64,7 @@ function geoToPath(geometry, project) {
 }
 
 const CHOROPLETH_COLORS = [
-  '#F0F9FF', '#BAE6FD', '#7DD3FC', '#38BDF8', '#1D4ED8', '#1E40AF', '#1E1B4B',
+  '#FFFFB2', '#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#B10026',
 ];
 
 function jenksBreaks(values, k = 7) {
@@ -154,7 +154,7 @@ export default function MapPoland({ onMazClick }) {
   return (
     <div style={{
       position: 'relative',
-      background: '#F1F5F9',
+      background: '#F8F9FA',
       borderRadius: '10px',
       overflow: 'hidden',
       boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
