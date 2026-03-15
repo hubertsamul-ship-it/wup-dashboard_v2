@@ -260,10 +260,13 @@ export default function Powiaty({ initialPowiat = null }) {
     [cmpWgms, powiaty, hasNullLast]
   );
 
-  const SHOW_N     = 12;
-  const napodLabels = trendLabels.slice(-SHOW_N);
-  const trendZarej = (d.trend_zarej_13m || []).slice(-SHOW_N);
-  const trendWyrej = (d.trend_wyrej_13m || []).slice(-SHOW_N);
+  const SHOW_N      = 12;
+  // Do wykresu napływ/odpływ używamy RAW etykiet (w tym Lut 26 gdzie stopa=null)
+  // żeby ostatni punkt był zawsze aktualny
+  const allTrendLabels = rawTrendMaz.map(t => t.label);
+  const napodLabels = allTrendLabels.slice(-SHOW_N);
+  const trendZarej  = (d.trend_zarej_13m || []).slice(-SHOW_N);
+  const trendWyrej  = (d.trend_wyrej_13m || []).slice(-SHOW_N);
   const wyrejTop5  = (d.wyrej_reasons || []).slice(0, 5);
 
   // Stopa bezrobocia powiatu + delta vs poprzedni miesiąc
