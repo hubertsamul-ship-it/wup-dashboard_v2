@@ -182,11 +182,12 @@ export default function Zwolnienia() {
     pkd_monthly = null,
   } = zwolnienia;
 
-  const tLabels  = trend_13m.map(t => t.label);
-  const zglData  = trend_13m.map(t => t.zgl);
-  const wydData  = trend_13m.map(t => t.wyd);
-  const faktData = trend_13m.map(t => t.fakt);
-  const monData  = trend_13m.map(t => t.mon);
+  const trend12  = trend_13m.slice(-12);
+  const tLabels  = trend12.map(t => t.label);
+  const zglData  = trend12.map(t => t.zgl);
+  const wydData  = trend12.map(t => t.wyd);
+  const faktData = trend12.map(t => t.fakt);
+  const monData  = trend12.map(t => t.mon);
 
   // Selektor miesiąca dla PKD — domyślnie ostatni dostępny miesiąc
   const pkdMonth = pkdMiesiac ?? tLabels[tLabels.length - 1] ?? '';
@@ -243,7 +244,7 @@ export default function Zwolnienia() {
 
       {/* Wykresy trendu */}
       <Grid cols={2} grow>
-        <Card title="Zgłoszenia i wypowiedzenia zmieniające" badge="13 miesięcy" grow>
+        <Card title="Zgłoszenia i wypowiedzenia zmieniające" badge="12 miesięcy" grow>
           <LineChartSVG
             datasets={[
               { data: zglData, color: '#e63946', label: 'Zgłoszenia' },
@@ -252,7 +253,7 @@ export default function Zwolnienia() {
             labels={tLabels} height={150}
           />
         </Card>
-        <Card title="Faktyczne zwolnienia i monitorowane" badge="13 miesięcy" grow>
+        <Card title="Faktyczne zwolnienia i monitorowane" badge="12 miesięcy" grow>
           <LineChartSVG
             datasets={[
               { data: faktData, color: '#f4a261', label: 'Faktyczne' },

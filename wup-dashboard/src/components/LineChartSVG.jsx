@@ -20,11 +20,13 @@ export default function LineChartSVG({
   labels,          // x-axis labels
   height = 160,
   width = 560,
+  showLegend = true,
 }) {
   const [hoveredIdx, setHoveredIdx] = useState(null);
 
   const W = width, H = height;
-  const pad = { t: 16, b: 32, l: 52, r: 16 };
+  const hasLabels = showLegend && datasets.some(d => d.label);
+  const pad = { t: hasLabels ? 34 : 16, b: 32, l: 52, r: 16 };
   const iW = W - pad.l - pad.r;
   const iH = H - pad.t - pad.b;
 
@@ -202,6 +204,31 @@ export default function LineChartSVG({
           />
         );
       })}
+
+      {/* Legend — top right */}
+      {hasLabels && (() => {
+        const totalW = datasets.reduce((acc, ds) => acc + (ds.label?.length ?? 0) * 6.5 + 22, 0);
+        let curX = W - pad.r - totalW;
+        return datasets.map((ds, di) => {
+          const col = ds.color || '#4895ef';
+          const lbl = ds.label || '';
+          const x = curX;
+          curX += lbl.length * 6.5 + 22;
+          return (
+            <g key={di}>
+              <circle cx={x + 5} cy={8} r="4.5" fill={col} opacity="0.9" />
+              <text
+                x={x + 14} y={12}
+                fontSize="9.5" fill="#64748b"
+                fontFamily="Outfit, sans-serif"
+                fontWeight="600"
+              >
+                {lbl}
+              </text>
+            </g>
+          );
+        });
+      })()}
 
       {/* Tooltip (rendered last = on top) */}
       {renderTooltip()}
