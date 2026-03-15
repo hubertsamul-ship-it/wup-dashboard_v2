@@ -49,7 +49,11 @@ export default function LineChartSVG({
   }, [mn, mx]);
 
   const step = Math.ceil(n / 6);
-  const xLabelIdxs = labels.map((_, i) => i).filter((i) => i % step === 0 || i === n - 1);
+  const baseIdxs = labels.map((_, i) => i).filter((i) => i % step === 0);
+  const lastBase = baseIdxs[baseIdxs.length - 1] ?? -Infinity;
+  const xLabelIdxs = (!baseIdxs.includes(n - 1) && (n - 1 - lastBase) >= Math.floor(step * 0.6))
+    ? [...baseIdxs, n - 1]
+    : baseIdxs;
 
   // ── Tooltip ──────────────────────────────────────────────────────────────
   const renderTooltip = () => {
