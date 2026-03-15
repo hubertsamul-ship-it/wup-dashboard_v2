@@ -49,16 +49,16 @@ export default function Sidebar({ active, onNav, collapsed, onToggle }) {
       }}>
         {collapsed ? (
           <img
-            src="/logo.png"
+            src="/logo-icon.svg"
             alt="WUP"
-            style={{ width: '30px', height: '30px', objectFit: 'contain' }}
+            style={{ width: '34px', height: '34px', objectFit: 'contain' }}
           />
         ) : (
           <>
             <img
-              src="/logo.png"
+              src="/logo.svg"
               alt="Mazostat"
-              style={{ width: '224px', maxHeight: '66px', objectFit: 'contain', marginBottom: '8px' }}
+              style={{ width: '220px', maxHeight: '64px', objectFit: 'contain', marginBottom: '8px' }}
             />
             <div style={{
               fontSize: 'var(--font-xs)', color: 'var(--muted)', textAlign: 'center',

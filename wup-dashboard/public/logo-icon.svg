@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#5bb5ff"/>
+      <stop offset="100%" stop-color="#22c4b0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Tło: zaokrąglony kwadrat -->
+  <rect width="64" height="64" rx="14" fill="#0d1e42"/>
+
+  <!-- 5 słupków tworzących sylwetkę M (baseline y=57) -->
+  <!-- słupek 1: lewy, h=38 -->
+  <rect x="8.5" y="19" width="7" height="38" rx="2" fill="url(#bar)"/>
+  <!-- słupek 2: lewy-środek, h=24 -->
+  <rect x="18.5" y="33" width="7" height="24" rx="2" fill="url(#bar)"/>
+  <!-- słupek 3: środek (dolina), h=13 -->
+  <rect x="28.5" y="44" width="7" height="13" rx="2" fill="url(#bar)" opacity="0.7"/>
+  <!-- słupek 4: prawy-środek, h=24 -->
+  <rect x="38.5" y="33" width="7" height="24" rx="2" fill="url(#bar)"/>
+  <!-- słupek 5: prawy, h=43 (wyższy = trend wzrostowy) -->
+  <rect x="48.5" y="14" width="7" height="43" rx="2" fill="url(#bar)"/>
+
+  <!-- Czerwona kropka trendu nad słupkiem 5 -->
+  <circle cx="52" cy="9" r="4.5" fill="#e63946"/>
+</svg>
