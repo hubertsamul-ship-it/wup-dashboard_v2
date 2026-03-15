@@ -6,6 +6,7 @@ import Card, { SectionHeader } from '../components/Card';
 import LineChartSVG from '../components/LineChartSVG';
 import WyrejDonut from '../components/WyrejDonut';
 import StatsSelector from '../components/StatsSelector';
+import GenderFigure from '../components/GenderFigures';
 import { useAppData } from '../context/DataContext';
 
 // Hook mierzący rozmiar kontenera — chart wypełnia dostępną przestrzeń
@@ -121,7 +122,7 @@ function CategoryRow({ item }) {
 
 // ── Główna strona ─────────────────────────────────────────────────────────────
 export default function Bezrobotni() {
-  const { bezrobotni, meta, loading } = useAppData();
+  const { bezrobotni, stopa, meta, loading } = useAppData();
   const [chartRef, chartSize] = useContainerSize();
 
   if (!bezrobotni) return null;
@@ -159,6 +160,13 @@ export default function Bezrobotni() {
 
   const COLOR_F = '#29b6a8';  // teal — kobiety
   const COLOR_M = '#4895ef';  // niebieski — mężczyźni
+
+  // Stopa bezrobocia Mazowieckie + delta
+  const mazStopa      = stopa?.stopa_maz ?? null;
+  const mazStopaDelta = stopa?.stopa_maz_delta ?? null;
+  const mazStopaDeltaType = mazStopaDelta == null ? 'eq' : mazStopaDelta >= 0 ? 'up' : 'dn';
+  const mazStopaDeltaStr  = mazStopaDelta == null ? null : formatDeltaStopa(mazStopaDelta, meta?.stopa_poprzedni_okres);
+  const stopaOkresAbbr    = formatOkresAbbr(meta?.stopa_okres);
 
   return (
     <div style={{
@@ -205,25 +213,23 @@ export default function Bezrobotni() {
         gap: '10px', minHeight: '280px', marginBottom: '10px',
       }}>
 
-        {/* PŁEĆ */}
-        <Card title={`Płeć · ${okresAbbr}`} grow>
-          <div style={{
-            display: 'flex', flexDirection: 'row',
-          }}>
-            <GenderFigure
-              label="Kobiety" n={kobiety} total={total}
-              color={COLOR_F} isFemale
-            />
-            <div style={{
-              width: '1px', background: 'rgba(0,0,0,0.06)',
-              margin: '4px 0', flexShrink: 0,
-            }} />
-            <GenderFigure
-              label="Mężczyźni" n={mezczyzni} total={total}
-              color={COLOR_M} isFemale={false}
-            />
-          </div>
-        </Card>
+        {/* STOPA + PŁEĆ */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <KpiCard
+            flag={stopaOkresAbbr || 'GUS · Mazowieckie'} flagColor="maz"
+            target={Math.round((mazStopa || 0) * 10)} decimals={1} suffix="%"
+            label="stopa bezrobocia · Mazowieckie"
+            delta={mazStopaDeltaStr} deltaType={mazStopaDeltaType}
+            variant={mazStopaDelta != null && mazStopaDelta > 0 ? 'red' : 'green'}
+          />
+          <Card title={`Płeć · ${okresAbbr}`} grow>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <GenderFigure label="Kobiety"   n={kobiety}   total={total} color={COLOR_F} isFemale />
+              <div style={{ width: '1px', background: 'rgba(0,0,0,0.06)', margin: '4px 0', flexShrink: 0 }} />
+              <GenderFigure label="Mężczyźni" n={mezczyzni} total={total} color={COLOR_M} isFemale={false} />
+            </div>
+          </Card>
+        </div>
 
         {/* KATEGORIE */}
         <Card title={`Kategorie bezrobotnych · ${okresAbbr}`} grow>

@@ -43,7 +43,7 @@ function AppShell({ page, setPage, powiatTarget, setPowiatTarget, sidebarCollaps
   );
 
   const pages = {
-    pulpit:        <Pulpit onNavPowiaty={p => { if (p.wgm) setPowiatTarget(p.wgm); setPage('powiaty'); }} />,
+    pulpit:        <Pulpit onNavPowiaty={p => { if (p.wgm) setPowiatTarget(p.wgm); setPage('powiaty'); }} onNavBezrobotni={() => setPage('bezrobotni')} />,
     bezrobotni:    <Bezrobotni />,
     stopa:         <Stopa />,
     pracujacy:     <Pracujacy />,

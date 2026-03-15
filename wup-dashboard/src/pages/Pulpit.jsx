@@ -50,7 +50,7 @@ function formatDeltaStopa(n, prevOkres) {
   return n >= 0 ? `↑ +${abs} pp vs. ${label}` : `↓ −${abs} pp vs. ${label}`;
 }
 
-export default function Pulpit({ onNavPowiaty }) {
+export default function Pulpit({ onNavPowiaty, onNavBezrobotni }) {
   const [trendMode, setTrendMode] = useState('bezr');
   const { pulpit, meta, loading } = useAppData();
 
@@ -110,7 +110,7 @@ export default function Pulpit({ onNavPowiaty }) {
 
       <Grid cols={2} style={{ gridTemplateColumns: '1fr 1fr' }}>
         <Card title="Stopa bezrobocia — Polska" badge={stopaOkresAbbr} badgeLive>
-          <MapPoland />
+          <MapPoland onMazClick={onNavBezrobotni} />
         </Card>
         <Card title="Stopa bezrobocia — powiaty mazowieckie" badge={stopaOkresAbbr} badgeLive>
           <MapMazowieckie onPowiatClick={onNavPowiaty} />

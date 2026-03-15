@@ -75,7 +75,7 @@ function mazostColor(s, minS, maxS) {
   return `rgb(${rgb.join(',')})`;
 }
 
-export default function MapPoland() {
+export default function MapPoland({ onMazClick }) {
   const [features, setFeatures] = useState([]);
   const [tooltip, setTooltip] = useState(null);
   const { stopa } = useAppData();
@@ -152,10 +152,10 @@ export default function MapPoland() {
             key={i}
             d={p.d}
             fill={p.stopa !== null ? mazostColor(p.stopa, minS, maxS) : '#eef0f3'}
-            stroke={p.isMaz ? '#4895ef' : 'rgba(255,255,255,0.85)'}
-            strokeWidth={p.isMaz ? 3 : 0.5}
+            stroke={p.isMaz ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.85)'}
+            strokeWidth={p.isMaz ? 1.5 : 0.5}
             opacity={1}
-            style={{ cursor: 'pointer', transition: 'opacity 0.12s' }}
+            style={{ cursor: p.isMaz && onMazClick ? 'pointer' : 'pointer', transition: 'opacity 0.12s' }}
             onMouseEnter={e => {
               e.currentTarget.style.opacity = '0.82';
               const wrap = e.currentTarget.closest('div');
@@ -166,6 +166,7 @@ export default function MapPoland() {
               e.currentTarget.style.opacity = '1';
               setTooltip(null);
             }}
+            onClick={p.isMaz && onMazClick ? () => onMazClick() : undefined}
           />
         ))}
       </svg>
@@ -174,8 +175,8 @@ export default function MapPoland() {
         marginTop: '6px', padding: '0 4px',
       }}>
         <div style={{ fontSize: '0.65rem', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '2px', border: '2.5px solid #4895ef', flexShrink: 0 }} />
-          Mazowieckie · najazd = szczegóły
+          <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '2px', border: '1.5px solid rgba(148,163,184,0.7)', flexShrink: 0 }} />
+          Mazowieckie{onMazClick ? ' · kliknij = Bezrobotni' : ' · najazd = szczegóły'}
         </div>
         <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
           <div style={{ width: '60px', height: '5px', borderRadius: '3px', background: 'linear-gradient(to right, #fdf2f0, #f3a683, #2c3e50)' }} />

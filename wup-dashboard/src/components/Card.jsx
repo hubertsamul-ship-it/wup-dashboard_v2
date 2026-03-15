@@ -68,7 +68,7 @@ export function Grid({ cols = 2, children, style: extraStyle = {}, grow = false 
       display: 'grid',
       gridTemplateColumns: `repeat(${cols}, 1fr)`,
       gap: '8px',
-      marginBottom: grow ? 0 : '8px',
+      marginBottom: '8px',
       ...(grow ? { alignItems: 'stretch' } : {}),
       ...extraStyle,
     }}>

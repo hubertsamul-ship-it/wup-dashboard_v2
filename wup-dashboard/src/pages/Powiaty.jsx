@@ -5,6 +5,7 @@ import Card, { SectionHeader, Grid } from '../components/Card';
 import LineChartSVG from '../components/LineChartSVG';
 import WyrejDonut from '../components/WyrejDonut';
 import StatsSelector from '../components/StatsSelector';
+import GenderFigure from '../components/GenderFigures';
 import { useAppData } from '../context/DataContext';
 
 const POW_COLORS = ['#e63946', '#4895ef', '#f4a261', '#52b788', '#a78bfa', '#fbbf24'];
@@ -355,12 +356,13 @@ export default function Powiaty({ initialPowiat = null }) {
             delta={stopaDeltaStr} deltaType={stopaDeltaType}
             variant={stopaDelta != null && stopaDelta > 0 ? 'red' : 'green'}
           />
-          <KpiCard
-            flag="Struktura płci" flagColor="pl"
-            target={kobiety} suffix=""
-            label={`kobiety · ${mezczyzni > 0 ? ((kobiety / total * 100).toFixed(0) + '% K / ' + (mezczyzni / total * 100).toFixed(0) + '% M') : '—'}`}
-            delta={null}
-          />
+          <Card title={`Płeć · ${d.nazwa || ''}`} grow>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <GenderFigure label="Kobiety"   n={kobiety}   total={total} color="#29b6a8" isFemale />
+              <div style={{ width: '1px', background: 'rgba(0,0,0,0.06)', margin: '4px 0', flexShrink: 0 }} />
+              <GenderFigure label="Mężczyźni" n={mezczyzni} total={total} color="#4895ef" isFemale={false} />
+            </div>
+          </Card>
         </div>
 
         {/* KATEGORIE */}
