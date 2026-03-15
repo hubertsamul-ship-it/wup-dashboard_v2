@@ -28,33 +28,12 @@ export function LogoIcon({ size = 36 }) {
   );
 }
 
-export function LogoFull({ width = 220 }) {
+export function LogoFull({ width = 200 }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width }}>
-      <LogoIcon size={44} />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-        <span style={{
-          fontFamily: 'Outfit, sans-serif',
-          fontSize: '1.25rem',
-          fontWeight: 800,
-          letterSpacing: '0.12em',
-          color: '#0d1e42',
-          lineHeight: 1.1,
-        }}>
-          MAZOSTAT
-        </span>
-        <span style={{
-          fontFamily: 'Outfit, sans-serif',
-          fontSize: '0.58rem',
-          fontWeight: 600,
-          letterSpacing: '0.22em',
-          color: '#3b82f6',
-          lineHeight: 1,
-          marginTop: '3px',
-        }}>
-          MAZOWSZE · RYNEK PRACY
-        </span>
-      </div>
-    </div>
+    <img
+      src="/logo.png"
+      alt="Mazostat"
+      style={{ width, objectFit: 'contain', display: 'block' }}
+    />
   );
 }
