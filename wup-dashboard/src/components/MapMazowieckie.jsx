@@ -91,26 +91,50 @@ function geoToPath(geometry, project) {
 }
 
 const CHOROPLETH_COLORS = [
-  '#EEF2FF', '#E0E7FF', '#C7D2FE', '#818CF8', '#4F46E5', '#3730A3', '#1E1B4B',
+  '#F0F9FF', '#BAE6FD', '#7DD3FC', '#38BDF8', '#1D4ED8', '#1E40AF', '#1E1B4B',
 ];
 
-// Quantile breaks — dzieli posortowane wartości na 7 równych klas
-function computeBreaks(values) {
-  if (values.length < 2) return [];
+// Natural Breaks (Jenks) — minimalizuje wariancję wewnątrz klas
+function jenksBreaks(values, k = 7) {
   const sorted = [...values].sort((a, b) => a - b);
   const n = sorted.length;
-  const breaks = [];
-  for (let i = 1; i < 7; i++) {
-    const idx = (i / 7) * (n - 1);
-    const lo = Math.floor(idx), hi = Math.ceil(idx);
-    breaks.push(sorted[lo] + (idx - lo) * (sorted[hi] - sorted[lo]));
+  if (n <= k) return sorted.slice(0, n - 1);
+
+  const lcl = Array.from({ length: n + 1 }, () => new Array(k + 1).fill(0));
+  const vcl = Array.from({ length: n + 1 }, () => new Array(k + 1).fill(Infinity));
+  for (let i = 1; i <= k; i++) { lcl[1][i] = 1; vcl[1][i] = 0; }
+
+  for (let l = 2; l <= n; l++) {
+    let sum = 0, sumSq = 0, w = 0;
+    for (let m = 1; m <= l; m++) {
+      const idx = l - m + 1;
+      const v = sorted[idx - 1];
+      w++; sum += v; sumSq += v * v;
+      const variance = sumSq - sum * sum / w;
+      if (idx > 1) {
+        for (let j = 2; j <= k; j++) {
+          const cost = variance + vcl[idx - 1][j - 1];
+          if (cost < vcl[l][j]) { vcl[l][j] = cost; lcl[l][j] = idx; }
+        }
+      }
+    }
+    lcl[l][1] = 1;
+    vcl[l][1] = sumSq - sum * sum / w;
   }
-  return breaks;
+
+  const breaks = new Array(k);
+  breaks[k - 1] = sorted[n - 1];
+  let pos = n;
+  for (let j = k; j >= 2; j--) {
+    breaks[j - 2] = sorted[lcl[pos][j] - 2];
+    pos = lcl[pos][j] - 1;
+  }
+  return breaks.slice(0, k - 1);
 }
 
 // Zwraca kolor HEX dla podanej wartości stopy bezrobocia
 function getChoroColor(value, breaks) {
-  if (value == null || !breaks.length) return '#eef0f3';
+  if (value == null || !breaks.length) return '#E2E8F0';
   for (let i = 0; i < breaks.length; i++) {
     if (value <= breaks[i]) return CHOROPLETH_COLORS[i];
   }
@@ -135,7 +159,7 @@ export default function MapMazowieckie({ onPowiatClick }) {
   const stopaValues = powiaty?.filter(p => p.stopa != null).map(p => p.stopa) ?? [];
   const minS = stopaValues.length ? Math.min(...stopaValues) : 1;
   const maxS = stopaValues.length ? Math.max(...stopaValues) : 25;
-  const breaks = useMemo(() => computeBreaks(stopaValues), [powiaty]);
+  const breaks = useMemo(() => jenksBreaks(stopaValues), [powiaty]);
 
   // Ładuj GeoJSON raz
   useEffect(() => {
@@ -156,7 +180,7 @@ export default function MapMazowieckie({ onPowiatClick }) {
 
   return (
     <div style={{
-      position: 'relative', background: '#F8FAFC', borderRadius: '10px', overflow: 'hidden',
+      position: 'relative', background: '#F1F5F9', borderRadius: '10px', overflow: 'hidden',
       boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
     }}>
       {tooltip && (
@@ -196,7 +220,11 @@ export default function MapMazowieckie({ onPowiatClick }) {
           const isHovered = hovered === gp.geoNazwa;
           return (
             <g key={i}
-              style={{ cursor: hasData && onPowiatClick ? 'pointer' : 'default' }}
+              style={{
+                cursor: hasData && onPowiatClick ? 'pointer' : 'default',
+                filter: isHovered ? 'drop-shadow(0 0 8px rgba(250,204,21,0.5))' : 'none',
+                transition: 'filter 0.2s ease',
+              }}
               onClick={() => {
                 if (hasData && onPowiatClick) onPowiatClick({ n: pow.nazwa, s: pow.stopa, wgm: pow.wgm });
               }}
@@ -221,8 +249,8 @@ export default function MapMazowieckie({ onPowiatClick }) {
                 d={gp.d}
                 fill={isHovered ? '#FACC15' : (hasData ? getChoroColor(pow.stopa, breaks) : '#E2E8F0')}
                 stroke="#FFFFFF"
-                strokeWidth={isHovered ? '1.5' : '0.6'}
-                style={{ transition: 'fill 0.2s, stroke-width 0.2s' }}
+                strokeWidth={isHovered ? '1.5' : '0.8'}
+                style={{ transition: 'fill 0.2s ease, stroke-width 0.2s ease' }}
               />
             </g>
           );

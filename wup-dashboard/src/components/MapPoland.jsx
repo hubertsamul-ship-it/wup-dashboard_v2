@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAppData } from '../context/DataContext';
 
-// Display name (z woj_stopa JSON) → GeoJSON nazwa
 const WOJ_MAP = {
   'Warmińsko-maz.':  'warmińsko-mazurskie',
   'Podkarpackie':    'podkarpackie',
@@ -65,20 +64,44 @@ function geoToPath(geometry, project) {
 }
 
 const CHOROPLETH_COLORS = [
-  '#EEF2FF', '#E0E7FF', '#C7D2FE', '#818CF8', '#4F46E5', '#3730A3', '#1E1B4B',
+  '#F0F9FF', '#BAE6FD', '#7DD3FC', '#38BDF8', '#1D4ED8', '#1E40AF', '#1E1B4B',
 ];
 
-function computeBreaks(values) {
-  if (values.length < 2) return [];
+function jenksBreaks(values, k = 7) {
   const sorted = [...values].sort((a, b) => a - b);
   const n = sorted.length;
-  const breaks = [];
-  for (let i = 1; i < 7; i++) {
-    const idx = (i / 7) * (n - 1);
-    const lo = Math.floor(idx), hi = Math.ceil(idx);
-    breaks.push(sorted[lo] + (idx - lo) * (sorted[hi] - sorted[lo]));
+  if (n <= k) return sorted.slice(0, n - 1);
+
+  const lcl = Array.from({ length: n + 1 }, () => new Array(k + 1).fill(0));
+  const vcl = Array.from({ length: n + 1 }, () => new Array(k + 1).fill(Infinity));
+  for (let i = 1; i <= k; i++) { lcl[1][i] = 1; vcl[1][i] = 0; }
+
+  for (let l = 2; l <= n; l++) {
+    let sum = 0, sumSq = 0, w = 0;
+    for (let m = 1; m <= l; m++) {
+      const idx = l - m + 1;
+      const v = sorted[idx - 1];
+      w++; sum += v; sumSq += v * v;
+      const variance = sumSq - sum * sum / w;
+      if (idx > 1) {
+        for (let j = 2; j <= k; j++) {
+          const cost = variance + vcl[idx - 1][j - 1];
+          if (cost < vcl[l][j]) { vcl[l][j] = cost; lcl[l][j] = idx; }
+        }
+      }
+    }
+    lcl[l][1] = 1;
+    vcl[l][1] = sumSq - sum * sum / w;
   }
-  return breaks;
+
+  const breaks = new Array(k);
+  breaks[k - 1] = sorted[n - 1];
+  let pos = n;
+  for (let j = k; j >= 2; j--) {
+    breaks[j - 2] = sorted[lcl[pos][j] - 2];
+    pos = lcl[pos][j] - 1;
+  }
+  return breaks.slice(0, k - 1);
 }
 
 function getChoroColor(value, breaks) {
@@ -105,7 +128,7 @@ export default function MapPoland({ onMazClick }) {
   const stopaValues = wojData.map(d => d.s).filter(v => v != null);
   const minS = stopaValues.length ? Math.min(...stopaValues) : 2;
   const maxS = stopaValues.length ? Math.max(...stopaValues) : 12;
-  const breaks = useMemo(() => computeBreaks(stopaValues), [stopa]);
+  const breaks = useMemo(() => jenksBreaks(stopaValues), [stopa]);
 
   useEffect(() => {
     fetch('/data/wojewodztwa.geojson')
@@ -131,7 +154,7 @@ export default function MapPoland({ onMazClick }) {
   return (
     <div style={{
       position: 'relative',
-      background: '#F8FAFC',
+      background: '#F1F5F9',
       borderRadius: '10px',
       overflow: 'hidden',
       boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
@@ -147,7 +170,7 @@ export default function MapPoland({ onMazClick }) {
         }}>
           <strong style={{ color: '#1e293b' }}>{tooltip.display}</strong><br />
           {tooltip.stopa !== null
-            ? <strong style={{ color: '#3730A3', fontFamily: 'JetBrains Mono, monospace' }}>{tooltip.stopa.toFixed(1).replace('.', ',')}%</strong>
+            ? <strong style={{ color: '#1E40AF', fontFamily: 'JetBrains Mono, monospace' }}>{tooltip.stopa.toFixed(1).replace('.', ',')}%</strong>
             : <span style={{ color: '#64748b' }}>brak danych</span>}
         </div>
       )}
@@ -168,18 +191,19 @@ export default function MapPoland({ onMazClick }) {
               d={p.d}
               fill={isHovered ? '#FACC15' : (p.stopa !== null ? getChoroColor(p.stopa, breaks) : '#E2E8F0')}
               stroke="#FFFFFF"
-              strokeWidth={isHovered ? '1.5' : '0.7'}
-              style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
+              strokeWidth={isHovered ? '1.5' : '0.8'}
+              style={{
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                filter: isHovered ? 'drop-shadow(0 0 8px rgba(250,204,21,0.5))' : 'none',
+              }}
               onMouseEnter={e => {
                 setHovered(p.nazwa);
                 const wrap = e.currentTarget.closest('div');
                 const wr = wrap.getBoundingClientRect();
                 setTooltip({ display: p.display, stopa: p.stopa, x: e.clientX - wr.left, y: e.clientY - wr.top });
               }}
-              onMouseLeave={() => {
-                setHovered(null);
-                setTooltip(null);
-              }}
+              onMouseLeave={() => { setHovered(null); setTooltip(null); }}
               onClick={p.isMaz && onMazClick ? () => onMazClick() : undefined}
             />
           );
@@ -189,8 +213,7 @@ export default function MapPoland({ onMazClick }) {
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         marginTop: '6px', padding: '0 4px',
       }}>
-        <div style={{ fontSize: '0.65rem', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '2px', border: '1.5px solid rgba(148,163,184,0.7)', flexShrink: 0 }} />
+        <div style={{ fontSize: '0.65rem', color: 'var(--muted)' }}>
           Mazowieckie{onMazClick ? ' · kliknij = szczegóły' : ' · najazd = szczegóły'}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
