@@ -31,8 +31,11 @@ export default function LineChartSVG({
   const iH = H - pad.t - pad.b;
 
   const allVals = datasets.flatMap(d => d.data);
-  const mn = Math.min(...allVals) * 0.97;
-  const mx = Math.max(...allVals) * 1.03;
+  const rawMin = Math.min(...allVals);
+  const rawMax = Math.max(...allVals);
+  const spread = rawMax - rawMin || rawMax * 0.1;
+  const mn = rawMin - spread * 0.25;
+  const mx = rawMax + spread * 0.25;
   const n = labels.length;
 
   const xPos = (i) => pad.l + (i / (n - 1)) * iW;
