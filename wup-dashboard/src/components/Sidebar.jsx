@@ -4,6 +4,7 @@ import {
   Wallet, FileBarChart, Map,
   ChevronLeft, ChevronRight, RefreshCw,
 } from 'lucide-react';
+import { LogoIcon, LogoFull } from './Logo';
 
 const NAV = [
   { id: 'pulpit',        Icon: LayoutDashboard, label: 'Przegląd',          section: 'Główne' },
@@ -48,21 +49,13 @@ export default function Sidebar({ active, onNav, collapsed, onToggle }) {
         transition: 'padding 0.22s ease',
       }}>
         {collapsed ? (
-          <img
-            src="/logo-icon.svg"
-            alt="WUP"
-            style={{ width: '34px', height: '34px', objectFit: 'contain' }}
-          />
+          <LogoIcon size={36} />
         ) : (
           <>
-            <img
-              src="/logo.svg"
-              alt="Mazostat"
-              style={{ width: '220px', maxHeight: '64px', objectFit: 'contain', marginBottom: '8px' }}
-            />
+            <LogoFull width={210} />
             <div style={{
               fontSize: 'var(--font-xs)', color: 'var(--muted)', textAlign: 'center',
-              lineHeight: 1.55, letterSpacing: '0.07em',
+              lineHeight: 1.55, letterSpacing: '0.07em', marginTop: '10px',
             }}>
               Wojewódzki Urząd Pracy<br />w Warszawie
             </div>
