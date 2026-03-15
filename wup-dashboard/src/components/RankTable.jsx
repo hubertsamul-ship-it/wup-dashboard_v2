@@ -15,7 +15,7 @@ function fmtVal(v, unit) {
  * @param {string}   accentColor — kolor ranku i paska (#52b788, #e63946, #4895ef …)
  * @param {boolean}  reverse     — true = niższe wartości wyżej (BOT listy)
  */
-export default function RankTable({ data = [], unit = '', accentColor = '#4895ef', reverse = false }) {
+export default function RankTable({ data = [], unit = '', accentColor = '#4895ef', reverse = false, getIcon }) {
   if (data.length === 0) return null;
 
   const sorted = [...data].sort((a, b) => reverse ? a.value - b.value : b.value - a.value);
@@ -82,12 +82,18 @@ export default function RankTable({ data = [], unit = '', accentColor = '#4895ef
               alignItems: 'flex-start',
               gap: '6px',
             }}>
-              <span style={{
-                width: '6px', height: '6px', borderRadius: '50%',
-                background: accentColor, flexShrink: 0,
-                marginTop: '4px', display: 'inline-block',
-                opacity: 0.75,
-              }} />
+              {getIcon ? (
+                <span style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', marginTop: '1px' }}>
+                  {getIcon(item.label)}
+                </span>
+              ) : (
+                <span style={{
+                  width: '6px', height: '6px', borderRadius: '50%',
+                  background: accentColor, flexShrink: 0,
+                  marginTop: '4px', display: 'inline-block',
+                  opacity: 0.75,
+                }} />
+              )}
               {item.label}
             </span>
 

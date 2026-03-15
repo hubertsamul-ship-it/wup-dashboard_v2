@@ -155,14 +155,14 @@ function PowiatSelector({ selected, onChange, allPowiaty, max = 6 }) {
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     width: '100%', textAlign: 'left', background: 'none', border: 'none',
-                    color: 'var(--text)', padding: '6px 14px', fontSize: '0.75rem',
+                    color: '#e2e8f0', padding: '6px 14px', fontSize: '0.75rem',
                     cursor: 'pointer', fontFamily: 'Outfit, sans-serif', transition: 'background 0.1s',
                   }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.10)'}
                   onMouseLeave={e => e.currentTarget.style.background = 'none'}
                 >
                   <span>{p.nazwa}</span>
-                  <span style={{ color: 'var(--muted)', marginLeft: '10px', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.68rem' }}>
+                  <span style={{ color: '#94a3b8', marginLeft: '10px', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.68rem' }}>
                     {p.stopa?.toFixed(1).replace('.', ',')}%
                   </span>
                 </button>

@@ -1,4 +1,9 @@
 import { useState, useMemo } from 'react';
+import {
+  Package, ShoppingCart, Truck, Mail, Code, Landmark, Shield,
+  Megaphone, Settings, FlaskConical, Wrench, HardHat, Utensils,
+  Phone, Server, GraduationCap, Stethoscope, Factory,
+} from 'lucide-react';
 import KpiCard from '../components/KpiCard';
 import Card, { SectionHeader, Grid } from '../components/Card';
 import LineChartSVG from '../components/LineChartSVG';
@@ -26,6 +31,36 @@ const PKD_NAMES = {
 };
 
 const pkdLabel = (kod) => PKD_NAMES[kod] || `PKD ${kod}`;
+
+const PKD_ICONS = {
+  '46': { Icon: Package,       color: '#f4a261' },
+  '47': { Icon: ShoppingCart,  color: '#4895ef' },
+  '49': { Icon: Truck,         color: '#fbbf24' },
+  '53': { Icon: Mail,          color: '#a78bfa' },
+  '62': { Icon: Code,          color: '#38bdf8' },
+  '64': { Icon: Landmark,      color: '#52b788' },
+  '66': { Icon: Shield,        color: '#6366f1' },
+  '73': { Icon: Megaphone,     color: '#f3a683' },
+  '28': { Icon: Settings,      color: '#94a3b8' },
+  '20': { Icon: FlaskConical,  color: '#34d399' },
+  '33': { Icon: Wrench,        color: '#d97706' },
+  '41': { Icon: HardHat,       color: '#fb923c' },
+  '56': { Icon: Utensils,      color: '#f87171' },
+  '61': { Icon: Phone,         color: '#22d3ee' },
+  '63': { Icon: Server,        color: '#818cf8' },
+  '85': { Icon: GraduationCap, color: '#9b8ccc' },
+  '86': { Icon: Stethoscope,   color: '#e63946' },
+};
+
+function getPkdIcon(label) {
+  // label wygląda jak "Handel hurtowy (46)" — wyciągamy kod
+  const m = label.match(/\((\d+)\)/);
+  if (m) {
+    const entry = PKD_ICONS[m[1]];
+    if (entry) return <entry.Icon size={12} color={entry.color} strokeWidth={2} />;
+  }
+  return <Factory size={12} color="#94a3b8" strokeWidth={2} />;
+}
 
 // ── Selektor zakresu dat ──────────────────────────────────────────────────
 
@@ -163,10 +198,10 @@ export default function Zwolnienia() {
       {/* PKD */}
       <Grid cols={2} grow>
         <Card title="Zgłoszenia wg PKD · ost. 12 m." badge="Top 5" grow>
-          <RankTable data={pkdZglData}  unit=" os." accentColor="#e63946" />
+          <RankTable data={pkdZglData}  unit=" os." accentColor="#e63946" getIcon={getPkdIcon} />
         </Card>
         <Card title="Faktyczne zwolnienia wg PKD · ost. 12 m." badge="Top 5" grow>
-          <RankTable data={pkdFaktData} unit=" os." accentColor="#e63946" />
+          <RankTable data={pkdFaktData} unit=" os." accentColor="#e63946" getIcon={getPkdIcon} />
         </Card>
       </Grid>
     </div>

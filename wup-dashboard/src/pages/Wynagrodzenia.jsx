@@ -1,8 +1,42 @@
+import {
+  Truck, ShoppingCart, Package, Code, DollarSign, Stethoscope,
+  GraduationCap, Wrench, HardHat, Utensils, Users, Briefcase,
+  BarChart2, Landmark, Shield, Cpu, Building2, Factory,
+} from 'lucide-react';
 import KpiCard from '../components/KpiCard';
 import Card, { SectionHeader, Grid } from '../components/Card';
 import HorizontalBar, { greenColor, stopaColor } from '../components/HorizontalBar';
 import RankTable from '../components/RankTable';
 import { useAppData } from '../context/DataContext';
+
+const ZAWOD_MAP = [
+  { keys: ['kierowca', 'transport', 'przewóz', 'konduktor'],          Icon: Truck,       color: '#f4a261' },
+  { keys: ['sprzedawca', 'kasjer', 'handel', 'handlow'],              Icon: ShoppingCart, color: '#4895ef' },
+  { keys: ['magazyn', 'logistyk', 'zaopatrz'],                        Icon: Package,      color: '#a78bfa' },
+  { keys: ['programist', 'informatyk', 'developer', 'it ', 'softw'], Icon: Code,         color: '#38bdf8' },
+  { keys: ['księgow', 'finansow', 'rachun', 'ekonom'],                Icon: DollarSign,   color: '#52b788' },
+  { keys: ['lekarz', 'pielęgniar', 'medycz', 'zdrowi', 'ratow'],     Icon: Stethoscope,  color: '#e63946' },
+  { keys: ['nauczyciel', 'pedagog', 'trener', 'wykładow'],            Icon: GraduationCap,color: '#9b8ccc' },
+  { keys: ['mechanik', 'serwis', 'naprawa', 'elektryk', 'instasl'],  Icon: Wrench,       color: '#fbbf24' },
+  { keys: ['budowlan', 'murarz', 'cieśla', 'monter', 'inżynier bud'],Icon: HardHat,      color: '#d97706' },
+  { keys: ['kucharz', 'gastron', 'kelner', 'barman'],                 Icon: Utensils,     color: '#f3a683' },
+  { keys: ['menedżer', 'kierownik', 'dyrektor', 'zarządz'],           Icon: Users,        color: '#0891b2' },
+  { keys: ['analityk', 'specjalista', 'konsultant'],                  Icon: BarChart2,    color: '#6366f1' },
+  { keys: ['bank', 'ubezpiecz', 'finanse'],                           Icon: Landmark,     color: '#059669' },
+  { keys: ['ochroniar', 'strażnik', 'ochrona'],                       Icon: Shield,       color: '#64748b' },
+  { keys: ['elektron', 'automatyk', 'robot'],                         Icon: Cpu,          color: '#0ea5e9' },
+  { keys: ['administr', 'biurow', 'sekretark'],                       Icon: Building2,    color: '#94a3b8' },
+  { keys: ['operator', 'produkcj', 'przemysł', 'przetw'],             Icon: Factory,      color: '#78716c' },
+];
+
+function getZawodIcon(label) {
+  const l = label.toLowerCase();
+  for (const m of ZAWOD_MAP) {
+    if (m.keys.some(k => l.includes(k)))
+      return <m.Icon size={12} color={m.color} strokeWidth={2} />;
+  }
+  return <Briefcase size={12} color="#94a3b8" strokeWidth={2} />;
+}
 
 const toBar  = arr => (arr || []).map(r => ({ label: r.label, value: r.value }));
 const toBar5 = arr => (arr || []).slice(0, 5).map(r => ({ label: r.label, value: r.value }));
@@ -56,10 +90,10 @@ export default function Wynagrodzenia() {
       {/* ── Wiersz 3: Rankingi zawodów ───────────────────────────────────────── */}
       <Grid cols={2} style={{ gap: '10px', marginBottom: '10px' }}>
         <Card title="TOP 5 najlepiej opłacanych zawodów (min. 50 UoP)" badge="Top 5">
-          <RankTable data={toBar5(top10_zawody_best)} unit=" zł" accentColor="#52b788" />
+          <RankTable data={toBar5(top10_zawody_best)} unit=" zł" accentColor="#52b788" getIcon={getZawodIcon} />
         </Card>
         <Card title="TOP 5 najniżej opłacanych zawodów (min. 50 UoP)" badge="Bot 5">
-          <RankTable data={toBar5(top10_zawody_worst)} unit=" zł" accentColor="#e63946" reverse />
+          <RankTable data={toBar5(top10_zawody_worst)} unit=" zł" accentColor="#e63946" reverse getIcon={getZawodIcon} />
         </Card>
       </Grid>
 
