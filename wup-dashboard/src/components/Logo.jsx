@@ -38,7 +38,7 @@ export function LogoFull({ width = 220 }) {
           fontSize: '1.25rem',
           fontWeight: 800,
           letterSpacing: '0.12em',
-          color: '#f1f5f9',
+          color: '#0d1e42',
           lineHeight: 1.1,
         }}>
           MAZOSTAT
@@ -46,11 +46,11 @@ export function LogoFull({ width = 220 }) {
         <span style={{
           fontFamily: 'Outfit, sans-serif',
           fontSize: '0.58rem',
-          fontWeight: 500,
+          fontWeight: 600,
           letterSpacing: '0.22em',
-          color: '#4895ef',
+          color: '#3b82f6',
           lineHeight: 1,
-          marginTop: '2px',
+          marginTop: '3px',
         }}>
           MAZOWSZE · RYNEK PRACY
         </span>
