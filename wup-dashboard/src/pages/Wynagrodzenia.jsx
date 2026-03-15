@@ -1,7 +1,8 @@
 import {
-  Truck, ShoppingCart, Package, Code, DollarSign, Stethoscope,
-  GraduationCap, Wrench, HardHat, Utensils, Users, Briefcase,
-  BarChart2, Landmark, Shield, Cpu, Building2, Factory,
+  ChefHat, Salad, Briefcase, Users, Building2, Code, Terminal,
+  Scissors, Flower2, Sparkles, Shovel, Hammer,
+  Truck, ShoppingCart, Stethoscope, GraduationCap, Wrench,
+  HardHat, Utensils, Landmark, Shield, Factory,
 } from 'lucide-react';
 import KpiCard from '../components/KpiCard';
 import Card, { SectionHeader, Grid } from '../components/Card';
@@ -10,23 +11,29 @@ import RankTable from '../components/RankTable';
 import { useAppData } from '../context/DataContext';
 
 const ZAWOD_MAP = [
-  { keys: ['kierowca', 'transport', 'przewóz', 'konduktor'],          Icon: Truck,       color: '#f4a261' },
-  { keys: ['sprzedawca', 'kasjer', 'handel', 'handlow'],              Icon: ShoppingCart, color: '#4895ef' },
-  { keys: ['magazyn', 'logistyk', 'zaopatrz'],                        Icon: Package,      color: '#a78bfa' },
-  { keys: ['programist', 'informatyk', 'developer', 'it ', 'softw'], Icon: Code,         color: '#38bdf8' },
-  { keys: ['księgow', 'finansow', 'rachun', 'ekonom'],                Icon: DollarSign,   color: '#52b788' },
-  { keys: ['lekarz', 'pielęgniar', 'medycz', 'zdrowi', 'ratow'],     Icon: Stethoscope,  color: '#e63946' },
-  { keys: ['nauczyciel', 'pedagog', 'trener', 'wykładow'],            Icon: GraduationCap,color: '#9b8ccc' },
-  { keys: ['mechanik', 'serwis', 'naprawa', 'elektryk', 'instasl'],  Icon: Wrench,       color: '#fbbf24' },
-  { keys: ['budowlan', 'murarz', 'cieśla', 'monter', 'inżynier bud'],Icon: HardHat,      color: '#d97706' },
-  { keys: ['kucharz', 'gastron', 'kelner', 'barman'],                 Icon: Utensils,     color: '#f3a683' },
-  { keys: ['menedżer', 'kierownik', 'dyrektor', 'zarządz'],           Icon: Users,        color: '#0891b2' },
-  { keys: ['analityk', 'specjalista', 'konsultant'],                  Icon: BarChart2,    color: '#6366f1' },
-  { keys: ['bank', 'ubezpiecz', 'finanse'],                           Icon: Landmark,     color: '#059669' },
-  { keys: ['ochroniar', 'strażnik', 'ochrona'],                       Icon: Shield,       color: '#64748b' },
-  { keys: ['elektron', 'automatyk', 'robot'],                         Icon: Cpu,          color: '#0ea5e9' },
-  { keys: ['administr', 'biurow', 'sekretark'],                       Icon: Building2,    color: '#94a3b8' },
-  { keys: ['operator', 'produkcj', 'przemysł', 'przetw'],             Icon: Factory,      color: '#78716c' },
+  // Konkretne zawody z danych
+  { keys: ['żywności', 'żywien', 'technolog żyw', 'dietet'],  Icon: ChefHat,      color: '#fb923c' },
+  { keys: ['dyrektor', 'prezes', 'zarządz', 'naczelnik'],     Icon: Briefcase,     color: '#0891b2' },
+  { keys: ['mediator', 'mediacja'],                            Icon: Users,         color: '#9b8ccc' },
+  { keys: ['urzędnik', 'urzędnicy', 'władz', 'wyższy ur'],   Icon: Building2,     color: '#64748b' },
+  { keys: ['programist', 'developer', 'softw'],                Icon: Code,          color: '#38bdf8' },
+  { keys: ['informatyk', 'it ', 'ict', 'systemy inf'],         Icon: Terminal,      color: '#22d3ee' },
+  { keys: ['fryzjer', 'fryzjers'],                             Icon: Scissors,      color: '#f472b6' },
+  { keys: ['kamieniarz', 'kamieniar'],                         Icon: Hammer,        color: '#78716c' },
+  { keys: ['florist', 'florysta', 'kwiac'],                    Icon: Flower2,       color: '#4ade80' },
+  { keys: ['niekonwencjonaln', 'terapii', 'alternatyw', 'bioenergoterapeut', 'naturoterap'], Icon: Sparkles, color: '#a78bfa' },
+  { keys: ['brukarz', 'brukar', 'chodnikarz'],                 Icon: Shovel,        color: '#d97706' },
+  // Ogólne kategorie jako fallback
+  { keys: ['kucharz', 'gastron', 'kelner', 'barman', 'cukiern'], Icon: Utensils,   color: '#f3a683' },
+  { keys: ['kierowca', 'transport', 'przewóz'],                Icon: Truck,         color: '#f4a261' },
+  { keys: ['sprzedawca', 'kasjer', 'handel'],                  Icon: ShoppingCart,  color: '#4895ef' },
+  { keys: ['lekarz', 'pielęgniar', 'medycz', 'ratow'],        Icon: Stethoscope,   color: '#e63946' },
+  { keys: ['nauczyciel', 'pedagog', 'trener'],                 Icon: GraduationCap, color: '#9b8ccc' },
+  { keys: ['mechanik', 'elektryk', 'naprawa', 'serwis'],      Icon: Wrench,        color: '#fbbf24' },
+  { keys: ['budowlan', 'murarz', 'monter', 'inżynier bud'],   Icon: HardHat,       color: '#fb923c' },
+  { keys: ['bank', 'ubezpiecz', 'finanse', 'makler'],         Icon: Landmark,      color: '#059669' },
+  { keys: ['ochroniar', 'strażnik', 'ochrona'],               Icon: Shield,        color: '#64748b' },
+  { keys: ['operator', 'produkcj', 'przemysł'],               Icon: Factory,       color: '#78716c' },
 ];
 
 function getZawodIcon(label) {
