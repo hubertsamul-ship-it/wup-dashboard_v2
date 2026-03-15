@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAppData } from '../context/DataContext';
 
 // Nazwa z mrpips_data.json → GeoJSON nazwa (plik powiaty_maz.geojson)
@@ -90,21 +90,38 @@ function geoToPath(geometry, project) {
   return '';
 }
 
-function mazostColor(s, minS, maxS) {
-  const t = Math.max(0, Math.min(1, (s - minS) / (maxS - minS)));
-  const lo  = [253, 242, 240]; // #fdf2f0 — bardzo niskie
-  const mid = [243, 166, 131]; // #f3a683 — średnie
-  const hi  = [44,  62,  80];  // #2c3e50 — najwyższe
-  const rgb = t < 0.5
-    ? lo.map((v, i)  => Math.round(v + (t * 2) * (mid[i] - v)))
-    : mid.map((v, i) => Math.round(v + ((t - 0.5) * 2) * (hi[i] - v)));
-  return `rgb(${rgb.join(',')})`;
+const CHOROPLETH_COLORS = [
+  '#EEF2FF', '#E0E7FF', '#C7D2FE', '#818CF8', '#4F46E5', '#3730A3', '#1E1B4B',
+];
+
+// Quantile breaks — dzieli posortowane wartości na 7 równych klas
+function computeBreaks(values) {
+  if (values.length < 2) return [];
+  const sorted = [...values].sort((a, b) => a - b);
+  const n = sorted.length;
+  const breaks = [];
+  for (let i = 1; i < 7; i++) {
+    const idx = (i / 7) * (n - 1);
+    const lo = Math.floor(idx), hi = Math.ceil(idx);
+    breaks.push(sorted[lo] + (idx - lo) * (sorted[hi] - sorted[lo]));
+  }
+  return breaks;
+}
+
+// Zwraca kolor HEX dla podanej wartości stopy bezrobocia
+function getChoroColor(value, breaks) {
+  if (value == null || !breaks.length) return '#eef0f3';
+  for (let i = 0; i < breaks.length; i++) {
+    if (value <= breaks[i]) return CHOROPLETH_COLORS[i];
+  }
+  return CHOROPLETH_COLORS[6];
 }
 
 export default function MapMazowieckie({ onPowiatClick }) {
   const { powiaty, loading } = useAppData();
   const [geoPaths, setGeoPaths] = useState([]);
   const [tooltip, setTooltip]   = useState(null);
+  const [hovered, setHovered]   = useState(null);
 
   // Buduj lookup: GeoJSON nazwa → dane powiatu
   const dataByGeo = {};
@@ -115,10 +132,10 @@ export default function MapMazowieckie({ onPowiatClick }) {
     });
   }
 
-  // Stopa min/max dla skali kolorów
   const stopaValues = powiaty?.filter(p => p.stopa != null).map(p => p.stopa) ?? [];
   const minS = stopaValues.length ? Math.min(...stopaValues) : 1;
   const maxS = stopaValues.length ? Math.max(...stopaValues) : 25;
+  const breaks = useMemo(() => computeBreaks(stopaValues), [powiaty]);
 
   // Ładuj GeoJSON raz
   useEffect(() => {
@@ -175,6 +192,7 @@ export default function MapMazowieckie({ onPowiatClick }) {
         {geoPaths.map((gp, i) => {
           const pow = dataByGeo[gp.geoNazwa];
           const hasData = pow && pow.stopa != null;
+          const isHovered = hovered === gp.geoNazwa;
           return (
             <g key={i}
               style={{ cursor: hasData && onPowiatClick ? 'pointer' : 'default' }}
@@ -182,7 +200,7 @@ export default function MapMazowieckie({ onPowiatClick }) {
                 if (hasData && onPowiatClick) onPowiatClick({ n: pow.nazwa, s: pow.stopa, wgm: pow.wgm });
               }}
               onMouseEnter={e => {
-                if (hasData) e.currentTarget.querySelector('path').style.opacity = '0.82';
+                setHovered(gp.geoNazwa);
                 const wrap = e.currentTarget.closest('div');
                 const wr = wrap.getBoundingClientRect();
                 setTooltip({
@@ -193,18 +211,17 @@ export default function MapMazowieckie({ onPowiatClick }) {
                   y: e.clientY - wr.top,
                 });
               }}
-              onMouseLeave={e => {
-                e.currentTarget.querySelector('path').style.opacity = '1';
+              onMouseLeave={() => {
+                setHovered(null);
                 setTooltip(null);
               }}
             >
               <path
                 d={gp.d}
-                fill={hasData ? mazostColor(pow.stopa, minS, maxS) : '#eef0f3'}
-                stroke="white"
-                strokeWidth="0.5"
-                opacity="1"
-                style={{ transition: 'opacity 0.12s' }}
+                fill={isHovered ? '#FACC15' : (hasData ? getChoroColor(pow.stopa, breaks) : '#eef0f3')}
+                stroke="#FFFFFF"
+                strokeWidth={isHovered ? '1.5' : '0.6'}
+                style={{ transition: 'fill 0.2s, stroke-width 0.2s' }}
               />
             </g>
           );
@@ -214,9 +231,12 @@ export default function MapMazowieckie({ onPowiatClick }) {
         <div style={{ fontSize: '0.65rem', color: 'var(--muted)' }}>
           Kliknij powiat · szary = brak danych · najazd = szczegóły
         </div>
-        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-          <div style={{ width: '60px', height: '5px', borderRadius: '3px', background: 'linear-gradient(to right, #fdf2f0, #f3a683, #2c3e50)' }} />
-          <span style={{ fontSize: '0.62rem', color: 'var(--muted)' }}>{minS.toFixed(1).replace('.', ',')}% — {maxS.toFixed(1).replace('.', ',')}%</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+          <span style={{ fontSize: '0.62rem', color: 'var(--muted)', marginRight: '2px' }}>{minS.toFixed(1).replace('.', ',')}%</span>
+          {CHOROPLETH_COLORS.map(c => (
+            <div key={c} style={{ width: '12px', height: '8px', borderRadius: '2px', background: c, border: '0.5px solid rgba(0,0,0,0.08)' }} />
+          ))}
+          <span style={{ fontSize: '0.62rem', color: 'var(--muted)', marginLeft: '2px' }}>{maxS.toFixed(1).replace('.', ',')}%</span>
         </div>
       </div>
     </div>
