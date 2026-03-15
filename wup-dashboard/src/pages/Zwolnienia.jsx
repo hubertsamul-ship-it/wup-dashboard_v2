@@ -3,6 +3,7 @@ import {
   Package, ShoppingCart, Truck, Mail, Code, Landmark, Shield,
   Megaphone, Settings, FlaskConical, Wrench, HardHat, Utensils,
   Phone, Server, GraduationCap, Stethoscope, Factory,
+  Car, Building2, BookOpen, Zap, Printer, ChefHat, Briefcase, Gamepad2,
 } from 'lucide-react';
 import KpiCard from '../components/KpiCard';
 import Card, { SectionHeader, Grid } from '../components/Card';
@@ -11,45 +12,91 @@ import RankTable from '../components/RankTable';
 import { useAppData } from '../context/DataContext';
 
 const PKD_NAMES = {
+  '10': 'Prod. artykułów spożywczych (10)',
+  '12': 'Prod. wyrobów tytoniowych (12)',
+  '13': 'Prod. wyrobów tekstylnych (13)',
+  '15': 'Prod. skór i wyrobów skórz. (15)',
+  '17': 'Prod. papieru (17)',
+  '18': 'Poligrafia (18)',
+  '20': 'Przemysł chemiczny (20)',
+  '21': 'Farmaceutyki (21)',
+  '22': 'Prod. wyrobów gumowych (22)',
+  '23': 'Prod. wyrobów niemetalicznych (23)',
+  '25': 'Prod. wyrobów metalowych (25)',
+  '27': 'Prod. urządzeń elektrycznych (27)',
+  '28': 'Maszyny i urządzenia (28)',
+  '29': 'Prod. pojazdów samochodowych (29)',
+  '32': 'Pozostała prod. wyrobów (32)',
+  '33': 'Naprawa maszyn (33)',
+  '41': 'Budownictwo (41)',
+  '43': 'Roboty budowlane spec. (43)',
   '46': 'Handel hurtowy (46)',
   '47': 'Handel detaliczny (47)',
   '49': 'Transport lądowy (49)',
+  '52': 'Magazynowanie (52)',
   '53': 'Poczta / kurierzy (53)',
+  '56': 'Gastronomia (56)',
+  '58': 'Działalność wydawnicza (58)',
+  '61': 'Telekomunikacja (61)',
   '62': 'IT i oprogramowanie (62)',
+  '63': 'IT — usługi inform. (63)',
   '64': 'Usługi finansowe (64)',
   '66': 'Ubezpieczenia (66)',
+  '69': 'Działalność prawnicza (69)',
+  '70': 'Firmy centralne / doradztwo (70)',
+  '72': 'Badania naukowe (72)',
   '73': 'Reklama i marketing (73)',
-  '28': 'Maszyny i urządzenia (28)',
-  '20': 'Przemysł chemiczny (20)',
-  '33': 'Naprawa maszyn (33)',
-  '41': 'Budownictwo (41)',
-  '56': 'Gastronomia (56)',
-  '61': 'Telekomunikacja (61)',
-  '63': 'IT — usługi inform. (63)',
+  '74': 'Pozostała dział. profesj. (74)',
+  '82': 'Obsługa biura i działalność (82)',
+  '84': 'Administracja publiczna (84)',
   '85': 'Edukacja (85)',
   '86': 'Ochrona zdrowia (86)',
+  '92': 'Działalność rozrywkowa (92)',
 };
 
 const pkdLabel = (kod) => PKD_NAMES[kod] || `PKD ${kod}`;
 
 const PKD_ICONS = {
+  '10': { Icon: ChefHat,       color: '#fb923c' },
+  '12': { Icon: Factory,       color: '#78716c' },
+  '13': { Icon: Factory,       color: '#a78bfa' },
+  '15': { Icon: Factory,       color: '#b45309' },
+  '17': { Icon: Factory,       color: '#64748b' },
+  '18': { Icon: Printer,       color: '#475569' },
+  '20': { Icon: FlaskConical,  color: '#34d399' },
+  '21': { Icon: FlaskConical,  color: '#10b981' },
+  '22': { Icon: Factory,       color: '#6b7280' },
+  '23': { Icon: Factory,       color: '#94a3b8' },
+  '25': { Icon: Factory,       color: '#78716c' },
+  '27': { Icon: Zap,           color: '#facc15' },
+  '28': { Icon: Settings,      color: '#94a3b8' },
+  '29': { Icon: Car,           color: '#3b82f6' },
+  '32': { Icon: Factory,       color: '#94a3b8' },
+  '33': { Icon: Wrench,        color: '#d97706' },
+  '41': { Icon: HardHat,       color: '#fb923c' },
+  '43': { Icon: HardHat,       color: '#f59e0b' },
   '46': { Icon: Package,       color: '#f4a261' },
   '47': { Icon: ShoppingCart,  color: '#4895ef' },
   '49': { Icon: Truck,         color: '#fbbf24' },
+  '52': { Icon: Package,       color: '#60a5fa' },
   '53': { Icon: Mail,          color: '#a78bfa' },
+  '56': { Icon: Utensils,      color: '#f87171' },
+  '58': { Icon: BookOpen,      color: '#7c3aed' },
+  '61': { Icon: Phone,         color: '#22d3ee' },
   '62': { Icon: Code,          color: '#38bdf8' },
+  '63': { Icon: Server,        color: '#818cf8' },
   '64': { Icon: Landmark,      color: '#52b788' },
   '66': { Icon: Shield,        color: '#6366f1' },
+  '69': { Icon: Landmark,      color: '#0ea5e9' },
+  '70': { Icon: Briefcase,     color: '#0891b2' },
+  '72': { Icon: FlaskConical,  color: '#8b5cf6' },
   '73': { Icon: Megaphone,     color: '#f3a683' },
-  '28': { Icon: Settings,      color: '#94a3b8' },
-  '20': { Icon: FlaskConical,  color: '#34d399' },
-  '33': { Icon: Wrench,        color: '#d97706' },
-  '41': { Icon: HardHat,       color: '#fb923c' },
-  '56': { Icon: Utensils,      color: '#f87171' },
-  '61': { Icon: Phone,         color: '#22d3ee' },
-  '63': { Icon: Server,        color: '#818cf8' },
+  '74': { Icon: Briefcase,     color: '#64748b' },
+  '82': { Icon: Settings,      color: '#6b7280' },
+  '84': { Icon: Building2,     color: '#475569' },
   '85': { Icon: GraduationCap, color: '#9b8ccc' },
   '86': { Icon: Stethoscope,   color: '#e63946' },
+  '92': { Icon: Gamepad2,      color: '#f472b6' },
 };
 
 function getPkdIcon(label) {
@@ -129,7 +176,11 @@ export default function Zwolnienia() {
 
   if (!zwolnienia) return null;
 
-  const { zgl_cur, fakt_cur, mon_cur, wyd_cur, trend_13m = [], pkd_top10 = [], pkd_top10_fakt = [] } = zwolnienia;
+  const {
+    zgl_cur, fakt_cur, mon_cur, wyd_cur,
+    trend_13m = [], pkd_top10 = [], pkd_top10_fakt = [],
+    pkd_monthly = null,
+  } = zwolnienia;
 
   const tLabels  = trend_13m.map(t => t.label);
   const zglData  = trend_13m.map(t => t.zgl);
@@ -137,11 +188,24 @@ export default function Zwolnienia() {
   const faktData = trend_13m.map(t => t.fakt);
   const monData  = trend_13m.map(t => t.mon);
 
-  const pkdZglData  = pkd_top10.slice(0, 5).map(d      => ({ label: pkdLabel(d.pkd), value: d.n }));
-  const pkdFaktData = pkd_top10_fakt.slice(0, 5).map(d => ({ label: pkdLabel(d.pkd), value: d.n }));
-
   // Selektor miesiąca dla PKD — domyślnie ostatni dostępny miesiąc
   const pkdMonth = pkdMiesiac ?? tLabels[tLabels.length - 1] ?? '';
+
+  // Dane PKD: jeśli są dane miesięczne — filtruj po wybranym miesiącu,
+  // w przeciwnym razie pokaż agregat roczny
+  const hasPkdMonthly = pkd_monthly && pkd_monthly[pkdMonth];
+  const pkdZglData = hasPkdMonthly
+    ? [...pkd_monthly[pkdMonth]]
+        .sort((a, b) => b.zgl - a.zgl)
+        .slice(0, 5)
+        .map(d => ({ label: pkdLabel(d.pkd), value: d.zgl }))
+    : pkd_top10.slice(0, 5).map(d => ({ label: pkdLabel(d.pkd), value: d.n }));
+  const pkdFaktData = hasPkdMonthly
+    ? [...pkd_monthly[pkdMonth]]
+        .sort((a, b) => b.fakt - a.fakt)
+        .slice(0, 5)
+        .map(d => ({ label: pkdLabel(d.pkd), value: d.fakt }))
+    : pkd_top10_fakt.slice(0, 5).map(d => ({ label: pkdLabel(d.pkd), value: d.n }));
 
   return (
     <div className="page-enter">
@@ -231,9 +295,11 @@ export default function Zwolnienia() {
             >{l}</option>
           ))}
         </select>
-        <span style={{ fontSize: '0.68rem', color: 'var(--muted)', fontStyle: 'italic' }}>
-          (ranking za ost. 12 mies.)
-        </span>
+        {!hasPkdMonthly && (
+          <span style={{ fontSize: '0.68rem', color: 'var(--muted)', fontStyle: 'italic' }}>
+            (ranking za ost. 12 mies.)
+          </span>
+        )}
       </div>
 
       <Grid cols={2} grow>

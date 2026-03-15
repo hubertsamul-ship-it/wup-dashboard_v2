@@ -10253,6 +10253,101 @@
         "pkd": "20",
         "n": 206
       }
-    ]
+    ],
+    "pkd_monthly": {
+      "Sty 25": [
+        {"pkd":"53","zgl":8518,"fakt":0},{"pkd":"47","zgl":340,"fakt":0},{"pkd":"20","zgl":312,"fakt":52},
+        {"pkd":"86","zgl":81,"fakt":0},{"pkd":"32","zgl":70,"fakt":0},{"pkd":"46","zgl":70,"fakt":20},
+        {"pkd":"74","zgl":60,"fakt":0},{"pkd":"10","zgl":40,"fakt":0},{"pkd":"58","zgl":27,"fakt":0},
+        {"pkd":"41","zgl":27,"fakt":0},{"pkd":"28","zgl":20,"fakt":17},{"pkd":"18","zgl":15,"fakt":0},
+        {"pkd":"33","zgl":0,"fakt":152},{"pkd":"66","zgl":0,"fakt":33},{"pkd":"64","zgl":0,"fakt":16},
+        {"pkd":"23","zgl":0,"fakt":8},{"pkd":"85","zgl":0,"fakt":7},{"pkd":"70","zgl":0,"fakt":7},
+        {"pkd":"49","zgl":0,"fakt":1}
+      ],
+      "Lut 25": [
+        {"pkd":"61","zgl":140,"fakt":0},{"pkd":"73","zgl":109,"fakt":0},{"pkd":"28","zgl":78,"fakt":114},
+        {"pkd":"20","zgl":70,"fakt":0},{"pkd":"63","zgl":53,"fakt":0},{"pkd":"43","zgl":49,"fakt":0},
+        {"pkd":"46","zgl":41,"fakt":30},{"pkd":"85","zgl":28,"fakt":15},{"pkd":"52","zgl":23,"fakt":0},
+        {"pkd":"13","zgl":10,"fakt":0},{"pkd":"53","zgl":0,"fakt":3329},{"pkd":"64","zgl":0,"fakt":77},
+        {"pkd":"66","zgl":0,"fakt":33},{"pkd":"62","zgl":0,"fakt":19},{"pkd":"33","zgl":0,"fakt":13},
+        {"pkd":"58","zgl":0,"fakt":10},{"pkd":"10","zgl":0,"fakt":1},{"pkd":"69","zgl":0,"fakt":7},
+        {"pkd":"70","zgl":0,"fakt":9},{"pkd":"82","zgl":0,"fakt":5}
+      ],
+      "Mar 25": [
+        {"pkd":"53","zgl":53264,"fakt":465},{"pkd":"20","zgl":178,"fakt":8},{"pkd":"70","zgl":97,"fakt":0},
+        {"pkd":"25","zgl":86,"fakt":0},{"pkd":"10","zgl":53,"fakt":40},{"pkd":"29","zgl":35,"fakt":0},
+        {"pkd":"73","zgl":27,"fakt":0},{"pkd":"62","zgl":0,"fakt":192},{"pkd":"63","zgl":0,"fakt":53},
+        {"pkd":"74","zgl":0,"fakt":60},{"pkd":"64","zgl":0,"fakt":18},{"pkd":"32","zgl":0,"fakt":40},
+        {"pkd":"28","zgl":0,"fakt":22},{"pkd":"47","zgl":0,"fakt":11},{"pkd":"66","zgl":0,"fakt":5},
+        {"pkd":"46","zgl":0,"fakt":5},{"pkd":"82","zgl":0,"fakt":6}
+      ],
+      "Kwi 25": [
+        {"pkd":"92","zgl":186,"fakt":0},{"pkd":"28","zgl":97,"fakt":43},{"pkd":"66","zgl":86,"fakt":11},
+        {"pkd":"82","zgl":75,"fakt":2},{"pkd":"62","zgl":47,"fakt":0},{"pkd":"33","zgl":39,"fakt":0},
+        {"pkd":"70","zgl":39,"fakt":50},{"pkd":"13","zgl":14,"fakt":1},{"pkd":"61","zgl":0,"fakt":129},
+        {"pkd":"73","zgl":0,"fakt":64},{"pkd":"10","zgl":0,"fakt":42},{"pkd":"20","zgl":0,"fakt":39},
+        {"pkd":"29","zgl":0,"fakt":16},{"pkd":"58","zgl":0,"fakt":17},{"pkd":"18","zgl":0,"fakt":15},
+        {"pkd":"64","zgl":0,"fakt":8},{"pkd":"46","zgl":0,"fakt":10},{"pkd":"32","zgl":0,"fakt":3}
+      ],
+      "Maj 25": [
+        {"pkd":"62","zgl":100,"fakt":1},{"pkd":"64","zgl":44,"fakt":28},{"pkd":"72","zgl":30,"fakt":0},
+        {"pkd":"47","zgl":30,"fakt":202},{"pkd":"10","zgl":22,"fakt":0},{"pkd":"33","zgl":13,"fakt":19},
+        {"pkd":"17","zgl":4,"fakt":4},{"pkd":"46","zgl":0,"fakt":31},{"pkd":"28","zgl":0,"fakt":16},
+        {"pkd":"52","zgl":0,"fakt":23},{"pkd":"73","zgl":0,"fakt":21},{"pkd":"20","zgl":0,"fakt":2},
+        {"pkd":"61","zgl":0,"fakt":11},{"pkd":"13","zgl":0,"fakt":5},{"pkd":"66","zgl":0,"fakt":4}
+      ],
+      "Cze 25": [
+        {"pkd":"49","zgl":433,"fakt":0},{"pkd":"47","zgl":380,"fakt":0},{"pkd":"23","zgl":85,"fakt":0},
+        {"pkd":"63","zgl":49,"fakt":0},{"pkd":"73","zgl":29,"fakt":51},{"pkd":"15","zgl":20,"fakt":17},
+        {"pkd":"13","zgl":2,"fakt":5},{"pkd":"66","zgl":0,"fakt":419},{"pkd":"53","zgl":0,"fakt":340},
+        {"pkd":"46","zgl":0,"fakt":61},{"pkd":"64","zgl":0,"fakt":45},{"pkd":"28","zgl":0,"fakt":34},
+        {"pkd":"62","zgl":0,"fakt":21},{"pkd":"82","zgl":0,"fakt":21},{"pkd":"20","zgl":0,"fakt":48},
+        {"pkd":"92","zgl":0,"fakt":18},{"pkd":"70","zgl":0,"fakt":7},{"pkd":"32","zgl":0,"fakt":10},
+        {"pkd":"33","zgl":0,"fakt":10}
+      ],
+      "Lip 25": [
+        {"pkd":"46","zgl":888,"fakt":34},{"pkd":"12","zgl":70,"fakt":0},{"pkd":"61","zgl":57,"fakt":0},
+        {"pkd":"62","zgl":52,"fakt":0},{"pkd":"66","zgl":0,"fakt":179},{"pkd":"53","zgl":0,"fakt":96},
+        {"pkd":"92","zgl":0,"fakt":58},{"pkd":"85","zgl":0,"fakt":28},{"pkd":"33","zgl":0,"fakt":10},
+        {"pkd":"28","zgl":0,"fakt":12},{"pkd":"64","zgl":0,"fakt":9},{"pkd":"32","zgl":0,"fakt":2}
+      ],
+      "Sie 25": [
+        {"pkd":"49","zgl":765,"fakt":0},{"pkd":"66","zgl":167,"fakt":2},{"pkd":"64","zgl":138,"fakt":7},
+        {"pkd":"63","zgl":97,"fakt":0},{"pkd":"58","zgl":36,"fakt":0},{"pkd":"46","zgl":0,"fakt":75},
+        {"pkd":"53","zgl":0,"fakt":27},{"pkd":"20","zgl":0,"fakt":26},{"pkd":"28","zgl":0,"fakt":24},
+        {"pkd":"82","zgl":0,"fakt":24},{"pkd":"10","zgl":0,"fakt":15},{"pkd":"92","zgl":0,"fakt":6},
+        {"pkd":"29","zgl":0,"fakt":2},{"pkd":"32","zgl":0,"fakt":1},{"pkd":"13","zgl":0,"fakt":1}
+      ],
+      "Wrz 25": [
+        {"pkd":"84","zgl":91,"fakt":0},{"pkd":"22","zgl":43,"fakt":0},{"pkd":"69","zgl":38,"fakt":0},
+        {"pkd":"62","zgl":32,"fakt":120},{"pkd":"20","zgl":8,"fakt":23},{"pkd":"53","zgl":0,"fakt":637},
+        {"pkd":"66","zgl":0,"fakt":135},{"pkd":"64","zgl":0,"fakt":55},{"pkd":"70","zgl":0,"fakt":79},
+        {"pkd":"47","zgl":0,"fakt":83},{"pkd":"92","zgl":0,"fakt":83},{"pkd":"46","zgl":0,"fakt":60},
+        {"pkd":"73","zgl":0,"fakt":29},{"pkd":"29","zgl":0,"fakt":17},{"pkd":"32","zgl":0,"fakt":14},
+        {"pkd":"33","zgl":0,"fakt":13},{"pkd":"12","zgl":0,"fakt":42},{"pkd":"10","zgl":0,"fakt":7},
+        {"pkd":"28","zgl":0,"fakt":8},{"pkd":"82","zgl":0,"fakt":6}
+      ],
+      "Paź 25": [
+        {"pkd":"47","zgl":358,"fakt":2},{"pkd":"61","zgl":191,"fakt":0},{"pkd":"62","zgl":86,"fakt":0},
+        {"pkd":"73","zgl":57,"fakt":0},{"pkd":"21","zgl":50,"fakt":0},{"pkd":"64","zgl":20,"fakt":6},
+        {"pkd":"53","zgl":0,"fakt":328},{"pkd":"46","zgl":0,"fakt":85},
+        {"pkd":"58","zgl":0,"fakt":36},{"pkd":"23","zgl":0,"fakt":17},{"pkd":"28","zgl":0,"fakt":13},
+        {"pkd":"22","zgl":0,"fakt":7},{"pkd":"12","zgl":0,"fakt":7},{"pkd":"66","zgl":0,"fakt":1}
+      ],
+      "Lis 25": [
+        {"pkd":"18","zgl":135,"fakt":0},{"pkd":"49","zgl":0,"fakt":450},{"pkd":"53","zgl":0,"fakt":351},
+        {"pkd":"47","zgl":0,"fakt":93},{"pkd":"63","zgl":0,"fakt":88},{"pkd":"64","zgl":0,"fakt":58},
+        {"pkd":"46","zgl":0,"fakt":48},{"pkd":"28","zgl":0,"fakt":7},{"pkd":"20","zgl":0,"fakt":1},
+        {"pkd":"12","zgl":0,"fakt":3},{"pkd":"73","zgl":0,"fakt":9},{"pkd":"66","zgl":0,"fakt":1},
+        {"pkd":"92","zgl":0,"fakt":1}
+      ],
+      "Gru 25": [
+        {"pkd":"61","zgl":540,"fakt":24},{"pkd":"62","zgl":135,"fakt":115},{"pkd":"64","zgl":35,"fakt":105},
+        {"pkd":"27","zgl":18,"fakt":0},{"pkd":"47","zgl":0,"fakt":179},{"pkd":"20","zgl":0,"fakt":58},
+        {"pkd":"73","zgl":0,"fakt":48},{"pkd":"46","zgl":0,"fakt":56},{"pkd":"53","zgl":0,"fakt":16},
+        {"pkd":"22","zgl":0,"fakt":32},{"pkd":"92","zgl":0,"fakt":20},{"pkd":"72","zgl":0,"fakt":22},
+        {"pkd":"66","zgl":0,"fakt":13},{"pkd":"23","zgl":0,"fakt":5},{"pkd":"63","zgl":0,"fakt":4}
+      ]
+    }
   }
 }
