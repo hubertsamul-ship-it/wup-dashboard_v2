@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Briefcase, UserX, UserMinus, MoreHorizontal, History } from 'lucide-react';
 
 function fmt(n) {
@@ -20,84 +19,66 @@ function getMeta(label) {
   return { Icon: MoreHorizontal, color: '#f4a261' };
 }
 
-function AnimatedBar({ targetPct, color }) {
-  const [pct, setPct] = useState(0);
-  useEffect(() => {
-    const id = setTimeout(() => requestAnimationFrame(() => setPct(targetPct)), 60);
-    return () => clearTimeout(id);
-  }, [targetPct]);
-
-  return (
-    <div style={{
-      height: '8px',
-      background: `${color}1a`,
-      borderRadius: '99px',
-      overflow: 'hidden',
-    }}>
-      <div style={{
-        height: '100%',
-        width: `${pct}%`,
-        background: color,
-        borderRadius: '99px',
-        transition: 'width 0.65s cubic-bezier(0.4, 0, 0.2, 1)',
-      }} />
-    </div>
-  );
-}
-
 export default function WyrejDonut({ data = [] }) {
   if (data.length === 0) return null;
-
-  const maxPct = Math.max(...data.map(d => d.pct ?? 0));
 
   return (
     <div style={{
       flex: 1, display: 'flex', flexDirection: 'column',
-      justifyContent: 'space-evenly', gap: '8px', minHeight: 0,
+      justifyContent: 'space-evenly', gap: '10px', minHeight: 0,
     }}>
       {data.map((item, i) => {
         const { Icon, color } = getMeta(item.label);
         const pct = item.pct ?? 0;
-        const barPct = maxPct ? (pct / maxPct) * 100 : 0;
 
         return (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
 
-            {/* Ikona w kółku */}
+            {/* Ikona */}
             <div style={{
-              width: '32px', height: '32px', borderRadius: '50%',
+              width: '30px', height: '30px', borderRadius: '50%',
               background: `${color}18`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0,
             }}>
-              <Icon size={14} color={color} strokeWidth={2} />
+              <Icon size={13} color={color} strokeWidth={2} />
             </div>
 
-            {/* Nazwa + pasek */}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{
-                fontSize: '0.7rem', color: '#475569',
-                lineHeight: 1.3, marginBottom: '5px',
-                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            {/* Linia: Nazwa ............ % liczba */}
+            <div style={{
+              flex: 1, display: 'flex', alignItems: 'baseline', gap: '6px', minWidth: 0,
+            }}>
+              {/* Nazwa */}
+              <span style={{
+                fontSize: '0.78rem', color: '#cbd5e1', fontWeight: 600,
+                whiteSpace: 'nowrap', flexShrink: 0,
               }}>
                 {item.label}
-              </div>
-              <AnimatedBar targetPct={barPct} color={color} />
-            </div>
+              </span>
 
-            {/* Liczba + procent */}
-            <div style={{ textAlign: 'right', flexShrink: 0, minWidth: '68px' }}>
+              {/* Linia kropkowana */}
               <div style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '0.85rem', fontWeight: 700, color: '#1e293b', lineHeight: 1,
-              }}>
-                {fmt(item.value)}
-              </div>
-              <div style={{
-                fontSize: '0.62rem', color, fontWeight: 600, marginTop: '2px',
+                flex: 1,
+                borderBottom: '1px dotted rgba(148,163,184,0.35)',
+                marginBottom: '3px',
+              }} />
+
+              {/* Procent */}
+              <span style={{
+                fontSize: '0.78rem', color, fontWeight: 700,
+                whiteSpace: 'nowrap', flexShrink: 0,
               }}>
                 {pct.toFixed(1).replace('.', ',')}%
-              </div>
+              </span>
+
+              {/* Liczba */}
+              <span style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '0.82rem', fontWeight: 700, color: '#e2e8f0',
+                whiteSpace: 'nowrap', flexShrink: 0, minWidth: '52px', textAlign: 'right',
+              }}>
+                {fmt(item.value)}
+              </span>
             </div>
 
           </div>
