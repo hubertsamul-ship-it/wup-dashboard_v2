@@ -91,7 +91,7 @@ function geoToPath(geometry, project) {
 }
 
 const CHOROPLETH_COLORS = [
-  '#EEF2FF', '#E0E7FF', '#C7D2FE', '#818CF8', '#4F46E5', '#3730A3', '#1E1B4B',
+  '#30123b', '#466be3', '#28bceb', '#32f298', '#a4fc3c', '#eecf3a', '#fb7e21',
 ];
 
 // Natural Breaks (Jenks) — minimalizuje wariancję wewnątrz klas
