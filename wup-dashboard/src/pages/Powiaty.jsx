@@ -80,14 +80,17 @@ function CategoryRow({ item }) {
           {item.label}
         </div>
       </div>
-      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
         <div style={{
           fontFamily: "'JetBrains Mono', monospace",
-          fontSize: '0.82rem', fontWeight: 700, color: '#1e293b', lineHeight: 1,
+          fontSize: '0.82rem', fontWeight: 700, color: '#1e293b',
         }}>
           {fmt(item.value)}
         </div>
-        <div style={{ fontSize: '0.57rem', color, fontWeight: 600 }}>
+        <div style={{
+          fontSize: '0.62rem', color, fontWeight: 600,
+          background: `${color}18`, padding: '1px 5px', borderRadius: '4px',
+        }}>
           {item.pct?.toFixed(1).replace('.', ',')}%
         </div>
       </div>

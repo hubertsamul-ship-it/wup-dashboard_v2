@@ -101,14 +101,17 @@ function CategoryRow({ item }) {
           {item.label}
         </div>
       </div>
-      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
         <div style={{
           fontFamily: "'JetBrains Mono', monospace",
-          fontSize: '0.8rem', fontWeight: 700, color: '#1e293b', lineHeight: 1.2,
+          fontSize: '0.8rem', fontWeight: 700, color: '#1e293b',
         }}>
           {fmt(item.value)}
         </div>
-        <div style={{ fontSize: 'var(--font-xs)', color, fontWeight: 600 }}>
+        <div style={{
+          fontSize: 'var(--font-xs)', color, fontWeight: 600,
+          background: `${color}18`, padding: '1px 5px', borderRadius: '4px',
+        }}>
           {item.pct?.toFixed(1).replace('.', ',')}%
         </div>
       </div>
@@ -199,7 +202,7 @@ export default function Bezrobotni() {
       {/* ── Wiersz 2: Płeć (1/4) | Kategorie (3/8) | Charakterystyka (3/8) ── */}
       <div style={{
         display: 'grid', gridTemplateColumns: '1fr 1.5fr 1.5fr',
-        gap: '10px', marginBottom: '10px',
+        gap: '10px', minHeight: '280px', marginBottom: '10px',
       }}>
 
         {/* PŁEĆ */}
