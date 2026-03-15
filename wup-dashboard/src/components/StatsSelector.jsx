@@ -14,9 +14,9 @@ const TABS = [
 ];
 
 /**
- * Słupek z animacją 0% → targetPct%.
+ * Słupek z animacją 0% → targetPct%. Renderuje children na dole słupka.
  */
-function AnimatedBar({ targetPct, color, delay = 0 }) {
+function AnimatedBar({ targetPct, color, delay = 0, children }) {
   const [pct, setPct] = useState(0);
 
   useEffect(() => {
@@ -33,7 +33,11 @@ function AnimatedBar({ targetPct, color, delay = 0 }) {
       background: `linear-gradient(to top, ${color}99, ${color})`,
       borderRadius: '6px 6px 3px 3px',
       transition: 'height 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-    }} />
+      display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+      paddingBottom: '3px', overflow: 'hidden',
+    }}>
+      {children}
+    </div>
   );
 }
 
@@ -74,37 +78,36 @@ function BarChart({ data, color }) {
               }}>
                 {pct}%
               </div>
-              <AnimatedBar targetPct={barPct} color={color} delay={i * 30} />
+              <AnimatedBar targetPct={barPct} color={color} delay={i * 30}>
+                <span style={{
+                  fontSize: '0.54rem',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontWeight: 700, color: 'rgba(255,255,255,0.92)',
+                  whiteSpace: 'nowrap', lineHeight: 1,
+                }}>
+                  {fmt(d.value)}
+                </span>
+              </AnimatedBar>
             </div>
           );
         })}
       </div>
 
-      {/* Etykiety + liczba osób */}
+      {/* Etykiety */}
       <div style={{ display: 'flex', gap: '5px', marginTop: '7px', flexShrink: 0 }}>
         {data.map((d, i) => (
           <div
             key={i}
             style={{
-              flex: 1,
-              textAlign: 'center', lineHeight: 1.3,
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
+              flex: 1, textAlign: 'center', lineHeight: 1.3,
             }}
           >
             <span style={{
-              fontSize: '0.56rem', color: '#cbd5e1',
+              fontSize: '0.63rem', color: '#e2e8f0',
               fontWeight: 700,
               wordBreak: 'break-word', hyphens: 'auto',
             }}>
               {d.label}
-            </span>
-            <span style={{
-              fontSize: '0.56rem',
-              fontFamily: "'JetBrains Mono', monospace",
-              color, fontWeight: 600, opacity: 0.85,
-              whiteSpace: 'nowrap',
-            }}>
-              {fmt(d.value)}
             </span>
           </div>
         ))}
