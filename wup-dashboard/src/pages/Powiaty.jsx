@@ -260,8 +260,10 @@ export default function Powiaty({ initialPowiat = null }) {
     [cmpWgms, powiaty, hasNullLast]
   );
 
-  const trendZarej = d.trend_zarej_13m || [];
-  const trendWyrej = d.trend_wyrej_13m || [];
+  const SHOW_N     = 12;
+  const napodLabels = trendLabels.slice(-SHOW_N);
+  const trendZarej = (d.trend_zarej_13m || []).slice(-SHOW_N);
+  const trendWyrej = (d.trend_wyrej_13m || []).slice(-SHOW_N);
   const wyrejTop5  = (d.wyrej_reasons || []).slice(0, 5);
 
   // Stopa bezrobocia powiatu + delta vs poprzedni miesiąc
@@ -388,17 +390,17 @@ export default function Powiaty({ initialPowiat = null }) {
         gap: '10px', minHeight: '290px', marginBottom: '10px',
       }}>
 
-        <Card title="Napływ i odpływ — ostatnie 13 miesięcy" grow>
-          <div ref={chartRef} style={{ height: '240px' }}>
+        <Card title="Napływ i odpływ — ostatnie 12 miesięcy" grow>
+          <div ref={chartRef} style={{ height: '240px', overflow: 'hidden' }}>
             {trendZarej.some(v => v != null) && (
               <LineChartSVG
                 datasets={[
                   { data: trendZarej, color: '#e63946', label: 'Zarejestrowani' },
                   { data: trendWyrej, color: '#4895ef', label: 'Wyrejestrowani' },
                 ]}
-                labels={trendLabels}
+                labels={napodLabels}
                 height={Math.max(chartSize.h - 4, 100)}
-                width={chartSize.w}
+                width={Math.max(chartSize.w, 10)}
               />
             )}
           </div>
@@ -424,7 +426,9 @@ export default function Powiaty({ initialPowiat = null }) {
             max={6}
           />
         </div>
-        <LineChartSVG datasets={stopaDatasets} labels={trendLabels} height={130} width={900} />
+        <div style={{ overflow: 'hidden' }}>
+          <LineChartSVG datasets={stopaDatasets} labels={trendLabels.slice(-SHOW_N)} height={130} width={900} />
+        </div>
       </Card>
 
     </div>
