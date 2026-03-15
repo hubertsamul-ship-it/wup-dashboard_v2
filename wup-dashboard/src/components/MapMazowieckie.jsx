@@ -156,7 +156,8 @@ export default function MapMazowieckie({ onPowiatClick }) {
 
   return (
     <div style={{
-      position: 'relative', background: '#ffffff', borderRadius: '10px', overflow: 'hidden',
+      position: 'relative', background: '#F8FAFC', borderRadius: '10px', overflow: 'hidden',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
     }}>
       {tooltip && (
         <div style={{
@@ -218,7 +219,7 @@ export default function MapMazowieckie({ onPowiatClick }) {
             >
               <path
                 d={gp.d}
-                fill={isHovered ? '#FACC15' : (hasData ? getChoroColor(pow.stopa, breaks) : '#eef0f3')}
+                fill={isHovered ? '#FACC15' : (hasData ? getChoroColor(pow.stopa, breaks) : '#E2E8F0')}
                 stroke="#FFFFFF"
                 strokeWidth={isHovered ? '1.5' : '0.6'}
                 style={{ transition: 'fill 0.2s, stroke-width 0.2s' }}
@@ -229,7 +230,7 @@ export default function MapMazowieckie({ onPowiatClick }) {
       </svg>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px', padding: '0 4px' }}>
         <div style={{ fontSize: '0.65rem', color: 'var(--muted)' }}>
-          Kliknij powiat · szary = brak danych · najazd = szczegóły
+          Kliknij powiat = szczegóły
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
           <span style={{ fontSize: '0.62rem', color: 'var(--muted)', marginRight: '2px' }}>{minS.toFixed(1).replace('.', ',')}%</span>

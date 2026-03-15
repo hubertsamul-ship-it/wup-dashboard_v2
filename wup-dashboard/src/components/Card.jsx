@@ -31,9 +31,9 @@ export default function Card({ title, badge, badgeLive, children, style: extraSt
           {badge && (
             <div style={{
               fontSize: 'var(--font-xs)',
-              background: badgeLive ? 'rgba(22,163,74,0.10)' : 'rgba(0,0,0,0.05)',
-              color: badgeLive ? 'var(--green)' : 'var(--muted)',
-              border: badgeLive ? '1px solid rgba(22,163,74,0.25)' : '1px solid rgba(0,0,0,0.07)',
+              background: badgeLive ? '#E0E7FF' : 'rgba(0,0,0,0.05)',
+              color: badgeLive ? '#3730A3' : 'var(--muted)',
+              border: badgeLive ? '1px solid #C7D2FE' : '1px solid rgba(0,0,0,0.07)',
               padding: '2px 8px', borderRadius: '20px', fontWeight: 500,
             }}>
               {badge}
