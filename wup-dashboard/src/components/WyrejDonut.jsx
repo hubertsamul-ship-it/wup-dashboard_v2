@@ -1,4 +1,4 @@
-import { Briefcase, UserX, UserMinus, MoreHorizontal, History } from 'lucide-react';
+import { Briefcase, UserX, UserMinus, HelpCircle, History, BookOpen, GraduationCap } from 'lucide-react';
 
 function fmt(n) {
   if (n == null) return '—';
@@ -6,17 +6,21 @@ function fmt(n) {
 }
 
 const ICON_MAP = [
-  { key: 'kontakt',    Icon: UserX,          color: '#4895ef' },
-  { key: 'podjęcie',   Icon: Briefcase,       color: '#52b788' },
-  { key: 'pracy',      Icon: Briefcase,       color: '#52b788' },
-  { key: 'rezygnacja', Icon: UserMinus,       color: '#e63946' },
-  { key: 'wiek',       Icon: History,         color: '#9b8ccc' },
-  { key: 'emery',      Icon: History,         color: '#9b8ccc' },
+  { key: 'kontakt',      Icon: UserX,          color: '#4895ef' },
+  { key: 'podjęcie',     Icon: Briefcase,       color: '#52b788' },
+  { key: 'pracy',        Icon: Briefcase,       color: '#52b788' },
+  { key: 'rezygnacja',   Icon: UserMinus,       color: '#e63946' },
+  { key: 'wiek',         Icon: History,         color: '#9b8ccc' },
+  { key: 'emery',        Icon: History,         color: '#9b8ccc' },
+  { key: 'szkoleni',     Icon: BookOpen,        color: '#38bdf8' },
+  { key: 'staż',         Icon: GraduationCap,   color: '#52b788' },
+  { key: 'staz',         Icon: GraduationCap,   color: '#52b788' },
+  { key: 'kurs',         Icon: BookOpen,        color: '#38bdf8' },
 ];
 function getMeta(label) {
   const l = label.toLowerCase();
   for (const m of ICON_MAP) if (l.includes(m.key)) return m;
-  return { Icon: MoreHorizontal, color: '#f4a261' };
+  return { Icon: HelpCircle, color: '#94a3b8' };
 }
 
 export default function WyrejDonut({ data = [] }) {

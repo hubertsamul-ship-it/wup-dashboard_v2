@@ -107,6 +107,7 @@ export default function Zwolnienia() {
 
   const [rangeFrom, setRangeFrom] = useState(null);
   const [rangeTo,   setRangeTo]   = useState(null);
+  const [pkdMiesiac, setPkdMiesiac] = useState(null);
 
   const from = rangeFrom ?? labels.find(l => l.includes('Sty 2025')) ?? labels[0] ?? '';
   const to   = rangeTo   ?? labels[labels.length - 1] ?? '';
@@ -138,6 +139,9 @@ export default function Zwolnienia() {
 
   const pkdZglData  = pkd_top10.slice(0, 5).map(d      => ({ label: pkdLabel(d.pkd), value: d.n }));
   const pkdFaktData = pkd_top10_fakt.slice(0, 5).map(d => ({ label: pkdLabel(d.pkd), value: d.n }));
+
+  // Selektor miesiąca dla PKD — domyślnie ostatni dostępny miesiąc
+  const pkdMonth = pkdMiesiac ?? tLabels[tLabels.length - 1] ?? '';
 
   return (
     <div className="page-enter">
@@ -195,12 +199,48 @@ export default function Zwolnienia() {
         </Card>
       </Grid>
 
-      {/* PKD */}
+      {/* PKD — selektor miesiąca */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: '10px',
+        marginBottom: '8px', flexWrap: 'wrap',
+      }}>
+        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text)' }}>
+          Ranking PKD · miesiąc:
+        </span>
+        <select
+          value={pkdMonth}
+          onChange={e => setPkdMiesiac(e.target.value)}
+          style={{
+            background: 'var(--card-bg)',
+            border: '1px solid var(--border)',
+            borderRadius: '6px',
+            color: 'var(--text)',
+            padding: '4px 28px 4px 10px',
+            fontSize: '0.75rem',
+            fontFamily: 'Outfit, sans-serif',
+            cursor: 'pointer',
+            appearance: 'none',
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'right 8px center',
+          }}
+        >
+          {tLabels.map(l => (
+            <option key={l} value={l}
+              style={{ background: 'var(--card-bg)', color: 'var(--text)' }}
+            >{l}</option>
+          ))}
+        </select>
+        <span style={{ fontSize: '0.68rem', color: 'var(--muted)', fontStyle: 'italic' }}>
+          (ranking za ost. 12 mies.)
+        </span>
+      </div>
+
       <Grid cols={2} grow>
-        <Card title="Zgłoszenia wg PKD · ost. 12 m." badge="Top 5" grow>
+        <Card title={`Zgłoszenia wg PKD · ${pkdMonth}`} badge="Top 5" grow>
           <RankTable data={pkdZglData}  unit=" os." accentColor="#e63946" getIcon={getPkdIcon} />
         </Card>
-        <Card title="Faktyczne zwolnienia wg PKD · ost. 12 m." badge="Top 5" grow>
+        <Card title={`Faktyczne zwolnienia wg PKD · ${pkdMonth}`} badge="Top 5" grow>
           <RankTable data={pkdFaktData} unit=" os." accentColor="#e63946" getIcon={getPkdIcon} />
         </Card>
       </Grid>
