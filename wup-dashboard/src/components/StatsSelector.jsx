@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Clock, Users, GraduationCap, Briefcase } from 'lucide-react';
 
+function fmt(n) {
+  if (n == null) return '—';
+  return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+}
+
 const TABS = [
   { id: 'czas', label: 'Czas bezrobocia', color: '#f3a683', Icon: Clock },
   { id: 'wiek', label: 'Wiek',             color: '#4895ef', Icon: Users },
@@ -75,19 +80,32 @@ function BarChart({ data, color }) {
         })}
       </div>
 
-      {/* Etykiety */}
+      {/* Etykiety + liczba osób */}
       <div style={{ display: 'flex', gap: '5px', marginTop: '7px', flexShrink: 0 }}>
         {data.map((d, i) => (
           <div
             key={i}
             style={{
               flex: 1,
-              fontSize: '0.52rem', color: '#94a3b8',
               textAlign: 'center', lineHeight: 1.3,
-              wordBreak: 'break-word', hyphens: 'auto',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
             }}
           >
-            {d.label}
+            <span style={{
+              fontSize: '0.56rem', color: '#cbd5e1',
+              fontWeight: 700,
+              wordBreak: 'break-word', hyphens: 'auto',
+            }}>
+              {d.label}
+            </span>
+            <span style={{
+              fontSize: '0.56rem',
+              fontFamily: "'JetBrains Mono', monospace",
+              color, fontWeight: 600, opacity: 0.85,
+              whiteSpace: 'nowrap',
+            }}>
+              {fmt(d.value)}
+            </span>
           </div>
         ))}
       </div>

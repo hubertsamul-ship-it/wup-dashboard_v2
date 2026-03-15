@@ -101,7 +101,7 @@ function CategoryRow({ item }) {
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
-          fontSize: '0.62rem', color: '#475569', lineHeight: 1.3,
+          fontSize: '0.70rem', color: '#475569', lineHeight: 1.3,
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {item.label}
@@ -110,12 +110,12 @@ function CategoryRow({ item }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
         <div style={{
           fontFamily: "'JetBrains Mono', monospace",
-          fontSize: '0.8rem', fontWeight: 700, color: '#1e293b',
+          fontSize: '0.90rem', fontWeight: 700, color: '#1e293b',
         }}>
           {fmt(item.value)}
         </div>
         <div style={{
-          fontSize: 'var(--font-xs)', color, fontWeight: 600,
+          fontSize: '0.70rem', color, fontWeight: 600,
           background: `${color}18`, padding: '1px 5px', borderRadius: '4px',
         }}>
           {item.pct?.toFixed(1).replace('.', ',')}%
@@ -238,10 +238,7 @@ export default function Bezrobotni() {
 
         {/* KATEGORIE */}
         <Card title={`Kategorie bezrobotnych · ${okresAbbr}`} grow>
-          <div style={{
-            display: 'flex', flexDirection: 'column',
-            gap: '6px',
-          }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', minHeight: 0 }}>
             {allKat.map((item, i) => <CategoryRow key={i} item={item} />)}
           </div>
         </Card>
