@@ -101,7 +101,7 @@ function CategoryRow({ item }) {
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
-          fontSize: '0.70rem', color: '#475569', lineHeight: 1.3,
+          fontSize: '0.78rem', color: '#475569', lineHeight: 1.3,
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {item.label}

@@ -80,7 +80,7 @@ function BarChart({ data, color }) {
               </div>
               <AnimatedBar targetPct={barPct} color={color} delay={i * 30}>
                 <span style={{
-                  fontSize: '0.54rem',
+                  fontSize: '0.64rem',
                   fontFamily: "'JetBrains Mono', monospace",
                   fontWeight: 700, color: 'rgba(255,255,255,0.92)',
                   whiteSpace: 'nowrap', lineHeight: 1,
