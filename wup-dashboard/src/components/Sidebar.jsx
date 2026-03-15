@@ -101,14 +101,6 @@ export default function Sidebar({ active, onNav, collapsed, onToggle }) {
               <RefreshCw size={12} />
               Odśwież dane
             </button>
-            <div style={{ marginTop: '7px', display: 'flex', flexDirection: 'column', gap: '3px' }}>
-              {['Osoby bezrobotne · Sty 2026', 'Stopa bezrobocia · Sty 2026', 'Raporty · Gru 2025'].map(s => (
-                <div key={s} style={{ fontSize: 'var(--font-xs)', color: 'var(--muted2)', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                  <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'var(--green)', flexShrink: 0, display: 'inline-block' }} />
-                  {s}
-                </div>
-              ))}
-            </div>
           </>
         ) : (
           <div style={{ display: 'flex', justifyContent: 'center' }}>
