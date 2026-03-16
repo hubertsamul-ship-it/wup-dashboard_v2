@@ -627,9 +627,13 @@ def extract_zwolnienia() -> dict:
     trend_13m = []
     for (rok, mc) in last_13:
         d = months_data[(rok, mc)]
+        pkd_m      = sorted(d['pkd'].items(),      key=lambda x: -x[1])[:10]
+        pkd_m_fakt = sorted(d.get('pkd_fakt', {}).items(), key=lambda x: -x[1])[:10]
         trend_13m.append({
             'label': f"{MIESIACE[mc-1]} {str(rok)[2:]}",
             'zgl': d['zgl'], 'wyd': d['wyd'], 'fakt': d['fakt'], 'mon': d['mon'],
+            'pkd':      [{'pkd': k, 'n': v} for k, v in pkd_m],
+            'pkd_fakt': [{'pkd': k, 'n': v} for k, v in pkd_m_fakt],
         })
 
     cur = months_data[sorted_keys[-1]]
