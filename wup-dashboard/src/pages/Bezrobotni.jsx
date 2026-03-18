@@ -7,6 +7,7 @@ import LineChartSVG from '../components/LineChartSVG';
 import WyrejDonut from '../components/WyrejDonut';
 import StatsSelector from '../components/StatsSelector';
 import { useAppData } from '../context/DataContext';
+import InfoTooltip from '../components/InfoTooltip';
 
 // Hook mierzący rozmiar kontenera — chart wypełnia dostępną przestrzeń
 function useContainerSize(defaultW = 560, defaultH = 200) {
@@ -60,6 +61,16 @@ function fmtDelta(d, label = 'poprzedni') {
   if (d == null || isNaN(d)) return '…';
   const abs = Math.abs(d).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
   return d >= 0 ? `↑ +${abs} vs. ${label}` : `↓ −${abs} vs. ${label}`;
+}
+function fmtRR(d) {
+  if (d == null || isNaN(d)) return null;
+  const abs = Math.abs(Math.round(d)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+  return d >= 0 ? `r/r ↑ +${abs}` : `r/r ↓ \u2212${abs}`;
+}
+function fmtRRstopa(d) {
+  if (d == null || isNaN(d)) return null;
+  const abs = Math.abs(d).toFixed(1).replace('.', ',');
+  return d >= 0 ? `r/r ↑ +${abs} pp` : `r/r ↓ \u2212${abs} pp`;
 }
 function dtType(d) {
   if (d == null) return 'eq';
@@ -136,14 +147,16 @@ export default function Bezrobotni() {
   const okresAbbr    = formatOkresAbbr(meta?.okres);
 
   const {
-    bezr_razem, bezr_delta,
-    wyrej_razem, wyrej_delta,
-    zarej_razem, zarej_delta,
-    oferty_razem, oferty_delta,
+    bezr_razem, bezr_delta, bezr_delta_rr = null,
+    wyrej_razem, wyrej_delta, wyrej_delta_rr = null,
+    zarej_razem, zarej_delta, zarej_delta_rr = null,
+    oferty_razem, oferty_delta, oferty_delta_rr = null,
+    aktywizacja_pct = null,
     kategorie   = [],
     charakterystyka,
     wyrej_reasons = [],
     trend_13m     = [],
+    trend_13m_prev_year = [],
   } = bezrobotni;
 
   const { kobiety, mezczyzni, czas, wiek, wyk, staz = [] } = charakterystyka;
@@ -157,9 +170,11 @@ export default function Bezrobotni() {
   const allKat = [...kategorie].sort((a, b) => b.n - a.n)
     .map(k => ({ label: k.label, value: k.n, pct: k.pct }));
 
-  const trendLabels = trend_13m.map(t => t.label);
-  const trendZarej  = trend_13m.map(t => t.zarej);
-  const trendWyrej  = trend_13m.map(t => t.wyrej);
+  const trendLabels    = trend_13m.map(t => t.label);
+  const trendZarej     = trend_13m.map(t => t.zarej);
+  const trendWyrej     = trend_13m.map(t => t.wyrej);
+  const trendZarejPrev = trend_13m_prev_year.map(t => t?.zarej ?? null);
+  const trendWyrejPrev = trend_13m_prev_year.map(t => t?.wyrej ?? null);
   const wyrejTop5   = wyrej_reasons.slice(0, 5);
   const total       = kobiety + mezczyzni;
 
@@ -167,8 +182,9 @@ export default function Bezrobotni() {
   const COLOR_M = '#4895ef';  // niebieski — mężczyźni
 
   // Stopa bezrobocia Mazowieckie + delta
-  const mazStopa      = stopa?.stopa_maz ?? null;
-  const mazStopaDelta = stopa?.stopa_maz_delta ?? null;
+  const mazStopa         = stopa?.stopa_maz ?? null;
+  const mazStopaDelta    = stopa?.stopa_maz_delta ?? null;
+  const mazStopaDeltaRR  = stopa?.stopa_maz_delta_rr ?? null;
   const mazStopaDeltaType = mazStopaDelta == null ? 'eq' : mazStopaDelta >= 0 ? 'up' : 'dn';
   const mazStopaDeltaStr  = mazStopaDelta == null ? null : formatDeltaStopa(mazStopaDelta, meta?.stopa_poprzedni_okres);
   const stopaOkresAbbr    = formatOkresAbbr(meta?.stopa_okres);
@@ -183,31 +199,42 @@ export default function Bezrobotni() {
         sub="MRPiPS-01 · rejestrowane bezrobocie · województwo mazowieckie"
       />
 
-      {/* ── Wiersz 1: 4 KPI ─────────────────────────────────────────── */}
+      {/* ── Wiersz 1: 5 KPI ─────────────────────────────────────────── */}
       <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+        display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)',
         gap: '10px', flexShrink: 0, marginBottom: '10px',
       }}>
         <KpiCard
           flag="Stan końcowy" flagColor="maz"
           target={loading ? 0 : bezr_razem} label="Zarejestrowanych"
           delta={loading ? '…' : fmtDelta(bezr_delta, prevLabel)} deltaType={dtType(bezr_delta)}
+          deltaRR={fmtRR(bezr_delta_rr)}
         />
         <KpiCard
           flag="Wyrejestrowani" flagColor="green"
           target={loading ? 0 : wyrej_razem} label="w miesiącu"
           delta={loading ? '…' : fmtDelta(wyrej_delta, prevLabel)} deltaType={dtType(wyrej_delta)}
+          deltaRR={fmtRR(wyrej_delta_rr)}
           variant="green"
         />
         <KpiCard
           flag="Zarejestrowani" flagColor="pl"
           target={loading ? 0 : zarej_razem} label="w miesiącu"
           delta={loading ? '…' : fmtDelta(zarej_delta, prevLabel)} deltaType={dtType(zarej_delta)}
+          deltaRR={fmtRR(zarej_delta_rr)}
         />
         <KpiCard
           flag="Oferty pracy" flagColor="green"
-          target={loading ? 0 : oferty_razem} label="w województwie"
+          target={loading ? 0 : oferty_razem} label={<>w województwie<InfoTooltip text="Liczba wolnych miejsc pracy i miejsc aktywizacji zawodowej zgłoszonych przez pracodawców do PUP." source="MRPiPS-01" /></>}
           delta={loading ? '…' : fmtDelta(oferty_delta, prevLabel)} deltaType={dtType(oferty_delta)}
+          deltaRR={fmtRR(oferty_delta_rr)}
+          variant="green"
+        />
+        <KpiCard
+          flag="Skuteczność aktywizacji" flagColor="green"
+          target={loading ? 0 : Math.round((aktywizacja_pct ?? 0) * 10)}
+          decimals={1} suffix="%"
+          label={<>wyrej. = podjęcie pracy<InfoTooltip text="Odsetek wyrejestrowanych bezrobotnych, których przyczyną wyrejestrowania było podjęcie zatrudnienia." source="MRPiPS-01" /></>}
           variant="green"
         />
       </div>
@@ -225,6 +252,7 @@ export default function Bezrobotni() {
             target={Math.round((mazStopa || 0) * 10)} decimals={1} suffix="%"
             label="stopa bezrobocia · Mazowieckie"
             delta={mazStopaDeltaStr} deltaType={mazStopaDeltaType}
+            deltaRR={fmtRRstopa(mazStopaDeltaRR)}
             variant={mazStopaDelta != null && mazStopaDelta > 0 ? 'red' : 'green'}
           />
           <Card title={`Płeć · ${okresAbbr}`} grow>
@@ -259,12 +287,14 @@ export default function Bezrobotni() {
         gap: '10px', marginBottom: '10px',
       }}>
 
-        <Card title="Napływ i odpływ bezrobotnych — ostatnie 13 miesięcy" grow>
+        <Card title="Napływ i odpływ bezrobotnych — ostatnie 13 miesięcy" grow exportTitle="naplyw_odplyw_bezrobotnych">
           <div ref={chartRef} style={{ height: '200px' }}>
             <LineChartSVG
               datasets={[
                 { data: trendZarej, color: '#e63946', label: 'Zarejestrowani' },
                 { data: trendWyrej, color: '#4895ef', label: 'Wyrejestrowani' },
+                { data: trendZarejPrev, color: '#e63946', label: 'Zarej. (rok wcześniej)', ghost: true },
+                { data: trendWyrejPrev, color: '#4895ef', label: 'Wyrej. (rok wcześniej)', ghost: true },
               ]}
               labels={trendLabels}
               height={Math.max(chartSize.h - 4, 100)}
@@ -273,7 +303,7 @@ export default function Bezrobotni() {
           </div>
         </Card>
 
-        <Card title={`Przyczyny wyrejestrowania · ${okresAbbr}`} grow>
+        <Card title={`Przyczyny wyrejestrowania · ${okresAbbr}`} grow exportTitle="przyczyny_wyrejestrowania">
           <WyrejDonut
             data={wyrejTop5.map(r => ({ label: r.label, value: r.n, pct: r.pct }))}
           />

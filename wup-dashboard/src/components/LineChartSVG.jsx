@@ -164,22 +164,38 @@ export default function LineChartSVG({
       {datasets.map((ds, di) => {
         const col = ds.color || '#4895ef';
         const rgb = hexToRgb(col);
-        const vals = ds.data;
+        const isGhost = ds.ghost === true;
+        const vals = ds.data.filter(v => v != null);
+        if (vals.length === 0) return null;
 
-        let path = `M${xPos(0).toFixed(1)},${yPos(vals[0]).toFixed(1)}`;
-        for (let i = 1; i < vals.length; i++) {
-          const cpx = (xPos(i - 1) + xPos(i)) / 2;
-          path += ` C${cpx.toFixed(1)},${yPos(vals[i-1]).toFixed(1)} ${cpx.toFixed(1)},${yPos(vals[i]).toFixed(1)} ${xPos(i).toFixed(1)},${yPos(vals[i]).toFixed(1)}`;
-        }
+        // Build path only for non-null values aligned to their indices
+        const allValsWithIdx = ds.data.map((v, i) => ({ v, i })).filter(pt => pt.v != null);
+        let path = '';
+        allValsWithIdx.forEach(({ v, i }, pi) => {
+          if (pi === 0) {
+            path = `M${xPos(i).toFixed(1)},${yPos(v).toFixed(1)}`;
+          } else {
+            const prev = allValsWithIdx[pi - 1];
+            const cpx = (xPos(prev.i) + xPos(i)) / 2;
+            path += ` C${cpx.toFixed(1)},${yPos(prev.v).toFixed(1)} ${cpx.toFixed(1)},${yPos(v).toFixed(1)} ${xPos(i).toFixed(1)},${yPos(v).toFixed(1)}`;
+          }
+        });
+        const lastPt = allValsWithIdx[allValsWithIdx.length - 1];
+        const firstPt = allValsWithIdx[0];
         const area = path +
-          ` L${xPos(vals.length - 1).toFixed(1)},${(pad.t + iH).toFixed(1)}` +
-          ` L${pad.l},${(pad.t + iH).toFixed(1)} Z`;
+          ` L${xPos(lastPt.i).toFixed(1)},${(pad.t + iH).toFixed(1)}` +
+          ` L${xPos(firstPt.i).toFixed(1)},${(pad.t + iH).toFixed(1)} Z`;
 
         return (
-          <g key={di}>
-            <path d={area} fill={`rgba(${rgb},0.07)`} />
-            <path d={path} fill="none" stroke={col} strokeWidth="2" strokeLinejoin="round" />
-            {vals.map((v, i) => (
+          <g key={di} opacity={isGhost ? 0.38 : 1}>
+            {!isGhost && <path d={area} fill={`rgba(${rgb},0.07)`} />}
+            <path
+              d={path} fill="none" stroke={col}
+              strokeWidth={isGhost ? '1.5' : '2'}
+              strokeDasharray={isGhost ? '5,3' : undefined}
+              strokeLinejoin="round"
+            />
+            {!isGhost && allValsWithIdx.map(({ v, i }) => (
               <circle
                 key={i}
                 cx={xPos(i).toFixed(1)} cy={yPos(v).toFixed(1)}
@@ -218,19 +234,23 @@ export default function LineChartSVG({
         return datasets.map((ds, di) => {
           const col = ds.color || '#4895ef';
           const lbl = ds.label || '';
+          const isGhost = ds.ghost === true;
           const x = curX;
           const charW = 7.2;
           curX += lbl.length * charW + 30;
           return (
-            <g key={di}>
-              {/* Linia legendy */}
-              <line x1={x} y1={12} x2={x + 14} y2={12} stroke={col} strokeWidth="2.5" strokeLinecap="round" />
-              <circle cx={x + 7} cy={12} r="3" fill={col} />
+            <g key={di} opacity={isGhost ? 0.55 : 1}>
+              <line
+                x1={x} y1={12} x2={x + 14} y2={12}
+                stroke={col} strokeWidth="2.5" strokeLinecap="round"
+                strokeDasharray={isGhost ? '4,2' : undefined}
+              />
+              {!isGhost && <circle cx={x + 7} cy={12} r="3" fill={col} />}
               <text
                 x={x + 19} y={16}
                 fontSize="11" fill="#334155"
                 fontFamily="Outfit, sans-serif"
-                fontWeight="600"
+                fontWeight={isGhost ? '400' : '600'}
               >
                 {lbl}
               </text>

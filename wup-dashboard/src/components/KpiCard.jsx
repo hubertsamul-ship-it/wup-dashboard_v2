@@ -40,6 +40,7 @@ export default function KpiCard({
   flag, flagColor = 'pl',
   target, decimals = 0, suffix = '',
   label, delta, deltaType = 'up',
+  deltaRR,   // second delta line: rok do roku (plain string)
   variant,   // 'red' | 'green' | 'blue' | undefined
   compact,   // smaller padding + font for dense layouts
   style: extraStyle = {},
@@ -108,7 +109,7 @@ export default function KpiCard({
         {label}
       </div>
 
-      {/* delta */}
+      {/* delta m/m */}
       {delta && (
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: '4px',
@@ -123,6 +124,20 @@ export default function KpiCard({
           ),
         }}>
           {delta}
+        </div>
+      )}
+
+      {/* delta r/r */}
+      {deltaRR && (
+        <div style={{
+          display: 'inline-flex', alignItems: 'center',
+          marginTop: '4px', marginLeft: delta ? '6px' : undefined,
+          padding: '3px 9px', borderRadius: '999px',
+          fontSize: '0.62rem', fontWeight: 500,
+          fontFamily: "'JetBrains Mono', monospace",
+          background: 'rgba(0,0,0,0.04)', color: 'var(--muted)', border: '1px solid var(--border)',
+        }}>
+          {deltaRR}
         </div>
       )}
     </div>

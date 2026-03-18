@@ -15,11 +15,12 @@ function fmtVal(v, unit) {
  * @param {string}   accentColor — kolor ranku i paska (#52b788, #e63946, #4895ef …)
  * @param {boolean}  reverse     — true = niższe wartości wyżej (BOT listy)
  */
-export default function RankTable({ data = [], unit = '', accentColor = '#4895ef', reverse = false, getIcon }) {
+export default function RankTable({ data = [], unit = '', accentColor = '#4895ef', reverse = false, getIcon, avgLine = null, avgLabel = 'śr.' }) {
   if (data.length === 0) return null;
 
   const sorted = [...data].sort((a, b) => reverse ? a.value - b.value : b.value - a.value);
   const maxVal = Math.max(...sorted.map(d => d.value), 1);
+  const avgLinePct = avgLine != null ? Math.min((avgLine / maxVal) * 100, 100) : null;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -56,6 +57,19 @@ export default function RankTable({ data = [], unit = '', accentColor = '#4895ef
               pointerEvents: 'none',
               transition: 'width 0.9s ease',
             }} />
+            {/* Linia referencyjna (np. średnia Mazowsza) */}
+            {avgLinePct != null && (
+              <div style={{
+                position: 'absolute',
+                left: `${avgLinePct}%`,
+                top: 0, bottom: 0,
+                width: '2px',
+                background: '#475569',
+                opacity: 0.35,
+                pointerEvents: 'none',
+                zIndex: 2,
+              }} />
+            )}
 
             {/* Numer pozycji */}
             <span style={{
@@ -113,6 +127,14 @@ export default function RankTable({ data = [], unit = '', accentColor = '#4895ef
           </div>
         );
       })}
+      {avgLinePct != null && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '6px', paddingLeft: '8px' }}>
+          <div style={{ width: '12px', height: '2px', background: '#475569', opacity: 0.5, borderRadius: '1px' }} />
+          <span style={{ fontSize: '0.62rem', color: 'var(--muted)' }}>
+            {avgLabel}: {unit === '%' ? avgLine.toFixed(1).replace('.', ',') + '%' : fmtVal(avgLine, unit)}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

@@ -3,6 +3,8 @@ import KpiCard from '../components/KpiCard';
 import Card, { SectionHeader, Grid } from '../components/Card';
 import LineChartSVG from '../components/LineChartSVG';
 import RankTable from '../components/RankTable';
+import HorizontalBar, { stopaColor, greenColor } from '../components/HorizontalBar';
+import InfoTooltip from '../components/InfoTooltip';
 import { useAppData } from '../context/DataContext';
 
 // Kolory linii trendu (woj. 1 = czerwony, 2 = niebieski, 3 = pomarańczowy)
@@ -131,6 +133,11 @@ function fmtDeltaStopa(d, prevOkres) {
   const label = miesiacNom(prevOkres);
   return d >= 0 ? `↑ +${abs} pp vs. ${label}` : `↓ −${abs} pp vs. ${label}`;
 }
+function fmtRRstopa(d) {
+  if (d == null || isNaN(d)) return null;
+  const abs = Math.abs(d).toFixed(1).replace('.', ',');
+  return d >= 0 ? `r/r ↑ +${abs} pp` : `r/r ↓ \u2212${abs} pp`;
+}
 
 export default function Stopa() {
   const [selWojs, setSelWojs] = useState(['Mazowieckie']);
@@ -193,16 +200,18 @@ export default function Stopa() {
         <KpiCard
           flag="Polska" flagColor="pl"
           target={Math.round(stopa_pl_val * 10)} decimals={1} suffix="%"
-          label="Ogółem kraj"
+          label={<>Ogółem kraj<InfoTooltip text="Stopa bezrobocia rejestrowanego — udział zarejestrowanych bezrobotnych w cywilnej ludności aktywnej zawodowo." source="GUS BDL" /></>}
           delta={fmtDeltaStopa(stopa.stopa_pl_delta, meta?.stopa_poprzedni_okres)}
           deltaType={stopa.stopa_pl_delta != null ? (stopa.stopa_pl_delta >= 0 ? 'up' : 'dn') : 'eq'}
+          deltaRR={fmtRRstopa(stopa.stopa_pl_delta_rr)}
         />
         <KpiCard
           flag="Mazowieckie" flagColor="maz"
           target={Math.round(stopa.stopa_maz * 10)} decimals={1} suffix="%"
-          label="Najniższa w PL"
+          label={<>Najniższa w PL<InfoTooltip text="Mazowieckie konsekwentnie notuje najniższą stopę bezrobocia wśród wszystkich województw." source="GUS BDL" /></>}
           delta={fmtDeltaStopa(stopa.stopa_maz_delta, meta?.stopa_poprzedni_okres)}
           deltaType={stopa.stopa_maz_delta != null ? (stopa.stopa_maz_delta >= 0 ? 'up' : 'dn') : 'eq'}
+          deltaRR={fmtRRstopa(stopa.stopa_maz_delta_rr)}
           variant="green"
         />
         <KpiCard
@@ -232,10 +241,10 @@ export default function Stopa() {
       {/* Ranking powiatów */}
       <Grid cols={2} grow>
         <Card title="Powiaty mazowieckie — najwyższa stopa" badge="Top 5" grow>
-          <RankTable data={pow_top5} unit="%" accentColor="#e63946" />
+          <RankTable data={pow_top5} unit="%" accentColor="#e63946" avgLine={stopa.stopa_maz} avgLabel="śr. MAZ" />
         </Card>
         <Card title="Powiaty mazowieckie — najniższa stopa" badge="Bot 5" grow>
-          <RankTable data={pow_bot5} unit="%" accentColor="#52b788" reverse />
+          <RankTable data={pow_bot5} unit="%" accentColor="#52b788" reverse avgLine={stopa.stopa_maz} avgLabel="śr. MAZ" />
         </Card>
       </Grid>
 

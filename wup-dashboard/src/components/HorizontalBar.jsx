@@ -37,6 +37,8 @@ export function greenColor(val, mx) {
  * @param {number}   barHeight  — wysokość słupka w px (domyślnie 6)
  * @param {boolean}  wrapLabel  — zezwól na zawijanie etykiety (domyślnie false = ellipsis)
  * @param {number}   labelWidth — szerokość kolumny etykiety w px (domyślnie 140)
+ * @param {number}   avgLine    — wartość referencji (np. średnia); rysuje pionową linię na słupkach
+ * @param {string}   avgLabel   — etykieta linii referencji (domyślnie 'śr.')
  */
 export default function HorizontalBar({
   data,
@@ -46,10 +48,13 @@ export default function HorizontalBar({
   barHeight = 6,
   wrapLabel = false,
   labelWidth = 140,
+  avgLine = null,
+  avgLabel = 'śr.',
 }) {
   const sorted = [...data].sort((a, b) => b.value - a.value);
   const items  = maxItems ? sorted.slice(0, maxItems) : sorted;
   const maxVal = Math.max(...items.map(d => d.value));
+  const avgPct = avgLine != null ? Math.min((avgLine / maxVal) * 100, 100) : null;
 
   return (
     <div>
@@ -88,8 +93,19 @@ export default function HorizontalBar({
 
             {/* Bar + value column */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '3px' }}>
-              <div style={{ height: `${barHeight}px`, background: 'rgba(0,0,0,0.07)', borderRadius: '3px', overflow: 'hidden' }}>
+              <div style={{ height: `${barHeight}px`, background: 'rgba(0,0,0,0.07)', borderRadius: '3px', position: 'relative' }}>
                 <div style={{ height: '100%', borderRadius: '3px', background: col, width: `${pct}%`, transition: 'width 0.8s ease' }} />
+                {avgPct != null && (
+                  <div style={{
+                    position: 'absolute',
+                    left: `${avgPct}%`,
+                    top: '-4px', bottom: '-4px',
+                    width: '2px',
+                    background: '#475569',
+                    borderRadius: '1px',
+                    opacity: 0.55,
+                  }} />
+                )}
               </div>
             </div>
 
@@ -110,6 +126,14 @@ export default function HorizontalBar({
           </div>
         );
       })}
+      {avgPct != null && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '6px' }}>
+          <div style={{ width: '12px', height: '2px', background: '#475569', opacity: 0.55, borderRadius: '1px' }} />
+          <span style={{ fontSize: '0.62rem', color: 'var(--muted)' }}>
+            {avgLabel}: {unit === '%' ? avgLine.toFixed(1).replace('.', ',') + '%' : fmtBarVal(avgLine) + (unit || '')}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

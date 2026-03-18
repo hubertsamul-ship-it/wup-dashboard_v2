@@ -29,6 +29,8 @@ Dane wyjściowe (public/data/):
 import json
 import os
 import sys
+import shutil
+from datetime import datetime
 
 # Dodaj ścieżkę do parsera MRPiPS (ninja/ przy katalogu nadrzędnym)
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ninja'))
@@ -739,6 +741,34 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
     bezr_pl_prev = round(bezr_pl_tys_prev * 1000) if bezr_pl_tys_prev is not None else None
     bezr_pl_delta = (bezr_pl_cur - bezr_pl_prev) if (bezr_pl_cur is not None and bezr_pl_prev is not None) else None
 
+    # ── R/R: rok do roku ─────────────────────────────────────────────────────
+    rok_str, mies_str = cur.split('-')
+    prev_yr_period = f"{int(rok_str)-1}-{mies_str}"
+
+    bezr_rr   = s(prev_yr_period, 'bezr_razem')   if prev_yr_period in mrpips_data else None
+    wyrej_rr  = s(prev_yr_period, 'wyrej_razem')  if prev_yr_period in mrpips_data else None
+    zarej_rr  = s(prev_yr_period, 'zarej_razem')  if prev_yr_period in mrpips_data else None
+    oferty_rr = s(prev_yr_period, 'oferty_pracy') if prev_yr_period in mrpips_data else None
+
+    bezr_delta_rr   = (bezr_cur  - bezr_rr)   if bezr_rr  is not None else None
+    wyrej_delta_rr  = (wyrej_cur - wyrej_rr)  if wyrej_rr is not None else None
+    zarej_delta_rr  = (zarej_cur - zarej_rr)  if zarej_rr is not None else None
+    oferty_delta_rr = (oferty_cur - oferty_rr) if oferty_rr is not None else None
+
+    rok_stopa_str, mies_stopa_str = stopa_cur_period.split('-')
+    prev_yr_stopa = f"{int(rok_stopa_str)-1}-{mies_stopa_str}"
+
+    stopa_maz_rr       = meta(prev_yr_stopa, 'stopa_maz')   if prev_yr_stopa in mrpips_data else None
+    stopa_pl_rr        = meta(prev_yr_stopa, 'stopa_pl')    if prev_yr_stopa in mrpips_data else None
+    bezr_pl_tys_rr     = meta(prev_yr_stopa, 'bezr_pl_tys') if prev_yr_stopa in mrpips_data else None
+
+    stopa_maz_delta_rr = (round(stopa_cur - stopa_maz_rr, 1)
+                          if stopa_cur is not None and stopa_maz_rr is not None else None)
+    stopa_pl_delta_rr  = (round(stopa_pl_cur - stopa_pl_rr, 1)
+                          if stopa_pl_cur is not None and stopa_pl_rr is not None else None)
+    bezr_pl_delta_rr   = (round(bezr_pl_tys_cur * 1000 - bezr_pl_tys_rr * 1000)
+                          if bezr_pl_tys_cur is not None and bezr_pl_tys_rr is not None else None)
+
     # ── Lookup stopy powiatów z okresu ze stopą (fallback dla powiaty/mapy) ──
     stopa_pow_lookup = {
         wgm: v.get('stopa')
@@ -832,6 +862,19 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
     trend_maz_13m = [
         {'okres': p, 'label': trend_label(p), 'stopa': meta(p, 'stopa_maz')}
         for p in last_13
+    ]
+
+    # ── Trend zarej/wyrej poprzedni rok (ghost line) ─────────────────────────
+    last_13_prev_yr = [
+        f"{int(p.split('-')[0])-1}-{p.split('-')[1]}" for p in last_13
+    ]
+    trend_13m_prev_year = [
+        {
+            'label': trend_label(p) if p in mrpips_data else None,
+            'zarej': s(p, 'zarej_razem') if p in mrpips_data else None,
+            'wyrej': s(p, 'wyrej_razem') if p in mrpips_data else None,
+        }
+        for p in last_13_prev_yr
     ]
 
     # ── Trend stopy Polski — ostatnie 13 miesięcy (GUS BDL) ─────────────────
@@ -940,6 +983,9 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
             'zarej_delta':  (v.get('zarej_razem') or 0) - (v_prv.get('zarej_razem') or 0),
             'wyrej_delta':  (v.get('wyrej_razem') or 0) - (v_prv.get('wyrej_razem') or 0),
             'oferty_delta': (v.get('oferty_pracy') or 0) - (v_prv.get('oferty_pracy') or 0),
+            'aktywizacja_pct': round(
+                (v.get('podjeli_prace') or 0) / max(v.get('wyrej_razem') or 1, 1) * 100, 1
+            ),
             # Trendy 13 mies.
             'trend_stopa_13m': trend_s,
             'trend_zarej_13m': trend_z,
@@ -947,6 +993,47 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
             # Wynagrodzenia (ZUS ark. 1)
             'wyn_brutto':    wyn.get('wynagrodzenie'),
             'wyn_pracujacy': wyn.get('pracujacy'),
+        })
+
+    # ── Highlights (Executive Brief) ─────────────────────────────────────────
+    def fmh(n):
+        """Format absolute integer with narrow no-break space as thousands separator."""
+        return f"{abs(round(n)):,}".replace(',', '\u202f')
+
+    def fms(n, dec=1):
+        """Format float with Polish decimal comma."""
+        return f"{n:.{dec}f}".replace('.', ',')
+
+    highlights = []
+    if bezr_delta_rr is not None:
+        dir_rr = 'wzrosła' if bezr_delta_rr > 0 else 'spadła'
+        highlights.append({
+            'type': 'bezr_rr',
+            'text': f"Liczba bezrobotnych {dir_rr} o {fmh(bezr_delta_rr)} os. rok do roku.",
+        })
+    if stopa_cur is not None and stopa_pl_cur is not None:
+        diff = round(stopa_cur - stopa_pl_cur, 1)
+        rel = 'niższa' if diff < 0 else 'wyższa'
+        highlights.append({
+            'type': 'stopa_vs_pl',
+            'text': (f"Stopa w Mazowieckiem ({fms(stopa_cur)}%) jest {rel} od krajowej "
+                     f"({fms(stopa_pl_cur)}%) o {fms(abs(diff))} pp."),
+        })
+    if stopa_maz_delta_rr is not None:
+        dir_s = 'wzrosła' if stopa_maz_delta_rr > 0 else 'spadła'
+        highlights.append({
+            'type': 'stopa_rr',
+            'text': (f"Stopa Mazowsza {dir_s} o {fms(abs(stopa_maz_delta_rr))} pp "
+                     f"rok do roku ({fms(stopa_maz_rr)} \u2192 {fms(stopa_cur)}%)."),
+        })
+    if pow_sorted:
+        pow_max_n = pow_sorted[0]
+        pow_min_n = pow_sorted[-1]
+        highlights.append({
+            'type': 'pow_range',
+            'text': (f"Rozpiętość stóp w powiatach: "
+                     f"{fms(pow_min_n['stopa'])}% ({pow_min_n['nazwa']}) "
+                     f"\u2013 {fms(pow_max_n['stopa'])}% ({pow_max_n['nazwa']})."),
         })
 
     # ── Wynagrodzenia: maz_avg z pre-computed wynagrodzenia_kpi ─────────────
@@ -965,34 +1052,47 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
             'stopa_okres':            stopa_cur_period,
             'stopa_poprzedni_okres':  stopa_prev_period,
             'data_aktualizacji':      data_akt,
+            'highlights':             highlights,
         },
         'pulpit': {
-            'bezr_razem':      bezr_cur,
-            'bezr_delta':      bezr_cur - bezr_prev,
-            'stopa_maz':       stopa_cur,
-            'stopa_maz_delta': stopa_delta,
-            'stopa_pl':        stopa_pl_cur if stopa_pl_cur is not None else 5.4,
-            'stopa_pl_delta':  stopa_pl_delta,
-            'bezr_pl':         bezr_pl_cur,
-            'bezr_pl_delta':   bezr_pl_delta,
-            'trend_37m':       trend_37m,
-            'mapa_maz':        mapa_maz,
+            'bezr_razem':           bezr_cur,
+            'bezr_delta':           bezr_cur - bezr_prev,
+            'bezr_delta_rr':        bezr_delta_rr,
+            'stopa_maz':            stopa_cur,
+            'stopa_maz_delta':      stopa_delta,
+            'stopa_maz_delta_rr':   stopa_maz_delta_rr,
+            'stopa_pl':             stopa_pl_cur if stopa_pl_cur is not None else 5.4,
+            'stopa_pl_delta':       stopa_pl_delta,
+            'stopa_pl_delta_rr':    stopa_pl_delta_rr,
+            'bezr_pl':              bezr_pl_cur,
+            'bezr_pl_delta':        bezr_pl_delta,
+            'bezr_pl_delta_rr':     bezr_pl_delta_rr,
+            'trend_37m':            trend_37m,
+            'mapa_maz':             mapa_maz,
         },
         'bezrobotni': {
-            'bezr_razem':  bezr_cur,
-            'bezr_delta':  bezr_cur - bezr_prev,
-            'wyrej_razem': wyrej_cur,
-            'wyrej_delta': wyrej_cur - wyrej_prev,
-            'zarej_razem': zarej_cur,
-            'zarej_delta': zarej_cur - zarej_prev,
-            'oferty_razem': oferty_cur,
-            'oferty_delta': oferty_cur - oferty_prev,
+            'bezr_razem':       bezr_cur,
+            'bezr_delta':       bezr_cur - bezr_prev,
+            'bezr_delta_rr':    bezr_delta_rr,
+            'wyrej_razem':      wyrej_cur,
+            'wyrej_delta':      wyrej_cur - wyrej_prev,
+            'wyrej_delta_rr':   wyrej_delta_rr,
+            'zarej_razem':      zarej_cur,
+            'zarej_delta':      zarej_cur - zarej_prev,
+            'zarej_delta_rr':   zarej_delta_rr,
+            'oferty_razem':     oferty_cur,
+            'oferty_delta':     oferty_cur - oferty_prev,
+            'oferty_delta_rr':  oferty_delta_rr,
             'kategorie':   kategorie,
             'wyrej_reasons': wyrej_reasons,
+            'aktywizacja_pct': round(
+                next((r['pct'] for r in wyrej_reasons if 'Podjęcie pracy' in r['label']), 0), 1
+            ),
             'trend_13m': [
                 {'label': t['label'], 'zarej': t['zarej'], 'wyrej': t['wyrej']}
                 for t in trend_37m[-13:]
             ],
+            'trend_13m_prev_year': trend_13m_prev_year,
             'charakterystyka': {
                 'kobiety':   d5_kobiety,
                 'mezczyzni': bezr_cur - d5_kobiety,
@@ -1003,17 +1103,19 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
             },
         },
         'stopa': {
-            'stopa_pl':        stopa_pl_cur if stopa_pl_cur is not None else 5.4,
-            'stopa_pl_delta':  stopa_pl_delta,
-            'stopa_maz':       stopa_cur,
-            'stopa_maz_delta': stopa_delta,
-            'pow_max':         pow_sorted[0]  if pow_sorted else None,
-            'pow_min':         pow_sorted[-1] if pow_sorted else None,
-            'pow_top5':        to_bar(pow_sorted[:5]),
-            'pow_bot5':        to_bar(pow_sorted[-5:]),
-            'trend_maz_13m':   trend_maz_13m,
-            'woj_stopa':       woj_stopa_list,
-            'trend_pl_13m':    trend_pl_13m,
+            'stopa_pl':           stopa_pl_cur if stopa_pl_cur is not None else 5.4,
+            'stopa_pl_delta':     stopa_pl_delta,
+            'stopa_pl_delta_rr':  stopa_pl_delta_rr,
+            'stopa_maz':          stopa_cur,
+            'stopa_maz_delta':    stopa_delta,
+            'stopa_maz_delta_rr': stopa_maz_delta_rr,
+            'pow_max':            pow_sorted[0]  if pow_sorted else None,
+            'pow_min':            pow_sorted[-1] if pow_sorted else None,
+            'pow_top5':           to_bar(pow_sorted[:5]),
+            'pow_bot5':           to_bar(pow_sorted[-5:]),
+            'trend_maz_13m':      trend_maz_13m,
+            'woj_stopa':          woj_stopa_list,
+            'trend_pl_13m':       trend_pl_13m,
         },
         'wynagrodzenia': {
             'maz_avg':       maz_avg,
@@ -1128,7 +1230,90 @@ def main():
         b = final['bezrobotni']
         print(f"  bezr_razem={b['bezr_razem']:,}  wyrej_delta={b['wyrej_delta']:+,}  oferty_delta={b['oferty_delta']:+,}")
 
-    print("\n" + "=" * 65)
+    # ── F0.1: Archiwizacja JSON ───────────────────────────────────────────────
+    okres = final.get('meta', {}).get('okres', 'unknown')
+    archive_dir = os.path.join(OUT_DIR, 'archive')
+    os.makedirs(archive_dir, exist_ok=True)
+    archive_path = os.path.join(archive_dir, f'dashboard_{okres}.json')
+    shutil.copy(final_path, archive_path)
+    print(f"  Archiwum: {archive_path}")
+
+    # ── F0.2: Walidacja danych ────────────────────────────────────────────────
+    warnings = []
+    info = []
+
+    powiaty = final.get('powiaty_lista', [])
+    info.append(f"Liczba powiatów w danych: {len(powiaty)} (oczekiwane: 42)")
+    if len(powiaty) != 42:
+        warnings.append(f"UWAGA: Liczba powiatów = {len(powiaty)}, oczekiwano 42!")
+
+    # Powiaty bez danych o wynagrodzeniach
+    bez_wyn = [p['nazwa'] for p in powiaty if not p.get('wyn_brutto')]
+    if bez_wyn:
+        warnings.append(f"Brak wynagrodzeń ({len(bez_wyn)} powiatów): {', '.join(bez_wyn)}")
+    else:
+        info.append("Wynagrodzenia: dane dla wszystkich powiatów OK")
+
+    # Powiaty bez stopy bezrobocia
+    bez_stopy = [p['nazwa'] for p in powiaty if not p.get('stopa')]
+    if bez_stopy:
+        warnings.append(f"Brak stopy bezrobocia ({len(bez_stopy)} powiatów): {', '.join(bez_stopy)}")
+    else:
+        info.append("Stopy bezrobocia: dane dla wszystkich powiatów OK")
+
+    # Suma kontrolna bezrobotnych vs poprzedni okres
+    bezr_cur = sum(p.get('bezr_razem', 0) for p in powiaty)
+    prev_okres = final.get('meta', {}).get('poprzedni_okres')
+    if prev_okres and prev_okres in mrpips_out:
+        bezr_prev = sum(
+            v.get('bezr_razem', 0) for v in mrpips_out[prev_okres].values()
+            if str(v.get('wgm', '')).startswith('14')
+        )
+        if bezr_prev > 0:
+            zmiana_pct = abs(bezr_cur - bezr_prev) / bezr_prev * 100
+            info.append(f"Bezrobotni {prev_okres}→{okres}: {bezr_prev:,}→{bezr_cur:,} ({zmiana_pct:+.1f}%)")
+            if zmiana_pct > 30:
+                warnings.append(
+                    f"ALARM: Suma bezrobotnych zmieniła się o {zmiana_pct:.1f}% "
+                    f"({bezr_prev:,}→{bezr_cur:,}) — sprawdź plik DBF!"
+                )
+
+    # Zwolnienia — czy są dane
+    zw = final.get('zwolnienia', {})
+    if not zw.get('trend_13m'):
+        warnings.append("Brak danych o zwolnieniach grupowych (trend_13m pusty)")
+    else:
+        info.append(f"Zwolnienia: {len(zw['trend_13m'])} miesięcy danych OK")
+
+    # Zapis raportu
+    report_path = os.path.join(OUT_DIR, 'validation_report.txt')
+    now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    with open(report_path, 'w', encoding='utf-8') as f:
+        f.write(f"WUP Dashboard — Raport walidacji\n")
+        f.write(f"Wygenerowano: {now_str}\n")
+        f.write(f"Okres danych: {okres}\n")
+        f.write("=" * 55 + "\n\n")
+        if warnings:
+            f.write(f"OSTRZEŻENIA ({len(warnings)}):\n")
+            for w in warnings:
+                f.write(f"  ⚠  {w}\n")
+            f.write("\n")
+        else:
+            f.write("OSTRZEŻENIA: brak — dane wyglądają poprawnie ✓\n\n")
+        f.write("INFORMACJE:\n")
+        for i in info:
+            f.write(f"  •  {i}\n")
+
+    # Podsumowanie w konsoli
+    print(f"\n{'=' * 65}")
+    if warnings:
+        print(f"  [!] WALIDACJA: {len(warnings)} ostrzezenie(n) — sprawdz {os.path.basename(report_path)}")
+        for w in warnings:
+            print(f"      {w}")
+    else:
+        print(f"  [OK] WALIDACJA: dane wyglądają poprawnie")
+    print(f"  Raport:   {report_path}")
+    print("=" * 65)
     print("  Gotowe! Dane w public/data/ — aplikacja wczyta je automatycznie.")
     print("  Uruchom serwer: npm run dev (port 5173)")
     print("=" * 65)
