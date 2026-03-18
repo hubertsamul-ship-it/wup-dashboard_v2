@@ -197,6 +197,98 @@ function fmtDelta(d, label = 'poprzedni') {
   return d >= 0 ? `↑ +${abs} vs. ${label}` : `↓ −${abs} vs. ${label}`;
 }
 
+// ── Searchable dropdown dla wyboru powiatu ───────────────────────────────────
+function PowiatDropdown({ options, value, onChange }) {
+  const [open, setOpen]   = useState(false);
+  const [query, setQuery] = useState('');
+  const inputRef = useRef(null);
+
+  const selected = options.find(o => o.value === value);
+  const filtered = query.trim()
+    ? options.filter(o => o.label.toLowerCase().includes(query.toLowerCase()))
+    : options;
+
+  const select = (val) => {
+    onChange(val);
+    setOpen(false);
+    setQuery('');
+  };
+
+  return (
+    <div style={{ position: 'relative', marginBottom: '10px' }}>
+      {open && <div style={{ position: 'fixed', inset: 0, zIndex: 98 }} onClick={() => { setOpen(false); setQuery(''); }} />}
+
+      {/* Trigger */}
+      <button
+        onClick={() => { setOpen(v => !v); setTimeout(() => inputRef.current?.focus(), 50); }}
+        style={{
+          width: '100%', padding: '10px 36px 10px 14px',
+          background: 'rgba(255,255,255,0.05)',
+          border: '1px solid var(--border)', borderRadius: '10px',
+          color: 'var(--text)', fontFamily: 'Outfit, sans-serif', fontSize: '0.82rem',
+          cursor: 'pointer', textAlign: 'left', position: 'relative',
+        }}
+      >
+        {selected?.label || '— wybierz powiat —'}
+        <span style={{
+          position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)',
+          fontSize: '0.65rem', color: 'var(--muted)', pointerEvents: 'none',
+        }}>▾</span>
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
+          background: '#0f172a', border: '1px solid var(--border)',
+          borderRadius: '10px', zIndex: 99,
+          boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+          display: 'flex', flexDirection: 'column', overflow: 'hidden',
+        }}>
+          <div style={{ padding: '8px 10px', borderBottom: '1px solid var(--border)' }}>
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Szukaj powiatu…"
+              style={{
+                width: '100%', padding: '6px 10px', boxSizing: 'border-box',
+                background: 'rgba(255,255,255,0.07)',
+                border: '1px solid var(--border)', borderRadius: '6px',
+                color: 'var(--text)', fontFamily: 'Outfit, sans-serif', fontSize: '0.78rem',
+                outline: 'none',
+              }}
+            />
+          </div>
+          <div style={{ maxHeight: '260px', overflowY: 'auto' }}>
+            {filtered.length === 0
+              ? <div style={{ padding: '12px 14px', fontSize: '0.75rem', color: 'var(--muted)' }}>Brak wyników</div>
+              : filtered.map(o => (
+                <button
+                  key={o.value}
+                  onClick={() => select(o.value)}
+                  style={{
+                    display: 'block', width: '100%', textAlign: 'left',
+                    background: o.value === value ? 'rgba(255,255,255,0.10)' : 'none',
+                    border: 'none', color: o.value === value ? '#fff' : '#cbd5e1',
+                    padding: '7px 14px', fontSize: '0.78rem',
+                    cursor: 'pointer', fontFamily: 'Outfit, sans-serif',
+                    transition: 'background 0.1s',
+                  }}
+                  onMouseEnter={e => { if (o.value !== value) e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
+                  onMouseLeave={e => { if (o.value !== value) e.currentTarget.style.background = 'none'; }}
+                >
+                  {o.label}
+                </button>
+              ))
+            }
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Główna strona ─────────────────────────────────────────────────────────────
 export default function Powiaty({ initialPowiat = null }) {
   const { powiaty, stopa, meta } = useAppData();
@@ -289,33 +381,12 @@ export default function Powiaty({ initialPowiat = null }) {
         sub={`MRPiPS-01 · ZUS · województwo mazowieckie · ${okresAbbr}`}
       />
 
-      {/* Selector powiatu */}
-      <select
+      {/* Selector powiatu — z wyszukiwarką */}
+      <PowiatDropdown
+        options={options}
         value={wgm || ''}
-        onChange={e => setSelWgm(e.target.value)}
-        style={{
-          width: '100%', padding: '10px 14px',
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid var(--border)', borderRadius: '10px',
-          color: 'var(--text)', fontFamily: 'Outfit, sans-serif', fontSize: '0.82rem',
-          cursor: 'pointer', appearance: 'none', marginBottom: '10px',
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
-          backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center',
-        }}
-      >
-        {options.map(o => (
-          <option
-            key={o.value}
-            value={o.value}
-            style={{
-              background: '#020617',
-              color: '#e5e7eb',
-            }}
-          >
-            {o.label}
-          </option>
-        ))}
-      </select>
+        onChange={setSelWgm}
+      />
 
       {/* ── Wiersz 1: 6 KPI ──────────────────────────────────────────────────── */}
       <div style={{
@@ -352,7 +423,7 @@ export default function Powiaty({ initialPowiat = null }) {
         gap: '10px', minHeight: '280px', marginBottom: '10px',
       }}>
 
-        {/* STOPA + KOBIETY/MĘŻCZYŹNI */}
+        {/* STOPA + AKTYWIZACJA + KOBIETY/MĘŻCZYŹNI */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <KpiCard
             flag={stopaOkresAbbr || 'Stopa bezrobocia'} flagColor="maz"
@@ -360,6 +431,12 @@ export default function Powiaty({ initialPowiat = null }) {
             label={`stopa bezrobocia · ${d.nazwa || ''}`}
             delta={stopaDeltaStr} deltaType={stopaDeltaType}
             variant={stopaDelta != null && stopaDelta > 0 ? 'red' : 'green'}
+          />
+          <KpiCard compact
+            flag="Skuteczność aktywizacji" flagColor="green"
+            target={Math.round((d.aktywizacja_pct ?? 0) * 10)} decimals={1} suffix="%"
+            label="wyrej. = podjęcie pracy"
+            variant="green"
           />
           <Card title={`Płeć · ${d.nazwa || ''}`} grow>
             <div style={{ display: 'flex', flexDirection: 'row' }}>
@@ -393,7 +470,7 @@ export default function Powiaty({ initialPowiat = null }) {
         gap: '10px', minHeight: '290px', marginBottom: '10px',
       }}>
 
-        <Card title="Napływ i odpływ — ostatnie 12 miesięcy" grow>
+        <Card title="Napływ i odpływ — ostatnie 12 miesięcy" grow exportTitle={`naplyw_odplyw_${d.nazwa || 'powiat'}`}>
           <div ref={chartRef} style={{ height: '240px', overflow: 'hidden' }}>
             {trendZarej.some(v => v != null) && (
               <LineChartSVG
@@ -420,7 +497,7 @@ export default function Powiaty({ initialPowiat = null }) {
       </div>
 
       {/* ── Wiersz 4: Stopa bezrobocia — porównanie powiatów ─────────────────── */}
-      <Card title="Stopa bezrobocia — porównanie powiatów" style={{ flexShrink: 0, marginBottom: '10px' }}>
+      <Card title="Stopa bezrobocia — porównanie powiatów" exportTitle="stopa_porownanie_powiatow" style={{ flexShrink: 0, marginBottom: '10px' }}>
         <div style={{ marginBottom: '10px' }}>
           <PowiatSelector
             selected={cmpWgms}

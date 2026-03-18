@@ -1,6 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "npm run build:vercel",
+  "installCommand": "npm install && cd wup-dashboard && npm install",
+  "buildCommand": "cd wup-dashboard && npm run build",
   "outputDirectory": "wup-dashboard/dist",
   "headers": [
     {
