@@ -4,7 +4,7 @@ import sys, os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from shared.core.parsers import parse_dbf_bytes, parse_excel_bytes
-from shared.core.analytics import compute_summary
+from shared.core.analytics import compute_summary, compute_resilience_from_summary
 
 router = APIRouter()
 
@@ -48,3 +48,19 @@ async def get_summary():
     except Exception as e:
         raise HTTPException(500, f"Analytics error: {e}")
     return JSONResponse(content=summary)
+
+
+@router.get("/mazostat/resilience")
+async def get_mazostat_resilience():
+    """LMR teaser: ranking odporności rynku pracy powiatów Mazowsza."""
+    json_path = os.path.join(
+        os.path.dirname(__file__), "..", "..", "wup-dashboard", "public", "data", "dashboard_final.json"
+    )
+    if not os.path.exists(json_path):
+        raise HTTPException(404, "dashboard_final.json not found — run extract_data.py first")
+    try:
+        summary = compute_summary(json_path)
+        payload = compute_resilience_from_summary(summary)
+    except Exception as e:
+        raise HTTPException(500, f"Resilience analytics error: {e}")
+    return JSONResponse(content=payload)

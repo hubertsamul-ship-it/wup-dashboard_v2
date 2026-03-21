@@ -6,6 +6,7 @@ import LineChartSVG from '../components/LineChartSVG';
 import WyrejDonut from '../components/WyrejDonut';
 import StatsSelector from '../components/StatsSelector';
 import GenderFigure from '../components/GenderFigures';
+import MarketRankingsPanel from '../components/MarketRankingsPanel';
 import { useAppData } from '../context/DataContext';
 
 const POW_COLORS = ['#e63946', '#4895ef', '#f4a261', '#52b788', '#a78bfa', '#fbbf24'];
@@ -293,6 +294,7 @@ function PowiatDropdown({ options, value, onChange }) {
 export default function Powiaty({ initialPowiat = null }) {
   const { powiaty, stopa, meta } = useAppData();
   const [chartRef, chartSize] = useContainerSize();
+  const [activeTab, setActiveTab] = useState('analityka');
 
   const options = (powiaty || [])
     .sort((a, b) => a.nazwa.localeCompare(b.nazwa, 'pl'))
@@ -380,6 +382,35 @@ export default function Powiaty({ initialPowiat = null }) {
         title="Analiza powiatowa"
         sub={`MRPiPS-01 · ZUS · województwo mazowieckie · ${okresAbbr}`}
       />
+
+      <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+        {[
+          { id: 'analityka', label: 'Analityka' },
+          { id: 'rankingi', label: 'Rankingi' },
+        ].map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setActiveTab(t.id)}
+            style={{
+              border: activeTab === t.id ? '1px solid #3b82f6' : '1px solid var(--border)',
+              background: activeTab === t.id ? 'rgba(59,130,246,0.14)' : 'var(--bg3)',
+              color: activeTab === t.id ? '#bfdbfe' : 'var(--muted)',
+              borderRadius: 8,
+              padding: '6px 12px',
+              fontSize: '0.74rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === 'rankingi' ? (
+        <MarketRankingsPanel powiaty={powiaty} />
+      ) : (
+        <>
 
       {/* Selector powiatu — z wyszukiwarką */}
       <PowiatDropdown
@@ -510,6 +541,8 @@ export default function Powiaty({ initialPowiat = null }) {
           <LineChartSVG datasets={stopaDatasets} labels={trendLabels} height={180} width={900} />
         </div>
       </Card>
+        </>
+      )}
 
     </div>
   );
