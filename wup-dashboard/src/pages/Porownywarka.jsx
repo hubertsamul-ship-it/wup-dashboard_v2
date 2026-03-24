@@ -8,6 +8,8 @@ import { useAppData } from '../context/DataContext';
 
 const A_COLOR = '#e63946';
 const B_COLOR = '#4895ef';
+const POW_COLORS = ['#e63946', '#4895ef', '#f4a261', '#52b788', '#a78bfa', '#fbbf24'];
+const CHART_COLORS = ['#e63946', '#4895ef', '#f4a261'];
 
 const MONTHS_ABBR = ['Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru'];
 
@@ -115,7 +117,7 @@ function buildWojRows(a, b, stopaPl, rankMap) {
   const rows = [
     { label: 'Stopa bezrobocia', unit: 'percent', a: a?.s, b: b?.s },
     { label: 'Różnica do Polski', unit: 'percent', a: a?.s != null ? a.s - stopaPl : null, b: b?.s != null ? b.s - stopaPl : null },
-    { label: 'Pozycja w rankingu (1 = najwyższa stopa)', unit: 'number', a: rankMap[a?.n] ?? null, b: rankMap[b?.n] ?? null },
+    { label: 'Pozycja w rankingu (1 = najniższa stopa)', unit: 'number', a: rankMap[a?.n] ?? null, b: rankMap[b?.n] ?? null },
   ];
   return rows.map((r) => {
     const delta = (r.a == null || r.b == null) ? null : r.b - r.a;
@@ -123,8 +125,160 @@ function buildWojRows(a, b, stopaPl, rankMap) {
   });
 }
 
+// ── Selektor powiatów do porównania (do 6) ───────────────────────────────────
+function PowiatSelector({ selected, onChange, allPowiaty, max = 6 }) {
+  const [open, setOpen] = useState(false);
+  const available = allPowiaty.filter((p) => !selected.includes(p.wgm));
+  const getName  = (wgm) => allPowiaty.find((p) => p.wgm === wgm)?.nazwa || wgm;
+  const getStopa = (wgm) => allPowiaty.find((p) => p.wgm === wgm)?.stopa;
+
+  const remove = (wgm) => { if (selected.length > 1) onChange(selected.filter((w) => w !== wgm)); };
+  const add    = (wgm) => { if (selected.length < max) onChange([...selected, wgm]); setOpen(false); };
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', position: 'relative' }}>
+      {open && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setOpen(false)} />}
+      {selected.map((wgm, i) => (
+        <div key={wgm} style={{
+          display: 'flex', alignItems: 'center', gap: '5px',
+          padding: '3px 8px 3px 10px', borderRadius: '20px',
+          background: `${POW_COLORS[i % POW_COLORS.length]}22`,
+          border: `1px solid ${POW_COLORS[i % POW_COLORS.length]}66`,
+          fontSize: '0.72rem', color: 'var(--text)',
+        }}>
+          <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: POW_COLORS[i % POW_COLORS.length], flexShrink: 0 }} />
+          {getName(wgm)}
+          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.65rem', color: POW_COLORS[i % POW_COLORS.length], marginLeft: '2px' }}>
+            {getStopa(wgm)?.toFixed(1).replace('.', ',')}%
+          </span>
+          {selected.length > 1 && (
+            <button
+              onClick={() => remove(wgm)}
+              style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: '0 0 0 2px', lineHeight: 1, fontSize: '0.82rem', display: 'flex', alignItems: 'center' }}
+              title={`Usuń ${getName(wgm)}`}
+            >×</button>
+          )}
+        </div>
+      ))}
+      {selected.length < max && (
+        <div style={{ position: 'relative', zIndex: 100 }}>
+          <button
+            onClick={() => setOpen(!open)}
+            style={{
+              background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)',
+              borderRadius: '20px', color: 'var(--muted)', cursor: 'pointer', padding: '3px 12px',
+              fontSize: '0.72rem', fontFamily: 'Outfit, sans-serif', transition: 'all 0.15s',
+            }}
+          >+ Dodaj</button>
+          {open && (
+            <div style={{
+              position: 'absolute', top: 'calc(100% + 4px)', left: 0,
+              background: '#1a2233', border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: '8px', padding: '4px 0',
+              maxHeight: '260px', overflowY: 'auto', minWidth: '210px',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.5)', zIndex: 101,
+            }}>
+              {available.map((p) => (
+                <button
+                  key={p.wgm}
+                  onClick={() => add(p.wgm)}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    width: '100%', textAlign: 'left', background: 'none', border: 'none',
+                    color: '#e2e8f0', padding: '6px 14px', fontSize: '0.75rem',
+                    cursor: 'pointer', fontFamily: 'Outfit, sans-serif', transition: 'background 0.1s',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.10)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
+                >
+                  <span>{p.nazwa}</span>
+                  <span style={{ color: '#94a3b8', marginLeft: '10px', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.68rem' }}>
+                    {p.stopa?.toFixed(1).replace('.', ',')}%
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Selektor województw do trendu (do 3) ─────────────────────────────────────
+function WojSelector({ selected, onChange, options = [] }) {
+  const [open, setOpen] = useState(false);
+  const available = options.filter((w) => !selected.includes(w.n));
+
+  const remove = (woj) => { if (selected.length > 1) onChange(selected.filter((w) => w !== woj)); };
+  const add    = (woj) => { if (selected.length < 3) onChange([...selected, woj]); setOpen(false); };
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', position: 'relative' }}>
+      {open && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setOpen(false)} />}
+      {selected.map((woj, i) => (
+        <div key={woj} style={{
+          display: 'flex', alignItems: 'center', gap: '5px',
+          padding: '3px 8px 3px 10px', borderRadius: '20px',
+          background: `${CHART_COLORS[i]}22`, border: `1px solid ${CHART_COLORS[i]}66`,
+          fontSize: '0.72rem', color: 'var(--text)',
+        }}>
+          <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: CHART_COLORS[i], flexShrink: 0 }} />
+          {woj}
+          {selected.length > 1 && (
+            <button
+              onClick={() => remove(woj)}
+              style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: '0 0 0 2px', lineHeight: 1, fontSize: '0.82rem', display: 'flex', alignItems: 'center' }}
+              title={`Usuń ${woj}`}
+            >×</button>
+          )}
+        </div>
+      ))}
+      {selected.length < 3 && (
+        <div style={{ position: 'relative', zIndex: 100 }}>
+          <button
+            onClick={() => setOpen(!open)}
+            style={{
+              background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)',
+              borderRadius: '20px', color: 'var(--muted)', cursor: 'pointer', padding: '3px 12px',
+              fontSize: '0.72rem', fontFamily: 'Outfit, sans-serif', transition: 'all 0.15s',
+            }}
+          >+ Dodaj</button>
+          {open && (
+            <div style={{
+              position: 'absolute', top: 'calc(100% + 4px)', left: 0,
+              background: '#1a2233', border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: '8px', padding: '4px 0',
+              maxHeight: '220px', overflowY: 'auto', minWidth: '170px',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.5)', zIndex: 101,
+            }}>
+              {available.map((w) => (
+                <button
+                  key={w.n}
+                  onClick={() => add(w.n)}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    width: '100%', textAlign: 'left', background: 'none', border: 'none',
+                    color: 'var(--text)', padding: '6px 14px', fontSize: '0.75rem',
+                    cursor: 'pointer', fontFamily: 'Outfit, sans-serif', transition: 'background 0.1s',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
+                >
+                  <span>{w.n}</span>
+                  <span style={{ color: 'var(--muted)', marginLeft: '10px', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.68rem' }}>{w.s}%</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Porownywarka({ initialPowiat = null }) {
-  const { powiaty, stopa, meta } = useAppData();
+  const { powiaty, stopa, meta, pulpit } = useAppData();
   const [mode, setMode] = useState('powiaty');
   const [activeSlot, setActiveSlot] = useState('A');
 
@@ -132,6 +286,8 @@ export default function Porownywarka({ initialPowiat = null }) {
   const [powB, setPowB] = useState(null);
   const [wojA, setWojA] = useState(null);
   const [wojB, setWojB] = useState(null);
+  const [cmpWgms, setCmpWgms] = useState([]);
+  const [selWojs, setSelWojs] = useState(['Mazowieckie']);
 
   const [groupOn, setGroupOn] = useState(() => (
     Object.fromEntries(POW_METRIC_GROUPS.map((g) => [g.id, true]))
@@ -182,6 +338,13 @@ export default function Porownywarka({ initialPowiat = null }) {
     }
   }, [wojOptions, wojA, wojB]);
 
+  // Inicjalizuj cmpWgms gdy powA/powB są gotowe
+  useEffect(() => {
+    if (!cmpWgms.length && powA) {
+      setCmpWgms([powA, powB].filter(Boolean));
+    }
+  }, [powA, powB]); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!powiaty || !stopa) return null;
 
   const powDataA = (powiaty || []).find((p) => p.wgm === powA) || null;
@@ -219,28 +382,64 @@ export default function Porownywarka({ initialPowiat = null }) {
     .flatMap((g) => g.metrics);
   const powRows = buildPowRows(activeMetrics, powDataA, powDataB);
 
-  const rankMap = Object.fromEntries((stopa.woj_stopa || []).map((w, idx) => [w.n, idx + 1]));
+  const rankMap = Object.fromEntries(
+    [...(stopa.woj_stopa || [])].sort((a, b) => a.s - b.s).map((w, idx) => [w.n, idx + 1])
+  );
   const wojRows = buildWojRows(wojDataA, wojDataB, stopa.stopa_pl, rankMap);
 
+  // ── Dane trendów powiatowych ─────────────────────────────────────────────
   const rawTrendMaz = stopa?.trend_maz_13m || [];
   const hasNullLast = rawTrendMaz.length > 0 && rawTrendMaz[rawTrendMaz.length - 1].stopa == null;
-  const trendBase = hasNullLast ? rawTrendMaz.slice(0, -1) : rawTrendMaz;
-  const trendLabels = trendBase.map((t) => t.label);
-  const trimSeries = (series = []) => (hasNullLast ? series.slice(0, -1) : series);
+  const trendLabels = (hasNullLast ? rawTrendMaz.slice(0, -1) : rawTrendMaz).map((t) => t.label);
 
-  const stopaDatasets = [
-    { data: trimSeries(powDataA?.trend_stopa_13m || []), color: A_COLOR, label: `A: ${powDataA?.nazwa || '—'}` },
-    { data: trimSeries(powDataB?.trend_stopa_13m || []), color: B_COLOR, label: `B: ${powDataB?.nazwa || '—'}` },
-  ];
+  const powSorted = useMemo(
+    () => [...(powiaty || [])].sort((a, b) => a.nazwa.localeCompare(b.nazwa, 'pl')),
+    [powiaty]
+  );
+
+  const cmpStopaDatasets = useMemo(
+    () => cmpWgms.map((w, i) => {
+      const p = (powiaty || []).find((x) => x.wgm === w);
+      const series = p?.trend_stopa_13m || [];
+      const data = hasNullLast ? series.slice(0, -1) : series;
+      return { color: POW_COLORS[i % POW_COLORS.length], label: p?.nazwa || w, data };
+    }),
+    [cmpWgms, powiaty, hasNullLast]
+  );
 
   const SHOW_N = 12;
   const napLabels = rawTrendMaz.map((t) => t.label).slice(-SHOW_N);
   const flowDatasets = [
-    { data: (powDataA?.trend_zarej_13m || []).slice(-SHOW_N), color: A_COLOR, label: `A napływ` },
-    { data: (powDataA?.trend_wyrej_13m || []).slice(-SHOW_N), color: A_COLOR, label: `A odpływ`, ghost: true },
-    { data: (powDataB?.trend_zarej_13m || []).slice(-SHOW_N), color: B_COLOR, label: `B napływ` },
-    { data: (powDataB?.trend_wyrej_13m || []).slice(-SHOW_N), color: B_COLOR, label: `B odpływ`, ghost: true },
+    { data: (powDataA?.trend_zarej_13m || []).slice(-SHOW_N), color: A_COLOR, label: `${powDataA?.nazwa || 'A'} napływ` },
+    { data: (powDataA?.trend_wyrej_13m || []).slice(-SHOW_N), color: A_COLOR, label: `${powDataA?.nazwa || 'A'} odpływ`, ghost: true },
+    { data: (powDataB?.trend_zarej_13m || []).slice(-SHOW_N), color: B_COLOR, label: `${powDataB?.nazwa || 'B'} napływ` },
+    { data: (powDataB?.trend_wyrej_13m || []).slice(-SHOW_N), color: B_COLOR, label: `${powDataB?.nazwa || 'B'} odpływ`, ghost: true },
   ];
+
+  // ── Dane trendu województw ───────────────────────────────────────────────
+  const stopa_pl_val = stopa.stopa_pl ?? 5.4;
+  const trend37 = (pulpit?.trend_37m || []).filter((t) => t.stopa != null);
+  const maz37Stopa = trend37.map((t) => t.stopa);
+  const trend37Labels = trend37.map((t) => t.label);
+
+  const WOJ_OPTIONS = [
+    { n: 'Mazowieckie', s: (stopa.woj_stopa || []).find((w) => w.n === 'Mazowieckie')?.s ?? stopa.stopa_maz },
+    { n: 'Polska', s: stopa_pl_val },
+    ...(stopa.woj_stopa || []).filter((w) => w.n !== 'Mazowieckie').sort((a, b) => a.n.localeCompare(b.n, 'pl')),
+  ];
+
+  function genWojTrend(currentStopa) {
+    const scale = currentStopa / (stopa_pl_val || 5.4);
+    return maz37Stopa.map((v) => Math.round(v * scale * 10) / 10);
+  }
+
+  const wojTrendDatasets = selWojs.map((woj, i) => ({
+    color: CHART_COLORS[i % CHART_COLORS.length],
+    label: woj,
+    data: woj === 'Mazowieckie'
+      ? maz37Stopa
+      : genWojTrend((stopa.woj_stopa || []).find((w) => w.n === woj)?.s ?? stopa_pl_val),
+  }));
 
   return (
     <div className="page-scroll">
@@ -281,7 +480,7 @@ export default function Porownywarka({ initialPowiat = null }) {
       >
         <div style={{ fontSize: '0.72rem', color: 'var(--muted)', marginBottom: 10 }}>
           {mode === 'powiaty'
-            ? 'Woj. mazowieckie • Stopa bezrobocia (%) • Kliknij mapę, aby ustawić aktywny slot A/B'
+            ? 'Woj. mazowieckie • Kliknij mapę w sekcji poniżej, aby ustawić aktywny slot A/B'
             : 'Polska • Stopa bezrobocia (%) • Kliknij mapę, aby ustawić aktywny slot A/B'}
         </div>
 
@@ -292,11 +491,7 @@ export default function Porownywarka({ initialPowiat = null }) {
               border: activeSlot === 'A' ? `1px solid ${A_COLOR}` : '1px solid var(--border)',
               background: activeSlot === 'A' ? `${A_COLOR}22` : 'var(--bg3)',
               color: activeSlot === 'A' ? A_COLOR : 'var(--muted)',
-              borderRadius: 20,
-              padding: '5px 12px',
-              fontSize: '0.72rem',
-              fontWeight: 700,
-              cursor: 'pointer',
+              borderRadius: 20, padding: '5px 12px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
             }}
           >
             Aktywny slot: A
@@ -307,11 +502,7 @@ export default function Porownywarka({ initialPowiat = null }) {
               border: activeSlot === 'B' ? `1px solid ${B_COLOR}` : '1px solid var(--border)',
               background: activeSlot === 'B' ? `${B_COLOR}22` : 'var(--bg3)',
               color: activeSlot === 'B' ? B_COLOR : 'var(--muted)',
-              borderRadius: 20,
-              padding: '5px 12px',
-              fontSize: '0.72rem',
-              fontWeight: 700,
-              cursor: 'pointer',
+              borderRadius: 20, padding: '5px 12px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
             }}
           >
             Aktywny slot: B
@@ -360,11 +551,7 @@ export default function Porownywarka({ initialPowiat = null }) {
                           border: groupOn[g.id] ? '1px solid #3b82f6' : '1px solid var(--border)',
                           background: groupOn[g.id] ? 'rgba(59,130,246,0.12)' : 'var(--bg3)',
                           color: groupOn[g.id] ? '#bfdbfe' : 'var(--muted)',
-                          borderRadius: 999,
-                          padding: '4px 10px',
-                          fontSize: '0.7rem',
-                          fontWeight: 600,
-                          cursor: 'pointer',
+                          borderRadius: 999, padding: '4px 10px', fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer',
                         }}
                       >
                         {g.label}
@@ -426,9 +613,17 @@ export default function Porownywarka({ initialPowiat = null }) {
             </div>
           </Card>
 
-          <Card title={`Trend stopy bezrobocia — ${powDataA?.nazwa || 'A'} / ${powDataB?.nazwa || 'B'}`} exportTitle="porownywarka_trend_stopa" style={{ marginBottom: 10 }}>
+          <Card title="Stopa bezrobocia — porównanie powiatów" exportTitle="porownywarka_stopa_powiaty" style={{ marginBottom: 10 }}>
+            <div style={{ marginBottom: 10 }}>
+              <PowiatSelector
+                selected={cmpWgms.length ? cmpWgms : [powA, powB].filter(Boolean)}
+                onChange={setCmpWgms}
+                allPowiaty={powSorted}
+                max={6}
+              />
+            </div>
             <LineChartSVG
-              datasets={stopaDatasets}
+              datasets={cmpStopaDatasets}
               labels={trendLabels}
               height={200}
               width={900}
@@ -480,7 +675,7 @@ export default function Porownywarka({ initialPowiat = null }) {
             </div>
           </Card>
 
-          <Card title="Stopa bezrobocia — snapshot A/B" exportTitle="porownywarka_woj_stopa_snapshot">
+          <Card title="Stopa bezrobocia — snapshot A/B" exportTitle="porownywarka_woj_stopa_snapshot" style={{ marginBottom: 10 }}>
             <HorizontalBar
               data={[
                 { label: `A · ${wojDataA?.n || '—'}`, value: wojDataA?.s || 0 },
@@ -493,6 +688,19 @@ export default function Porownywarka({ initialPowiat = null }) {
               labelWidth={260}
               avgLine={stopa?.stopa_pl}
               avgLabel="Polska"
+            />
+          </Card>
+
+          <Card title="Trend stopy bezrobocia 2023–2026" exportTitle="porownywarka_woj_trend">
+            <div style={{ marginBottom: 8 }}>
+              <WojSelector selected={selWojs} onChange={setSelWojs} options={WOJ_OPTIONS} />
+            </div>
+            <LineChartSVG
+              datasets={wojTrendDatasets}
+              labels={trend37Labels}
+              height={200}
+              width={900}
+              showValueLabels
             />
           </Card>
         </>

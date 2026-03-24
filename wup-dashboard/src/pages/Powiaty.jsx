@@ -96,84 +96,6 @@ function CategoryRow({ item }) {
   );
 }
 
-// ── Selektor powiatów do porównania ──────────────────────────────────────────
-function PowiatSelector({ selected, onChange, allPowiaty, max = 6 }) {
-  const [open, setOpen] = useState(false);
-  const available = allPowiaty.filter(p => !selected.includes(p.wgm));
-  const getName  = (wgm) => allPowiaty.find(p => p.wgm === wgm)?.nazwa || wgm;
-  const getStopa = (wgm) => allPowiaty.find(p => p.wgm === wgm)?.stopa;
-
-  const remove = (wgm) => { if (selected.length > 1) onChange(selected.filter(w => w !== wgm)); };
-  const add    = (wgm) => { if (selected.length < max) onChange([...selected, wgm]); setOpen(false); };
-
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', position: 'relative' }}>
-      {open && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setOpen(false)} />}
-      {selected.map((wgm, i) => (
-        <div key={wgm} style={{
-          display: 'flex', alignItems: 'center', gap: '5px',
-          padding: '3px 8px 3px 10px', borderRadius: '20px',
-          background: `${POW_COLORS[i]}22`, border: `1px solid ${POW_COLORS[i]}66`,
-          fontSize: '0.72rem', color: 'var(--text)',
-        }}>
-          <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: POW_COLORS[i], flexShrink: 0 }} />
-          {getName(wgm)}
-          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.65rem', color: POW_COLORS[i], marginLeft: '2px' }}>
-            {getStopa(wgm)?.toFixed(1).replace('.', ',')}%
-          </span>
-          {selected.length > 1 && (
-            <button
-              onClick={() => remove(wgm)}
-              style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: '0 0 0 2px', lineHeight: 1, fontSize: '0.82rem', display: 'flex', alignItems: 'center' }}
-              title={`Usuń ${getName(wgm)}`}
-            >×</button>
-          )}
-        </div>
-      ))}
-      {selected.length < max && (
-        <div style={{ position: 'relative', zIndex: 100 }}>
-          <button
-            onClick={() => setOpen(!open)}
-            style={{
-              background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)',
-              borderRadius: '20px', color: 'var(--muted)', cursor: 'pointer', padding: '3px 12px',
-              fontSize: '0.72rem', fontFamily: 'Outfit, sans-serif', transition: 'all 0.15s',
-            }}
-          >+ Dodaj</button>
-          {open && (
-            <div style={{
-              position: 'absolute', top: 'calc(100% + 4px)', left: 0,
-              background: '#1a2233', border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: '8px', padding: '4px 0',
-              maxHeight: '260px', overflowY: 'auto', minWidth: '210px',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.5)', zIndex: 101,
-            }}>
-              {available.map(p => (
-                <button
-                  key={p.wgm}
-                  onClick={() => add(p.wgm)}
-                  style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    width: '100%', textAlign: 'left', background: 'none', border: 'none',
-                    color: '#e2e8f0', padding: '6px 14px', fontSize: '0.75rem',
-                    cursor: 'pointer', fontFamily: 'Outfit, sans-serif', transition: 'background 0.1s',
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.10)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'none'}
-                >
-                  <span>{p.nazwa}</span>
-                  <span style={{ color: '#94a3b8', marginLeft: '10px', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.68rem' }}>
-                    {p.stopa?.toFixed(1).replace('.', ',')}%
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
 
 const MONTHS_NOM = [
   'styczeń','luty','marzec','kwiecień','maj','czerwiec',
@@ -298,17 +220,12 @@ export default function Powiaty({ initialPowiat = null }) {
     .sort((a, b) => a.nazwa.localeCompare(b.nazwa, 'pl'))
     .map(p => ({ value: p.wgm, label: p.nazwa }));
 
-  const [selWgm, setSelWgm]   = useState(initialPowiat);
-  const [cmpWgms, setCmpWgms] = useState([initialPowiat || '1465']);
+  const [selWgm, setSelWgm] = useState(initialPowiat);
 
   const defaultWgm = (powiaty || []).find(p => p.wgm === '1465')?.wgm || options[0]?.value || null;
   const wgm = selWgm || defaultWgm;
 
-  useEffect(() => {
-    if (wgm) setCmpWgms(prev => [wgm, ...prev.slice(1).filter(w => w !== wgm)]);
-  }, [wgm]);
-
-  const d = (powiaty || []).find(p => p.wgm === wgm) || {};
+const d = (powiaty || []).find(p => p.wgm === wgm) || {};
 
   if (!powiaty || powiaty.length === 0) return null;
 
