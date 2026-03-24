@@ -523,14 +523,6 @@ export default function Porownywarka({ initialPowiat = null }) {
           )}
         </div>
 
-        {mode === 'woj' && (
-          <MapPoland
-            selectedWoj={[wojA, wojB].filter(Boolean)}
-            selectionColors={[A_COLOR, B_COLOR]}
-            onSelectWoj={(name) => setWojSlot(activeSlot, name)}
-            subtitle={`Polska · stopa bezrobocia (%) · ${formatOkresAbbr(meta?.stopa_okres)}`}
-          />
-        )}
       </Card>
 
       {mode === 'powiaty' ? (
@@ -644,51 +636,75 @@ export default function Porownywarka({ initialPowiat = null }) {
         </>
       ) : (
         <>
-          <Card title="Porównanie województw — tabela różnic" exportTitle="porownywarka_tabela_woj" style={{ marginBottom: 10 }}>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 6px' }}>
-                <thead>
-                  <tr style={{ fontSize: '0.66rem', color: 'var(--muted)' }}>
-                    <th style={{ textAlign: 'left', padding: '0 8px' }}>Wskaźnik</th>
-                    <th style={{ textAlign: 'right', padding: '0 8px', color: A_COLOR }}>A</th>
-                    <th style={{ textAlign: 'right', padding: '0 8px', color: B_COLOR }}>B</th>
-                    <th style={{ textAlign: 'right', padding: '0 8px' }}>Δ (B-A)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {wojRows.map((r) => (
-                    <tr key={r.label} style={{ background: 'rgba(255,255,255,0.03)' }}>
-                      <td style={{ padding: '8px', fontSize: '0.76rem', color: 'var(--text)' }}>{r.label}</td>
-                      <td style={{ padding: '8px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.75rem', color: A_COLOR }}>
-                        {formatByUnit(r.a, r.unit)}
-                      </td>
-                      <td style={{ padding: '8px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.75rem', color: B_COLOR }}>
-                        {formatByUnit(r.b, r.unit)}
-                      </td>
-                      <td style={{ padding: '8px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.74rem', color: r.delta > 0 ? '#16a34a' : (r.delta < 0 ? '#dc2626' : 'var(--muted)') }}>
-                        {formatDelta(r.delta, r.unit)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
+          <Card title="Różnice A/B i mapa województw" exportTitle="porownywarka_tabela_mapa_woj" style={{ marginBottom: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, alignItems: 'start' }}>
 
-          <Card title="Stopa bezrobocia — snapshot A/B" exportTitle="porownywarka_woj_stopa_snapshot" style={{ marginBottom: 10 }}>
-            <HorizontalBar
-              data={[
-                { label: `A · ${wojDataA?.n || '—'}`, value: wojDataA?.s || 0 },
-                { label: `B · ${wojDataB?.n || '—'}`, value: wojDataB?.s || 0 },
-              ]}
-              unit="%"
-              colorFn={stopaColor}
-              maxItems={2}
-              barHeight={14}
-              labelWidth={260}
-              avgLine={stopa?.stopa_pl}
-              avgLabel="Polska"
-            />
+              {/* Lewa: tabela różnic + snapshot */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div>
+                  <div style={{ fontSize: '0.66rem', color: 'var(--muted)', letterSpacing: '0.07em', fontWeight: 700, marginBottom: 6 }}>RÓŻNICE A/B — METRYKI WOJEWÓDZTW</div>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 4px' }}>
+                      <thead>
+                        <tr style={{ fontSize: '0.63rem', color: 'var(--muted)' }}>
+                          <th style={{ textAlign: 'left', padding: '0 6px' }}>Wskaźnik</th>
+                          <th style={{ textAlign: 'right', padding: '0 6px', color: A_COLOR, maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {wojDataA?.n || 'A'}
+                          </th>
+                          <th style={{ textAlign: 'right', padding: '0 6px', color: B_COLOR, maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {wojDataB?.n || 'B'}
+                          </th>
+                          <th style={{ textAlign: 'right', padding: '0 6px' }}>Δ (B-A)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {wojRows.map((r) => (
+                          <tr key={r.label} style={{ background: 'rgba(255,255,255,0.03)' }}>
+                            <td style={{ padding: '6px', fontSize: '0.73rem', color: 'var(--text)' }}>{r.label}</td>
+                            <td style={{ padding: '6px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.72rem', color: A_COLOR }}>
+                              {formatByUnit(r.a, r.unit)}
+                            </td>
+                            <td style={{ padding: '6px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.72rem', color: B_COLOR }}>
+                              {formatByUnit(r.b, r.unit)}
+                            </td>
+                            <td style={{ padding: '6px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.71rem', color: r.delta > 0 ? '#16a34a' : (r.delta < 0 ? '#dc2626' : 'var(--muted)') }}>
+                              {formatDelta(r.delta, r.unit)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ fontSize: '0.66rem', color: 'var(--muted)', letterSpacing: '0.07em', fontWeight: 700, marginBottom: 6 }}>STOPA BEZROBOCIA — SNAPSHOT A/B</div>
+                  <HorizontalBar
+                    data={[
+                      { label: `A · ${wojDataA?.n || '—'}`, value: wojDataA?.s || 0 },
+                      { label: `B · ${wojDataB?.n || '—'}`, value: wojDataB?.s || 0 },
+                    ]}
+                    unit="%"
+                    colorFn={stopaColor}
+                    maxItems={2}
+                    barHeight={14}
+                    labelWidth={220}
+                    avgLine={stopa?.stopa_pl}
+                    avgLabel="Polska"
+                  />
+                </div>
+              </div>
+
+              {/* Prawa: mapa (połowa szerokości karty) */}
+              <div>
+                <MapPoland
+                  selectedWoj={[wojA, wojB].filter(Boolean)}
+                  selectionColors={[A_COLOR, B_COLOR]}
+                  onSelectWoj={(name) => setWojSlot(activeSlot, name)}
+                  subtitle={`Polska · stopa bezrobocia (%) · ${formatOkresAbbr(meta?.stopa_okres)}`}
+                />
+              </div>
+            </div>
           </Card>
 
           <Card title="Trend stopy bezrobocia 2023–2026" exportTitle="porownywarka_woj_trend">
