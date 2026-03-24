@@ -469,9 +469,9 @@ export default function Powiaty({ initialPowiat = null }) {
             variant={stopaDelta != null && stopaDelta > 0 ? 'red' : 'green'}
           />
           <KpiCard compact
-            flag="Intensywność aktywizacji" flagColor="green"
-            target={Math.round((aktywizacjaProgramowaPct ?? 0) * 10)} decimals={1} suffix="%"
-            label="udział działań programowych w odpływie"
+            flag="Skuteczność aktywizacji" flagColor="green"
+            target={Math.round((d.aktywizacja_pct ?? 0) * 10)} decimals={1} suffix="%"
+            label="podjęli pracę / objęci aktywizacją"
             variant="green"
           />
           <Card title={`Płeć · ${d.nazwa || ''}`} grow>

@@ -239,7 +239,7 @@ export default function Bezrobotni() {
           flag="Intensywność aktywizacji" flagColor="green"
           target={loading ? 0 : Math.round((aktywizacjaProgramowaPct ?? 0) * 10)}
           decimals={1} suffix="%"
-          label={<>udział działań programowych w odpływie<InfoTooltip text="Odsetek wyrejestrowanych bezrobotnych skierowanych do działań aktywizacyjnych: szkolenia i staże, prace społecznie użyteczne, reintegracja społeczno-zawodowa oraz agencje zatrudnienia." source="MRPiPS-01 (D1 T2: 054,056,057,058,059)" /></>}
+          label={<>podjęli pracę / objęci aktywizacją<InfoTooltip text="Liczba osób, które podjęły pracę, podzielona przez łączną liczbę osób objętych aktywnymi formami przeciwdziałania bezrobociu (dział 1.3 MRPiPS-01, kol. 1)." source="MRPiPS-01" /></>}
           variant="green"
         />
       </div>

@@ -290,6 +290,13 @@ def extract_mrpips(filename: str, stopa_dict: dict) -> dict:
         # Dzieci (D1 T1 NRW=010 R5 — "Mający co najmniej 1 dziecko do 18 lat", oba formaty)
         dzieci           = m.get_value(p, '1', '1', '010', 'R5')
 
+        # Aktywne formy (D1 T3 / sekcja 1.3) — NRW 073-100 nowy, 069-096 stary
+        # Kolumna R1 = "rozpoczynający udział w wybranej formie w miesiącu" (ogółem)
+        at = lambda n: str(n - (4 if old_fmt else 0)).zfill(3)
+        aktywizacja_total = sum(
+            m.get_value(p, '1', '3', at(n), 'R1') for n in range(73, 101)
+        )
+
         # Przyczyny wyrejestrowania (D1 T2) — offset -4 w starym formacie
         wyrej_staz        = m.get_value(p, '1', '2', wr('056'), 'R1')
         wyrej_szkolenie   = m.get_value(p, '1', '2', wr('054'), 'R1') + wyrej_staz
@@ -336,6 +343,7 @@ def extract_mrpips(filename: str, stopa_dict: dict) -> dict:
             'wyrej_psu':         wyrej_psu,
             'wyrej_reintegracja': wyrej_reintegracja,
             'wyrej_agencja':     wyrej_agencja,
+            'aktywizacja_total': aktywizacja_total,
             'd5_staz':          d5_staz,
             'rok':              m.rok,
             'miesiac':          m.miesiac,
@@ -999,7 +1007,7 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
             # Intensywność aktywizacji (programowa):
             # udział odpływu do działań aktywizacyjnych (szkolenia/staże, PSU, reintegracja, agencje).
             'aktywizacja_pct': round(
-                aktywizacja_programowa_n / max(v.get('wyrej_razem') or 1, 1) * 100, 1
+                (v.get('podjeli_prace') or 0) / max(v.get('aktywizacja_total') or 1, 1) * 100, 1
             ),
             # Trendy 13 mies.
             'trend_stopa_13m': trend_s,
@@ -1101,13 +1109,7 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
             'kategorie':   kategorie,
             'wyrej_reasons': wyrej_reasons,
             'aktywizacja_pct': round(
-                (
-                    s(cur, 'wyrej_szkolenie')
-                    + s(cur, 'wyrej_psu')
-                    + s(cur, 'wyrej_reintegracja')
-                    + s(cur, 'wyrej_agencja')
-                ) / max(wyrej_cur or 1, 1) * 100,
-                1
+                s(cur, 'podjeli_prace') / max(s(cur, 'aktywizacja_total') or 1, 1) * 100, 1
             ),
             'trend_13m': [
                 {'label': t['label'], 'zarej': t['zarej'], 'wyrej': t['wyrej']}
