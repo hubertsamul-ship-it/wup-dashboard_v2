@@ -156,7 +156,6 @@ export default function Bezrobotni() {
     charakterystyka,
     wyrej_reasons = [],
     trend_13m     = [],
-    trend_13m_prev_year = [],
   } = bezrobotni;
 
   const { kobiety, mezczyzni, czas, wiek, wyk, staz = [] } = charakterystyka;
@@ -170,11 +169,9 @@ export default function Bezrobotni() {
   const allKat = [...kategorie].sort((a, b) => b.n - a.n)
     .map(k => ({ label: k.label, value: k.n, pct: k.pct }));
 
-  const trendLabels    = trend_13m.map(t => t.label);
-  const trendZarej     = trend_13m.map(t => t.zarej);
-  const trendWyrej     = trend_13m.map(t => t.wyrej);
-  const trendZarejPrev = trend_13m_prev_year.map(t => t?.zarej ?? null);
-  const trendWyrejPrev = trend_13m_prev_year.map(t => t?.wyrej ?? null);
+  const trendLabels = trend_13m.map(t => t.label);
+  const trendZarej  = trend_13m.map(t => t.zarej);
+  const trendWyrej  = trend_13m.map(t => t.wyrej);
   const wyrejTop5   = wyrej_reasons.slice(0, 5);
   const total       = kobiety + mezczyzni;
   const aktywizacjaProgramowaPct = (() => {
@@ -293,18 +290,18 @@ export default function Bezrobotni() {
       }}>
 
         <Card title="Napływ i odpływ bezrobotnych — ostatnie 13 miesięcy" grow exportTitle="naplyw_odplyw_bezrobotnych">
-          <div ref={chartRef} style={{ height: '200px' }}>
-            <LineChartSVG
-              datasets={[
-                { data: trendZarej, color: '#e63946', label: 'Zarejestrowani' },
-                { data: trendWyrej, color: '#4895ef', label: 'Wyrejestrowani' },
-                { data: trendZarejPrev, color: '#e63946', label: 'Zarej. (rok wcześniej)', ghost: true },
-                { data: trendWyrejPrev, color: '#4895ef', label: 'Wyrej. (rok wcześniej)', ghost: true },
-              ]}
-              labels={trendLabels}
-              height={Math.max(chartSize.h - 4, 100)}
-              width={chartSize.w}
-            />
+          <div ref={chartRef} style={{ height: '240px', overflow: 'hidden' }}>
+            {trendZarej.some(v => v != null) && (
+              <LineChartSVG
+                datasets={[
+                  { data: trendZarej, color: '#e63946', label: 'Zarejestrowani' },
+                  { data: trendWyrej, color: '#4895ef', label: 'Wyrejestrowani' },
+                ]}
+                labels={trendLabels}
+                height={Math.max(chartSize.h - 4, 100)}
+                width={Math.max(chartSize.w, 10)}
+              />
+            )}
           </div>
         </Card>
 

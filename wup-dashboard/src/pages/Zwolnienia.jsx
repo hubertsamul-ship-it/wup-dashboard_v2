@@ -73,8 +73,12 @@ export default function Zwolnienia() {
   const [rangeFrom, setRangeFrom] = useState(null);
   const [rangeTo,   setRangeTo]   = useState(null);
   const [pkdMiesiac, setPkdMiesiac] = useState(null);
+  const [chartMode,  setChartMode]  = useState('zgl');
+  const [chartFrom,  setChartFrom]  = useState(null);
+  const [chartTo,    setChartTo]    = useState(null);
 
-  const from = rangeFrom ?? labels[0] ?? '';
+  const JAN26 = labels.find(l => l.startsWith('Sty') && l.includes('26')) || labels[0] || '';
+  const from = rangeFrom ?? JAN26;
   const to   = rangeTo   ?? labels[labels.length - 1] ?? '';
   const pkdLabel_ = pkdMiesiac ?? labels[labels.length - 1] ?? '';
 
@@ -152,27 +156,60 @@ export default function Zwolnienia() {
         </Grid>
       </Card>
 
-      {/* Wykresy trendu */}
-      <Grid cols={2} grow>
-        <Card title="Zgłoszenia i wypowiedzenia zmieniające" badge={`${tLabels.length} miesięcy`} grow>
-          <LineChartSVG
-            datasets={[
-              { data: zglData, color: '#e63946', label: 'Zgłoszenia' },
-              { data: wydData, color: '#4895ef', label: 'Wypow. zmieniające' },
-            ]}
-            labels={tLabels} height={150}
-          />
-        </Card>
-        <Card title="Faktyczne zwolnienia i monitorowane" badge={`${tLabels.length} miesięcy`} grow>
-          <LineChartSVG
-            datasets={[
-              { data: faktData, color: '#f4a261', label: 'Faktyczne' },
-              { data: monData,  color: '#52b788', label: 'Monitorowane' },
-            ]}
-            labels={tLabels} height={150}
-          />
-        </Card>
-      </Grid>
+      {/* Wykres trendu — przełącznik */}
+      {(() => {
+        const cFrom = chartFrom ?? JAN26;
+        const cTo   = chartTo   ?? tLabels[tLabels.length - 1] ?? '';
+        const ci    = tLabels.indexOf(cFrom);
+        const cj    = tLabels.indexOf(cTo);
+        const cLo   = Math.min(ci < 0 ? 0 : ci, cj < 0 ? tLabels.length - 1 : cj);
+        const cHi   = Math.max(ci < 0 ? 0 : ci, cj < 0 ? tLabels.length - 1 : cj);
+        const cLabels  = tLabels.slice(cLo, cHi + 1);
+        const cZgl  = zglData.slice(cLo, cHi + 1);
+        const cWyd  = wydData.slice(cLo, cHi + 1);
+        const cFakt = faktData.slice(cLo, cHi + 1);
+        const cMon  = monData.slice(cLo, cHi + 1);
+        const datasets = chartMode === 'zgl'
+          ? [{ data: cZgl, color: '#e63946', label: 'Zgłoszenia' }, { data: cWyd, color: '#4895ef', label: 'Wypow. zmieniające' }]
+          : [{ data: cFakt, color: '#f4a261', label: 'Faktyczne' }, { data: cMon, color: '#52b788', label: 'Monitorowane' }];
+        return (
+          <Card
+            title="Trend zwolnień grupowych"
+            exportTitle="trend_zwolnien"
+            badge={
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  {[
+                    { id: 'zgl',  label: 'Zgłoszenia / Wypow.' },
+                    { id: 'fakt', label: 'Faktyczne / Monit.' },
+                  ].map(opt => (
+                    <button
+                      key={opt.id}
+                      onClick={() => setChartMode(opt.id)}
+                      style={{
+                        padding: '3px 10px', borderRadius: '6px', border: 'none', cursor: 'pointer',
+                        fontSize: '0.68rem', fontWeight: chartMode === opt.id ? 700 : 500,
+                        fontFamily: 'Outfit, sans-serif',
+                        background: chartMode === opt.id ? 'var(--nav-active)' : 'var(--bg3)',
+                        color: chartMode === opt.id ? '#fff' : 'var(--muted)',
+                      }}
+                    >{opt.label}</button>
+                  ))}
+                </div>
+                <RangeSelector
+                  labels={tLabels}
+                  from={cFrom}
+                  to={cTo}
+                  onChange={(f, t) => { setChartFrom(f); setChartTo(t); }}
+                />
+              </div>
+            }
+            style={{ marginBottom: '10px' }}
+          >
+            <LineChartSVG datasets={datasets} labels={cLabels} height={160} />
+          </Card>
+        );
+      })()}
 
       {/* PKD — ranking miesięczny */}
       <Card style={{ marginBottom: '10px' }}>

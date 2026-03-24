@@ -61,7 +61,7 @@ function fmtRRstopa(n) {
 }
 
 export default function Pulpit({ onNavPowiaty, onNavBezrobotni }) {
-  const [trendMode, setTrendMode] = useState('bezr');
+  const [trendMode, setTrendMode] = useState('stopa');
   const { pulpit, meta, loading } = useAppData();
 
   if (!pulpit) return null;
@@ -193,6 +193,7 @@ export default function Pulpit({ onNavPowiaty, onNavBezrobotni }) {
           height={180}
           width={900}
           showValueLabels
+          valueLabelMode="peaks"
         />
       </Card>
 

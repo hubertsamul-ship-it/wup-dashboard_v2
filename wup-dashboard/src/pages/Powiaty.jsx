@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Home, Clock, GraduationCap, Heart, Users, Shield } from 'lucide-react';
 import KpiCard from '../components/KpiCard';
 import Card, { SectionHeader, Grid } from '../components/Card';
@@ -249,25 +249,7 @@ const d = (powiaty || []).find(p => p.wgm === wgm) || {};
   const allKat = [...(d.kategorie || [])].sort((a, b) => b.n - a.n)
     .map(k => ({ label: k.label, value: k.n, pct: k.pct }));
 
-  // Trend etykiet: obetnij końcówkę, jeśli ostatni miesiąc nie ma stopy (np. luty 2026)
   const rawTrendMaz = stopa?.trend_maz_13m || [];
-  const hasNullLast = rawTrendMaz.length > 0 && rawTrendMaz[rawTrendMaz.length - 1].stopa == null;
-  const trendMaz    = hasNullLast ? rawTrendMaz.slice(0, -1) : rawTrendMaz;
-  const trendLabels = trendMaz.map(t => t.label);
-
-  const powSorted = useMemo(() =>
-    [...(powiaty || [])].sort((a, b) => a.nazwa.localeCompare(b.nazwa, 'pl')),
-    [powiaty]
-  );
-  const stopaDatasets = useMemo(() =>
-    cmpWgms.map((w, i) => {
-      const p = (powiaty || []).find(x => x.wgm === w);
-      const series = p?.trend_stopa_13m || [];
-      const data   = hasNullLast ? series.slice(0, -1) : series;
-      return { color: POW_COLORS[i % POW_COLORS.length], label: p?.nazwa || w, data };
-    }),
-    [cmpWgms, powiaty, hasNullLast]
-  );
 
   const SHOW_N      = 12;
   // Do wykresu napływ/odpływ używamy RAW etykiet (w tym Lut 26 gdzie stopa=null)
@@ -417,27 +399,6 @@ const d = (powiaty || []).find(p => p.wgm === wgm) || {};
         )}
 
       </div>
-
-      {/* ── Wiersz 4: Stopa bezrobocia — porównanie powiatów ─────────────────── */}
-      <Card title="Stopa bezrobocia — porównanie powiatów" exportTitle="stopa_porownanie_powiatow" style={{ flexShrink: 0, marginBottom: '10px' }}>
-        <div style={{ marginBottom: '10px' }}>
-          <PowiatSelector
-            selected={cmpWgms}
-            onChange={setCmpWgms}
-            allPowiaty={powSorted}
-            max={6}
-          />
-        </div>
-        <div style={{ overflow: 'hidden' }}>
-          <LineChartSVG
-            datasets={stopaDatasets}
-            labels={trendLabels}
-            height={180}
-            width={900}
-            showValueLabels
-          />
-        </div>
-      </Card>
 
     </div>
   );

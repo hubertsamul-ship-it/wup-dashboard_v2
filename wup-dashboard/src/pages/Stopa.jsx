@@ -1,9 +1,32 @@
+import { useState } from 'react';
 import KpiCard from '../components/KpiCard';
-import Card, { SectionHeader, Grid } from '../components/Card';
+import Card, { SectionHeader, Grid, Toggle } from '../components/Card';
 import RankTable from '../components/RankTable';
 import HorizontalBar, { stopaColor, greenColor } from '../components/HorizontalBar';
+import LineChartSVG from '../components/LineChartSVG';
 import InfoTooltip from '../components/InfoTooltip';
 import { useAppData } from '../context/DataContext';
+
+function RangeSelector({ labels, from, to, onChange }) {
+  const sel = {
+    background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)',
+    borderRadius: '6px', color: 'var(--text)', padding: '4px 8px',
+    fontSize: 'var(--font-sm)', fontFamily: 'Outfit, sans-serif', cursor: 'pointer',
+    option: { background: '#1e293b', color: '#e2e8f0' },
+  };
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+      <span style={{ fontSize: 'var(--font-xs)', color: 'var(--muted)' }}>Od:</span>
+      <select value={from} onChange={e => onChange(e.target.value, to)} style={sel}>
+        {labels.map(l => <option key={l} value={l} style={{ background: '#1e293b', color: '#e2e8f0' }}>{l}</option>)}
+      </select>
+      <span style={{ fontSize: 'var(--font-xs)', color: 'var(--muted)' }}>Do:</span>
+      <select value={to} onChange={e => onChange(from, e.target.value)} style={sel}>
+        {labels.map(l => <option key={l} value={l} style={{ background: '#1e293b', color: '#e2e8f0' }}>{l}</option>)}
+      </select>
+    </div>
+  );
+}
 
 
 // ── Strona ─────────────────────────────────────────────────────────────────
@@ -30,7 +53,9 @@ function fmtRRstopa(d) {
 }
 
 export default function Stopa() {
-  const { stopa, meta } = useAppData();
+  const { stopa, meta, pulpit } = useAppData();
+  const [rangeFrom, setRangeFrom] = useState(null);
+  const [rangeTo,   setRangeTo]   = useState(null);
 
   if (!stopa) return null;
 
@@ -41,6 +66,20 @@ export default function Stopa() {
   } = stopa;
 
   const stopa_pl_val = stopa.stopa_pl ?? 5.4;
+
+  // ── Trend stopy MAZ (pełny zakres) ───────────────────────────────────────
+  const trend37All   = (pulpit?.trend_37m || []).filter(t => t.stopa != null);
+  const trendAllLabels = trend37All.map(t => t.label);
+  const DEFAULT_FROM = trendAllLabels.find(l => l.startsWith('Sty') && l.includes('25')) || trendAllLabels[0] || '';
+  const tFrom = rangeFrom ?? DEFAULT_FROM;
+  const tTo   = rangeTo   ?? trendAllLabels[trendAllLabels.length - 1] ?? '';
+  const iFrom = trendAllLabels.indexOf(tFrom);
+  const iTo   = trendAllLabels.indexOf(tTo);
+  const lo = Math.min(iFrom < 0 ? 0 : iFrom, iTo < 0 ? trendAllLabels.length - 1 : iTo);
+  const hi = Math.max(iFrom < 0 ? 0 : iFrom, iTo < 0 ? trendAllLabels.length - 1 : iTo);
+  const trendSlice  = trend37All.slice(lo, hi + 1);
+  const trendLabels = trendSlice.map(t => t.label);
+  const trendData   = [{ data: trendSlice.map(t => t.stopa), color: '#4895ef', label: 'Mazowieckie' }];
 
   // Rankingi województw (woj_stopa posortowane desc z JSON)
   const WOJ_TOP5 = woj_stopa.slice(0, 5).map(d => ({ label: d.n, value: d.s }));
@@ -105,6 +144,31 @@ export default function Stopa() {
           <RankTable data={pow_bot5} unit="%" accentColor="#52b788" reverse avgLine={stopa.stopa_maz} avgLabel="śr. MAZ" />
         </Card>
       </Grid>
+
+      {/* Trend stopy MAZ */}
+      {trendAllLabels.length > 0 && (
+        <Card
+          title={`Trend stopy bezrobocia — Mazowieckie (${trendAllLabels[0]}–${trendAllLabels[trendAllLabels.length - 1]})`}
+          exportTitle="trend_stopy_mazowieckie"
+          badge={
+            <RangeSelector
+              labels={trendAllLabels}
+              from={tFrom}
+              to={tTo}
+              onChange={(f, t) => { setRangeFrom(f); setRangeTo(t); }}
+            />
+          }
+        >
+          <LineChartSVG
+            datasets={trendData}
+            labels={trendLabels}
+            height={180}
+            width={900}
+            showValueLabels
+            valueLabelMode="peaks"
+          />
+        </Card>
+      )}
 
     </div>
   );

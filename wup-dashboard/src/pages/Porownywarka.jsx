@@ -7,7 +7,7 @@ import MapPoland from '../components/MapPoland';
 import { useAppData } from '../context/DataContext';
 
 const A_COLOR = '#e63946';
-const B_COLOR = '#4895ef';
+const B_COLOR = '#fbbf24';
 const POW_COLORS = ['#e63946', '#4895ef', '#f4a261', '#52b788', '#a78bfa', '#fbbf24'];
 const CHART_COLORS = ['#e63946', '#4895ef', '#f4a261'];
 
@@ -93,7 +93,7 @@ function SelectUnit({ label, value, options, onChange, color }) {
         }}
       >
         {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
+          <option key={o.value} value={o.value} style={{ background: '#1e293b', color: '#e2e8f0' }}>{o.label}</option>
         ))}
       </select>
     </label>

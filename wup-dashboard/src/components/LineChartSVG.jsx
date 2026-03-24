@@ -213,21 +213,38 @@ export default function LineChartSVG({
               />
             ))}
             {showValueLabels && allValsWithIdx.length > 0 && (() => {
-              const points = valueLabelMode === 'all'
-                ? allValsWithIdx
-                : [allValsWithIdx[allValsWithIdx.length - 1]];
-              return points.map(({ v, i }, pi) => {
-                const lastPoint = i === n - 1;
-                const yShift = valueLabelMode === 'last'
-                  ? ((di % 2 === 0) ? -10 : 12)
-                  : -8;
+              const points = (() => {
+                if (valueLabelMode === 'all') return allValsWithIdx;
+                if (valueLabelMode === 'peaks') {
+                  return allValsWithIdx.filter(({ v }, pi, arr) => {
+                    if (pi === 0 || pi === arr.length - 1) return true;
+                    const pv = arr[pi - 1].v, nv = arr[pi + 1].v;
+                    return (v > pv && v > nv) || (v < pv && v < nv);
+                  });
+                }
+                return [allValsWithIdx[allValsWithIdx.length - 1]];
+              })();
+              return points.map(({ v, i: idx }, pi) => {
+                const isLast = idx === n - 1;
+                const yShift = (() => {
+                  if (valueLabelMode === 'last') return (di % 2 === 0) ? -10 : 12;
+                  if (valueLabelMode === 'peaks') {
+                    const prevV = pi > 0 ? points[pi - 1].v : null;
+                    const nextV = pi < points.length - 1 ? points[pi + 1].v : null;
+                    const isValley = (prevV !== null && v <= prevV) && (nextV !== null && v <= nextV);
+                    return isValley ? 14 : -10;
+                  }
+                  return -8;
+                })();
+                const anchor = valueLabelMode === 'last' ? (isLast ? 'end' : 'start') : 'middle';
+                const dx = valueLabelMode === 'last' ? (isLast ? '-6' : '6') : '0';
                 return (
                   <text
-                    key={`lbl-${i}-${pi}`}
-                    x={xPos(i).toFixed(1)}
+                    key={`lbl-${idx}-${pi}`}
+                    x={xPos(idx).toFixed(1)}
                     y={(yPos(v) + yShift).toFixed(1)}
-                    textAnchor={lastPoint ? 'end' : 'start'}
-                    dx={lastPoint ? '-6' : '6'}
+                    textAnchor={anchor}
+                    dx={dx}
                     fontSize="10"
                     fill={col}
                     fontFamily="JetBrains Mono, monospace"
