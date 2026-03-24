@@ -141,7 +141,13 @@ function getChoroColor(value, breaks) {
   return CHOROPLETH_COLORS[6];
 }
 
-export default function MapMazowieckie({ onPowiatClick }) {
+export default function MapMazowieckie({
+  onPowiatClick,
+  selectedWgms = [],
+  selectionColors = ['#e63946', '#4895ef'],
+  onSelectWgm,
+  subtitle = 'Woj. mazowieckie · stopa bezrobocia (%)',
+}) {
   const { powiaty, loading } = useAppData();
   const [geoPaths, setGeoPaths] = useState([]);
   const [tooltip, setTooltip]   = useState(null);
@@ -159,7 +165,7 @@ export default function MapMazowieckie({ onPowiatClick }) {
   const stopaValues = powiaty?.filter(p => p.stopa != null).map(p => p.stopa) ?? [];
   const minS = stopaValues.length ? Math.min(...stopaValues) : 1;
   const maxS = stopaValues.length ? Math.max(...stopaValues) : 25;
-  const breaks = useMemo(() => jenksBreaks(stopaValues), [powiaty]);
+  const breaks = useMemo(() => jenksBreaks(stopaValues), [stopaValues]);
 
   // Ładuj GeoJSON raz
   useEffect(() => {
@@ -178,11 +184,75 @@ export default function MapMazowieckie({ onPowiatClick }) {
 
   const isEmpty = geoPaths.length === 0 || loading;
 
+  const selectedList = selectedWgms
+    .map((wgm, idx) => {
+      const p = (powiaty || []).find((x) => x.wgm === wgm);
+      if (!p) return null;
+      return { wgm, nazwa: p.nazwa, color: selectionColors[idx % selectionColors.length] };
+    })
+    .filter(Boolean);
+
+  const interactive = Boolean(onPowiatClick || onSelectWgm);
+  const hint = onSelectWgm
+    ? 'Kliknij powiat = ustaw wybór A/B'
+    : (onPowiatClick ? 'Kliknij powiat = szczegóły' : 'Najedź powiat = szczegóły');
+
   return (
     <div style={{
       position: 'relative', background: '#F8F9FA', borderRadius: '10px', overflow: 'hidden',
       boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
     }}>
+      <div style={{
+        position: 'absolute',
+        left: 8,
+        top: 8,
+        zIndex: 11,
+        fontSize: '0.64rem',
+        color: '#334155',
+        background: 'rgba(255,255,255,0.88)',
+        border: '1px solid rgba(148,163,184,0.35)',
+        borderRadius: 999,
+        padding: '2px 8px',
+        pointerEvents: 'none',
+      }}>
+        {subtitle}
+      </div>
+      {selectedList.length > 0 && (
+        <div style={{
+          position: 'absolute',
+          right: 8,
+          top: 8,
+          zIndex: 11,
+          display: 'flex',
+          gap: 6,
+          flexWrap: 'wrap',
+          justifyContent: 'flex-end',
+          maxWidth: '62%',
+          pointerEvents: 'none',
+        }}>
+          {selectedList.map((s, idx) => (
+            <div key={s.wgm} style={{
+              fontSize: '0.64rem',
+              color: '#1e293b',
+              background: 'rgba(255,255,255,0.9)',
+              border: '1px solid rgba(148,163,184,0.35)',
+              borderRadius: 999,
+              padding: '2px 8px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+            }}>
+              <span style={{
+                width: 7, height: 7, borderRadius: '50%',
+                background: s.color,
+                border: '1px solid rgba(0,0,0,0.25)',
+                display: 'inline-block',
+              }} />
+              {idx === 0 ? 'A' : 'B'} · {s.nazwa}
+            </div>
+          ))}
+        </div>
+      )}
       {tooltip && (
         <div style={{
           position: 'absolute', background: '#ffffff',
@@ -218,15 +288,20 @@ export default function MapMazowieckie({ onPowiatClick }) {
           const pow = dataByGeo[gp.geoNazwa];
           const hasData = pow && pow.stopa != null;
           const isHovered = hovered === gp.geoNazwa;
+          const selectedIdx = pow ? selectedWgms.indexOf(pow.wgm) : -1;
+          const isSelected = selectedIdx !== -1;
+          const selectedColor = isSelected ? selectionColors[selectedIdx % selectionColors.length] : null;
           return (
             <g key={i}
               style={{
-                cursor: hasData && onPowiatClick ? 'pointer' : 'default',
+                cursor: hasData && interactive ? 'pointer' : 'default',
                 filter: isHovered ? 'drop-shadow(0 0 8px rgba(250,204,21,0.5))' : 'none',
                 transition: 'filter 0.2s ease',
               }}
               onClick={() => {
-                if (hasData && onPowiatClick) onPowiatClick({ n: pow.nazwa, s: pow.stopa, wgm: pow.wgm });
+                if (!hasData || !interactive) return;
+                if (onSelectWgm) onSelectWgm(pow);
+                if (onPowiatClick) onPowiatClick({ n: pow.nazwa, s: pow.stopa, wgm: pow.wgm });
               }}
               onMouseEnter={e => {
                 setHovered(gp.geoNazwa);
@@ -247,9 +322,9 @@ export default function MapMazowieckie({ onPowiatClick }) {
             >
               <path
                 d={gp.d}
-                fill={isHovered ? '#FACC15' : (hasData ? getChoroColor(pow.stopa, breaks) : '#E2E8F0')}
-                stroke="#FFFFFF"
-                strokeWidth={isHovered ? '1.5' : '0.8'}
+                fill={isSelected ? selectedColor : (isHovered ? '#FACC15' : (hasData ? getChoroColor(pow.stopa, breaks) : '#E2E8F0'))}
+                stroke={isSelected ? '#0f172a' : '#FFFFFF'}
+                strokeWidth={isSelected ? '2' : (isHovered ? '1.5' : '0.8')}
                 style={{ transition: 'fill 0.2s ease, stroke-width 0.2s ease' }}
               />
             </g>
@@ -258,7 +333,7 @@ export default function MapMazowieckie({ onPowiatClick }) {
       </svg>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px', padding: '0 4px' }}>
         <div style={{ fontSize: '0.65rem', color: 'var(--muted)' }}>
-          Kliknij powiat = szczegóły
+          {hint}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
           <span style={{ fontSize: '0.62rem', color: 'var(--muted)', marginRight: '2px' }}>{minS.toFixed(1).replace('.', ',')}%</span>

@@ -187,7 +187,13 @@ export default function Pulpit({ onNavPowiaty, onNavBezrobotni }) {
           />
         }
       >
-        <LineChartSVG datasets={trendData} labels={trendLabels} height={180} width={900} />
+        <LineChartSVG
+          datasets={trendData}
+          labels={trendLabels}
+          height={180}
+          width={900}
+          showValueLabels
+        />
       </Card>
 
     </div>

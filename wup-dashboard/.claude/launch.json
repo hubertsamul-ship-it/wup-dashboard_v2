@@ -2,8 +2,8 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "wup-dashboard React (Vite)",
-      "runtimeExecutable": "npm",
+      "name": "wup-dashboard (React + Vite)",
+      "runtimeExecutable": "C:/Program Files/nodejs/npm.cmd",
       "runtimeArgs": ["run", "dev"],
       "port": 5173
     },

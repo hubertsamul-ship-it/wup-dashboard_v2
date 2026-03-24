@@ -1,5 +1,5 @@
 // Pure SVG line chart matching the mockup aesthetic exactly
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 function hexToRgb(hex) {
   if (!hex || !hex.startsWith('#')) return '100,100,100';
@@ -10,6 +10,7 @@ function hexToRgb(hex) {
 }
 
 function fmt(v) {
+  if (v == null || Number.isNaN(v)) return '—';
   if (v >= 10000) return Math.round(v / 1000) + 'k';
   if (v >= 1000) return (v / 1000).toFixed(1).replace('.', ',') + 'k';
   return v % 1 !== 0 ? v.toFixed(1).replace('.', ',') : String(Math.round(v));
@@ -21,6 +22,9 @@ export default function LineChartSVG({
   height = 160,
   width = 560,
   showLegend = true,
+  showValueLabels = false,
+  valueLabelMode = 'last', // 'last' | 'all'
+  valueFormatter,
 }) {
   const [hoveredIdx, setHoveredIdx] = useState(null);
 
@@ -30,31 +34,34 @@ export default function LineChartSVG({
   const iW = W - pad.l - pad.r;
   const iH = H - pad.t - pad.b;
 
-  const allVals = datasets.flatMap(d => d.data);
-  const rawMin = Math.min(...allVals);
-  const rawMax = Math.max(...allVals);
+  const allVals = datasets
+    .flatMap(d => d.data)
+    .filter(v => typeof v === 'number' && Number.isFinite(v));
+  const rawMin = allVals.length ? Math.min(...allVals) : 0;
+  const rawMax = allVals.length ? Math.max(...allVals) : 1;
   const spread = rawMax - rawMin || rawMax * 0.1;
   const mn = rawMin - spread * 0.1;
   const mx = rawMax + spread * 0.1;
   const n = labels.length;
+  const valueFmt = valueFormatter || fmt;
 
-  const xPos = (i) => pad.l + (i / (n - 1)) * iW;
+  const xPos = (i) => {
+    if (n <= 1) return pad.l + iW / 2;
+    return pad.l + (i / (n - 1)) * iW;
+  };
   const yPos = (v) => pad.t + iH - ((v - mn) / (mx - mn)) * iH;
 
-  const gridLines = useMemo(() => {
-    const lines = [];
-    for (let i = 0; i <= 3; i++) {
-      const v = mn + (mx - mn) * (i / 3);
-      const yy = yPos(v);
-      lines.push({ v, yy });
-    }
-    return lines;
-  }, [mn, mx]);
+  const gridLines = [];
+  for (let i = 0; i <= 3; i++) {
+    const v = mn + (mx - mn) * (i / 3);
+    const yy = yPos(v);
+    gridLines.push({ v, yy });
+  }
 
-  const step = Math.ceil(n / 6);
-  const baseIdxs = labels.map((_, i) => i).filter((i) => i % step === 0);
+  const step = Math.max(1, Math.ceil(Math.max(n, 1) / 6));
+  const baseIdxs = n > 0 ? labels.map((_, i) => i).filter((i) => i % step === 0) : [];
   const lastBase = baseIdxs[baseIdxs.length - 1] ?? -Infinity;
-  const xLabelIdxs = (!baseIdxs.includes(n - 1) && (n - 1 - lastBase) >= Math.floor(step * 0.6))
+  const xLabelIdxs = (n > 0 && !baseIdxs.includes(n - 1) && (n - 1 - lastBase) >= Math.floor(step * 0.6))
     ? [...baseIdxs, n - 1]
     : baseIdxs;
 
@@ -110,7 +117,7 @@ export default function LineChartSVG({
                 fontFamily="JetBrains Mono, monospace"
                 fontWeight="700"
               >
-                {fmt(v)}
+                {v == null || Number.isNaN(v) ? '—' : valueFmt(v)}
               </text>
             </g>
           );
@@ -205,6 +212,37 @@ export default function LineChartSVG({
                 style={{ transition: 'r 0.1s' }}
               />
             ))}
+            {showValueLabels && allValsWithIdx.length > 0 && (() => {
+              const points = valueLabelMode === 'all'
+                ? allValsWithIdx
+                : [allValsWithIdx[allValsWithIdx.length - 1]];
+              return points.map(({ v, i }, pi) => {
+                const lastPoint = i === n - 1;
+                const yShift = valueLabelMode === 'last'
+                  ? ((di % 2 === 0) ? -10 : 12)
+                  : -8;
+                return (
+                  <text
+                    key={`lbl-${i}-${pi}`}
+                    x={xPos(i).toFixed(1)}
+                    y={(yPos(v) + yShift).toFixed(1)}
+                    textAnchor={lastPoint ? 'end' : 'start'}
+                    dx={lastPoint ? '-6' : '6'}
+                    fontSize="10"
+                    fill={col}
+                    fontFamily="JetBrains Mono, monospace"
+                    fontWeight="700"
+                    paintOrder="stroke"
+                    stroke="#ffffff"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    {valueFmt(v)}
+                  </text>
+                );
+              });
+            })()}
           </g>
         );
       })}

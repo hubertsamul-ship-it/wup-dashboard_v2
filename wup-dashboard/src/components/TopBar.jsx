@@ -8,6 +8,7 @@ const TITLES = {
   wynagrodzenia:'Wynagrodzenia — sektor przedsiębiorstw',
   zwolnienia:   'Zwolnienia grupowe',
   powiaty:      'Analityka powiatowa',
+  porownywarka: 'Porównywarka A/B',
 };
 
 const MONTHS_FULL = [

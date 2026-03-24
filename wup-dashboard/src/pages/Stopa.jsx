@@ -253,7 +253,13 @@ export default function Stopa() {
         <div style={{ marginBottom: '8px' }}>
           <WojSelector selected={selWojs} onChange={setSelWojs} options={WOJ_OPTIONS} />
         </div>
-        <LineChartSVG datasets={trendDatasets} labels={trendLabels} height={180} width={900} />
+        <LineChartSVG
+          datasets={trendDatasets}
+          labels={trendLabels}
+          height={180}
+          width={900}
+          showValueLabels
+        />
       </Card>
     </div>
   );

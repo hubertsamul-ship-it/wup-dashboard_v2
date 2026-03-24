@@ -10,6 +10,7 @@ import Pracujacy from './pages/Pracujacy';
 import Wynagrodzenia from './pages/Wynagrodzenia';
 import Zwolnienia from './pages/Zwolnienia';
 import Powiaty from './pages/Powiaty';
+import Porownywarka from './pages/Porownywarka';
 
 function AppShell({ page, setPage, powiatTarget, setPowiatTarget, sidebarCollapsed, setSidebarCollapsed }) {
   const { loading, error, retry } = useAppData();
@@ -50,6 +51,7 @@ function AppShell({ page, setPage, powiatTarget, setPowiatTarget, sidebarCollaps
     wynagrodzenia: <Wynagrodzenia />,
     zwolnienia:    <Zwolnienia />,
     powiaty:       <Powiaty initialPowiat={powiatTarget} key={powiatTarget} />,
+    porownywarka:  <Porownywarka initialPowiat={powiatTarget} key={`cmp-${powiatTarget || 'none'}`} />,
   };
 
   return (

@@ -112,7 +112,13 @@ function getChoroColor(value, breaks) {
   return CHOROPLETH_COLORS[6];
 }
 
-export default function MapPoland({ onMazClick }) {
+export default function MapPoland({
+  onMazClick,
+  selectedWoj = [],
+  selectionColors = ['#e63946', '#4895ef'],
+  onSelectWoj,
+  subtitle = 'Polska · stopa bezrobocia (%)',
+}) {
   const [features, setFeatures] = useState([]);
   const [tooltip, setTooltip] = useState(null);
   const [hovered, setHovered] = useState(null);
@@ -128,7 +134,7 @@ export default function MapPoland({ onMazClick }) {
   const stopaValues = wojData.map(d => d.s).filter(v => v != null);
   const minS = stopaValues.length ? Math.min(...stopaValues) : 2;
   const maxS = stopaValues.length ? Math.max(...stopaValues) : 12;
-  const breaks = useMemo(() => jenksBreaks(stopaValues), [stopa]);
+  const breaks = useMemo(() => jenksBreaks(stopaValues), [stopaValues]);
 
   useEffect(() => {
     fetch('/data/wojewodztwa.geojson')
@@ -151,6 +157,9 @@ export default function MapPoland({ onMazClick }) {
     isMaz:   f.nazwa === 'mazowieckie',
   }));
 
+  const selectedSet = new Set(selectedWoj);
+  const interactive = Boolean(onMazClick || onSelectWoj);
+
   return (
     <div style={{
       position: 'relative',
@@ -159,6 +168,57 @@ export default function MapPoland({ onMazClick }) {
       overflow: 'hidden',
       boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
     }}>
+      <div style={{
+        position: 'absolute',
+        left: 8,
+        top: 8,
+        zIndex: 11,
+        fontSize: '0.64rem',
+        color: '#334155',
+        background: 'rgba(255,255,255,0.88)',
+        border: '1px solid rgba(148,163,184,0.35)',
+        borderRadius: 999,
+        padding: '2px 8px',
+        pointerEvents: 'none',
+      }}>
+        {subtitle}
+      </div>
+      {selectedWoj.length > 0 && (
+        <div style={{
+          position: 'absolute',
+          right: 8,
+          top: 8,
+          zIndex: 11,
+          display: 'flex',
+          gap: 6,
+          flexWrap: 'wrap',
+          justifyContent: 'flex-end',
+          maxWidth: '62%',
+          pointerEvents: 'none',
+        }}>
+          {selectedWoj.map((name, idx) => (
+            <div key={name} style={{
+              fontSize: '0.64rem',
+              color: '#1e293b',
+              background: 'rgba(255,255,255,0.9)',
+              border: '1px solid rgba(148,163,184,0.35)',
+              borderRadius: 999,
+              padding: '2px 8px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+            }}>
+              <span style={{
+                width: 7, height: 7, borderRadius: '50%',
+                background: selectionColors[idx % selectionColors.length],
+                border: '1px solid rgba(0,0,0,0.25)',
+                display: 'inline-block',
+              }} />
+              {idx === 0 ? 'A' : 'B'} · {name}
+            </div>
+          ))}
+        </div>
+      )}
       {tooltip && (
         <div style={{
           position: 'absolute', background: '#ffffff',
@@ -185,15 +245,18 @@ export default function MapPoland({ onMazClick }) {
         )}
         {[...paths.filter(p => !p.isMaz), ...paths.filter(p => p.isMaz)].map((p, i) => {
           const isHovered = hovered === p.nazwa;
+          const isSelected = selectedSet.has(p.display) || selectedSet.has(p.nazwa);
+          const selIdx = selectedWoj.findIndex((x) => x === p.display || x === p.nazwa);
+          const selColor = selIdx !== -1 ? selectionColors[selIdx % selectionColors.length] : null;
           return (
             <path
               key={i}
               d={p.d}
-              fill={isHovered ? '#FACC15' : (p.stopa !== null ? getChoroColor(p.stopa, breaks) : '#E2E8F0')}
-              stroke="#FFFFFF"
-              strokeWidth={isHovered ? '1.5' : '0.8'}
+              fill={isSelected ? selColor : (isHovered ? '#FACC15' : (p.stopa !== null ? getChoroColor(p.stopa, breaks) : '#E2E8F0'))}
+              stroke={isSelected ? '#0f172a' : '#FFFFFF'}
+              strokeWidth={isSelected ? '2' : (isHovered ? '1.5' : '0.8')}
               style={{
-                cursor: 'pointer',
+                cursor: interactive ? 'pointer' : 'default',
                 transition: 'all 0.2s ease',
                 filter: isHovered ? 'drop-shadow(0 0 8px rgba(250,204,21,0.5))' : 'none',
               }}
@@ -204,7 +267,10 @@ export default function MapPoland({ onMazClick }) {
                 setTooltip({ display: p.display, stopa: p.stopa, x: e.clientX - wr.left, y: e.clientY - wr.top });
               }}
               onMouseLeave={() => { setHovered(null); setTooltip(null); }}
-              onClick={p.isMaz && onMazClick ? () => onMazClick() : undefined}
+              onClick={() => {
+                if (onSelectWoj) onSelectWoj(p.display);
+                if (p.isMaz && onMazClick) onMazClick();
+              }}
             />
           );
         })}
@@ -214,7 +280,9 @@ export default function MapPoland({ onMazClick }) {
         marginTop: '6px', padding: '0 4px',
       }}>
         <div style={{ fontSize: '0.65rem', color: 'var(--muted)' }}>
-          Mazowieckie{onMazClick ? ' · kliknij = szczegóły' : ' · najazd = szczegóły'}
+          {onSelectWoj
+            ? 'Kliknij województwo = ustaw wybór A/B'
+            : `Mazowieckie${onMazClick ? ' · kliknij = szczegóły' : ' · najazd = szczegóły'}`}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
           <span style={{ fontSize: '0.62rem', color: 'var(--muted)', marginRight: '2px' }}>{minS.toFixed(1).replace('.', ',')}%</span>

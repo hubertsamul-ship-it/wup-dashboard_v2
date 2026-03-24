@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   LayoutDashboard, Users, TrendingDown, Briefcase,
-  Wallet, FileBarChart, Map,
+  Wallet, FileBarChart, Map, SplitSquareHorizontal,
   ChevronLeft, ChevronRight, RefreshCw,
 } from 'lucide-react';
 import { LogoIcon, LogoFull } from './Logo';
@@ -14,6 +14,7 @@ const NAV = [
   { id: 'wynagrodzenia', Icon: Wallet,          label: 'Wynagrodzenia',     section: null },
   { id: 'zwolnienia',    Icon: FileBarChart,    label: 'Zwolnienia',        section: null },
   { id: 'powiaty',       Icon: Map,             label: 'Powiaty',           section: 'Analityka' },
+  { id: 'porownywarka',  Icon: SplitSquareHorizontal, label: 'Porównywarka', section: null },
 ];
 
 export default function Sidebar({ active, onNav, collapsed, onToggle }) {
