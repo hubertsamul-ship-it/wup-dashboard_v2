@@ -293,6 +293,9 @@ def extract_mrpips(filename: str, stopa_dict: dict) -> dict:
         # Przyczyny wyrejestrowania (D1 T2) — offset -4 w starym formacie
         wyrej_staz        = m.get_value(p, '1', '2', wr('056'), 'R1')
         wyrej_szkolenie   = m.get_value(p, '1', '2', wr('054'), 'R1') + wyrej_staz
+        wyrej_psu         = m.get_value(p, '1', '2', wr('057'), 'R1')
+        wyrej_reintegracja = m.get_value(p, '1', '2', wr('058'), 'R1')
+        wyrej_agencja     = m.get_value(p, '1', '2', wr('059'), 'R1')
         wyrej_niepodjecie = m.get_value(p, '1', '2', wr('060'), 'R1')
         wyrej_brak_kont   = m.get_value(p, '1', '2', wr('063'), 'R1')
         wyrej_dobrowolna  = m.get_value(p, '1', '2', wr('064'), 'R1')
@@ -330,6 +333,9 @@ def extract_mrpips(filename: str, stopa_dict: dict) -> dict:
             'wyrej_wiek_emet':   wyrej_wiek_emet,
             'wyrej_prawa_emet':  wyrej_prawa_emet,
             'wyrej_inne':        wyrej_inne,
+            'wyrej_psu':         wyrej_psu,
+            'wyrej_reintegracja': wyrej_reintegracja,
+            'wyrej_agencja':     wyrej_agencja,
             'd5_staz':          d5_staz,
             'rok':              m.rok,
             'miesiac':          m.miesiac,
@@ -941,6 +947,13 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
             n = v.get(field) or 0
             return {'label': label, 'n': n, 'pct': round(n / wyrej * 100, 1) if wyrej else 0}
 
+        aktywizacja_programowa_n = (
+            (v.get('wyrej_szkolenie') or 0)
+            + (v.get('wyrej_psu') or 0)
+            + (v.get('wyrej_reintegracja') or 0)
+            + (v.get('wyrej_agencja') or 0)
+        )
+
         pow_lista.append({
             'wgm':   wgm,
             'nazwa': nazwa,
@@ -983,8 +996,10 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
             'zarej_delta':  (v.get('zarej_razem') or 0) - (v_prv.get('zarej_razem') or 0),
             'wyrej_delta':  (v.get('wyrej_razem') or 0) - (v_prv.get('wyrej_razem') or 0),
             'oferty_delta': (v.get('oferty_pracy') or 0) - (v_prv.get('oferty_pracy') or 0),
+            # Intensywność aktywizacji (programowa):
+            # udział odpływu do działań aktywizacyjnych (szkolenia/staże, PSU, reintegracja, agencje).
             'aktywizacja_pct': round(
-                (v.get('podjeli_prace') or 0) / max(v.get('wyrej_razem') or 1, 1) * 100, 1
+                aktywizacja_programowa_n / max(v.get('wyrej_razem') or 1, 1) * 100, 1
             ),
             # Trendy 13 mies.
             'trend_stopa_13m': trend_s,
@@ -1086,7 +1101,13 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
             'kategorie':   kategorie,
             'wyrej_reasons': wyrej_reasons,
             'aktywizacja_pct': round(
-                next((r['pct'] for r in wyrej_reasons if 'Podjęcie pracy' in r['label']), 0), 1
+                (
+                    s(cur, 'wyrej_szkolenie')
+                    + s(cur, 'wyrej_psu')
+                    + s(cur, 'wyrej_reintegracja')
+                    + s(cur, 'wyrej_agencja')
+                ) / max(wyrej_cur or 1, 1) * 100,
+                1
             ),
             'trend_13m': [
                 {'label': t['label'], 'zarej': t['zarej'], 'wyrej': t['wyrej']}

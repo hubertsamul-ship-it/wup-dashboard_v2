@@ -177,6 +177,11 @@ export default function Bezrobotni() {
   const trendWyrejPrev = trend_13m_prev_year.map(t => t?.wyrej ?? null);
   const wyrejTop5   = wyrej_reasons.slice(0, 5);
   const total       = kobiety + mezczyzni;
+  const aktywizacjaProgramowaPct = (() => {
+    const row = (wyrej_reasons || []).find((r) => (r.label || '').toLowerCase().includes('szkolenie i staż'));
+    if (row && typeof row.pct === 'number') return row.pct;
+    return aktywizacja_pct ?? 0;
+  })();
 
   const COLOR_F = '#29b6a8';  // teal — kobiety
   const COLOR_M = '#4895ef';  // niebieski — mężczyźni
@@ -231,10 +236,10 @@ export default function Bezrobotni() {
           variant="green"
         />
         <KpiCard
-          flag="Skuteczność aktywizacji" flagColor="green"
-          target={loading ? 0 : Math.round((aktywizacja_pct ?? 0) * 10)}
+          flag="Intensywność aktywizacji" flagColor="green"
+          target={loading ? 0 : Math.round((aktywizacjaProgramowaPct ?? 0) * 10)}
           decimals={1} suffix="%"
-          label={<>wyrej. = podjęcie pracy<InfoTooltip text="Odsetek wyrejestrowanych bezrobotnych, których przyczyną wyrejestrowania było podjęcie zatrudnienia." source="MRPiPS-01" /></>}
+          label={<>udział działań programowych w odpływie<InfoTooltip text="Odsetek wyrejestrowanych bezrobotnych skierowanych do działań aktywizacyjnych: szkolenia i staże, prace społecznie użyteczne, reintegracja społeczno-zawodowa oraz agencje zatrudnienia." source="MRPiPS-01 (D1 T2: 054,056,057,058,059)" /></>}
           variant="green"
         />
       </div>
