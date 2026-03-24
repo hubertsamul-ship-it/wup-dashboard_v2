@@ -2,8 +2,8 @@
   "meta": {
     "okres": "2026-02",
     "poprzedni_okres": "2026-01",
-    "stopa_okres": "2026-01",
-    "stopa_poprzedni_okres": "2025-12",
+    "stopa_okres": "2026-02",
+    "stopa_poprzedni_okres": "2026-01",
     "data_aktualizacji": "2026-02-28",
     "highlights": [
       {
@@ -12,7 +12,7 @@
       },
       {
         "type": "stopa_vs_pl",
-        "text": "Stopa w Mazowieckiem (4,5%) jest niższa od krajowej (6,0%) o 1,5 pp."
+        "text": "Stopa w Mazowieckiem (4,5%) jest niższa od krajowej (6,1%) o 1,6 pp."
       },
       {
         "type": "stopa_rr",
@@ -29,14 +29,14 @@
     "bezr_delta": 2305,
     "bezr_delta_rr": 9043,
     "stopa_maz": 4.5,
-    "stopa_maz_delta": 0.2,
+    "stopa_maz_delta": 0.0,
     "stopa_maz_delta_rr": 0.3,
-    "stopa_pl": 6.0,
-    "stopa_pl_delta": 0.3,
+    "stopa_pl": 6.1,
+    "stopa_pl_delta": 0.1,
     "stopa_pl_delta_rr": 0.6,
-    "bezr_pl": 934100,
-    "bezr_pl_delta": 46200,
-    "bezr_pl_delta_rr": 96500,
+    "bezr_pl": 954900,
+    "bezr_pl_delta": 20800,
+    "bezr_pl_delta_rr": 108300,
     "trend_37m": [
       {
         "okres": "2023-01",
@@ -340,20 +340,20 @@
         "bezr": 124941,
         "zarej": 12883,
         "wyrej": 10578,
-        "stopa": null
+        "stopa": 4.5
       }
     ],
     "mapa_maz": [
       {
         "wgm": "1401",
         "nazwa": "Białobrzeski",
-        "stopa": 8.2,
+        "stopa": 8.5,
         "bezr_razem": 1022
       },
       {
         "wgm": "1402",
         "nazwa": "Ciechanowski",
-        "stopa": 8.7,
+        "stopa": 8.8,
         "bezr_razem": 2906
       },
       {
@@ -371,43 +371,43 @@
       {
         "wgm": "1405",
         "nazwa": "Grodziski",
-        "stopa": 3.4,
+        "stopa": 3.6,
         "bezr_razem": 1420
       },
       {
         "wgm": "1406",
         "nazwa": "Grójecki",
-        "stopa": 3.4,
+        "stopa": 3.5,
         "bezr_razem": 1414
       },
       {
         "wgm": "1407",
         "nazwa": "Kozienicki",
-        "stopa": 10.0,
+        "stopa": 9.8,
         "bezr_razem": 1886
       },
       {
         "wgm": "1408",
         "nazwa": "Legionowski",
-        "stopa": 6.8,
+        "stopa": 6.9,
         "bezr_razem": 2650
       },
       {
         "wgm": "1409",
         "nazwa": "Lipski",
-        "stopa": 13.5,
+        "stopa": 13.1,
         "bezr_razem": 1437
       },
       {
         "wgm": "1410",
         "nazwa": "Łosicki",
-        "stopa": 5.9,
+        "stopa": 6.1,
         "bezr_razem": 693
       },
       {
         "wgm": "1411",
         "nazwa": "Makowski",
-        "stopa": 17.0,
+        "stopa": 16.9,
         "bezr_razem": 2671
       },
       {
@@ -419,7 +419,7 @@
       {
         "wgm": "1413",
         "nazwa": "Mławski",
-        "stopa": 7.2,
+        "stopa": 7.3,
         "bezr_razem": 2000
       },
       {
@@ -431,7 +431,7 @@
       {
         "wgm": "1415",
         "nazwa": "Ostrołęcki",
-        "stopa": 9.6,
+        "stopa": 9.8,
         "bezr_razem": 2941
       },
       {
@@ -455,37 +455,37 @@
       {
         "wgm": "1419",
         "nazwa": "Płocki",
-        "stopa": 10.5,
+        "stopa": 10.8,
         "bezr_razem": 3519
       },
       {
         "wgm": "1420",
         "nazwa": "Płoński",
-        "stopa": 10.6,
+        "stopa": 10.8,
         "bezr_razem": 3335
       },
       {
         "wgm": "1421",
         "nazwa": "Pruszkowski",
-        "stopa": 2.7,
+        "stopa": 2.8,
         "bezr_razem": 2258
       },
       {
         "wgm": "1422",
         "nazwa": "Przasnyski",
-        "stopa": 10.3,
+        "stopa": 10.2,
         "bezr_razem": 1816
       },
       {
         "wgm": "1423",
         "nazwa": "Przysuski",
-        "stopa": 19.0,
+        "stopa": 18.9,
         "bezr_razem": 2589
       },
       {
         "wgm": "1424",
         "nazwa": "Pułtuski",
-        "stopa": 15.2,
+        "stopa": 15.0,
         "bezr_razem": 2697
       },
       {
@@ -497,19 +497,19 @@
       {
         "wgm": "1426",
         "nazwa": "Siedlecki",
-        "stopa": 5.8,
+        "stopa": 5.9,
         "bezr_razem": 1578
       },
       {
         "wgm": "1427",
         "nazwa": "Sierpecki",
-        "stopa": 12.7,
+        "stopa": 12.8,
         "bezr_razem": 2189
       },
       {
         "wgm": "1428",
         "nazwa": "Sochaczewski",
-        "stopa": 3.7,
+        "stopa": 3.8,
         "bezr_razem": 1186
       },
       {
@@ -533,31 +533,31 @@
       {
         "wgm": "1433",
         "nazwa": "Węgrowski",
-        "stopa": 5.8,
+        "stopa": 6.0,
         "bezr_razem": 1303
       },
       {
         "wgm": "1434",
         "nazwa": "Wołomiński",
-        "stopa": 6.7,
+        "stopa": 6.8,
         "bezr_razem": 6149
       },
       {
         "wgm": "1435",
         "nazwa": "Wyszkowski",
-        "stopa": 4.8,
+        "stopa": 4.7,
         "bezr_razem": 1362
       },
       {
         "wgm": "1436",
         "nazwa": "Zwoleński",
-        "stopa": 13.8,
+        "stopa": 13.6,
         "bezr_razem": 1573
       },
       {
         "wgm": "1437",
         "nazwa": "Żuromiński",
-        "stopa": 15.1,
+        "stopa": 15.0,
         "bezr_razem": 1992
       },
       {
@@ -569,25 +569,25 @@
       {
         "wgm": "1461",
         "nazwa": "m. Ostrołęka",
-        "stopa": 8.0,
+        "stopa": 8.1,
         "bezr_razem": 1864
       },
       {
         "wgm": "1462",
         "nazwa": "m. Płock",
-        "stopa": 5.5,
+        "stopa": 5.6,
         "bezr_razem": 3283
       },
       {
         "wgm": "1463",
         "nazwa": "m. Radom",
-        "stopa": 10.5,
+        "stopa": 10.7,
         "bezr_razem": 9125
       },
       {
         "wgm": "1464",
         "nazwa": "m. Siedlce",
-        "stopa": 4.6,
+        "stopa": 4.8,
         "bezr_razem": 1742
       },
       {
@@ -685,7 +685,7 @@
         "pct": 0.8
       }
     ],
-    "aktywizacja_pct": 60.2,
+    "aktywizacja_pct": 638.2,
     "trend_13m": [
       {
         "label": "Lut 25",
@@ -858,11 +858,11 @@
     }
   },
   "stopa": {
-    "stopa_pl": 6.0,
-    "stopa_pl_delta": 0.3,
+    "stopa_pl": 6.1,
+    "stopa_pl_delta": 0.1,
     "stopa_pl_delta_rr": 0.6,
     "stopa_maz": 4.5,
-    "stopa_maz_delta": 0.2,
+    "stopa_maz_delta": 0.0,
     "stopa_maz_delta_rr": 0.3,
     "pow_max": {
       "wgm": "1430",
@@ -881,7 +881,7 @@
       },
       {
         "label": "Przysuski",
-        "value": 19.0
+        "value": 18.9
       },
       {
         "label": "Radomski",
@@ -889,25 +889,25 @@
       },
       {
         "label": "Makowski",
-        "value": 17.0
+        "value": 16.9
       },
       {
         "label": "Pułtuski",
-        "value": 15.2
+        "value": 15.0
       }
     ],
     "pow_bot5": [
       {
         "label": "Grodziski",
-        "value": 3.4
+        "value": 3.6
       },
       {
         "label": "Grójecki",
-        "value": 3.4
+        "value": 3.5
       },
       {
         "label": "Pruszkowski",
-        "value": 2.7
+        "value": 2.8
       },
       {
         "label": "Warszawski zachodni",
@@ -982,13 +982,13 @@
       {
         "okres": "2026-02",
         "label": "Lut 26",
-        "stopa": null
+        "stopa": 4.5
       }
     ],
     "woj_stopa": [
       {
         "n": "Warmińsko-maz.",
-        "s": 9.9
+        "s": 10.1
       },
       {
         "n": "Podkarpackie",
@@ -996,19 +996,19 @@
       },
       {
         "n": "Świętokrzyskie",
-        "s": 8.8
+        "s": 9.0
       },
       {
         "n": "Lubelskie",
-        "s": 8.5
+        "s": 8.6
       },
       {
         "n": "Kujawsko-pom.",
-        "s": 8.2
+        "s": 8.3
       },
       {
         "n": "Zachodniopom.",
-        "s": 8.1
+        "s": 8.2
       },
       {
         "n": "Podlaskie",
@@ -1016,23 +1016,23 @@
       },
       {
         "n": "Opolskie",
-        "s": 6.7
+        "s": 6.8
       },
       {
         "n": "Łódzkie",
-        "s": 6.6
+        "s": 6.7
       },
       {
         "n": "Lubuskie",
-        "s": 6.1
+        "s": 6.2
       },
       {
         "n": "Dolnośląskie",
-        "s": 5.6
+        "s": 5.7
       },
       {
         "n": "Pomorskie",
-        "s": 5.6
+        "s": 5.7
       },
       {
         "n": "Małopolskie",
@@ -1040,7 +1040,7 @@
       },
       {
         "n": "Śląskie",
-        "s": 4.7
+        "s": 4.8
       },
       {
         "n": "Mazowieckie",
@@ -1048,7 +1048,7 @@
       },
       {
         "n": "Wielkopolskie",
-        "s": 3.8
+        "s": 3.9
       }
     ],
     "trend_pl_13m": [
@@ -1102,7 +1102,7 @@
       },
       {
         "label": "Lut 26",
-        "stopa": null
+        "stopa": 6.1
       }
     ]
   },
@@ -3061,7 +3061,7 @@
     {
       "wgm": "1401",
       "nazwa": "Białobrzeski",
-      "stopa": 8.2,
+      "stopa": 8.5,
       "bezr_razem": 1022,
       "bezr_kobiety": 427,
       "zarej_razem": 102,
@@ -3179,7 +3179,7 @@
       "zarej_delta": 1,
       "wyrej_delta": -18,
       "oferty_delta": -34,
-      "aktywizacja_pct": 78.7,
+      "aktywizacja_pct": 300.0,
       "trend_stopa_13m": [
         8.3,
         8.1,
@@ -3193,7 +3193,7 @@
         7.9,
         8.0,
         8.2,
-        null
+        8.5
       ],
       "trend_zarej_13m": [
         107,
@@ -3231,7 +3231,7 @@
     {
       "wgm": "1402",
       "nazwa": "Ciechanowski",
-      "stopa": 8.7,
+      "stopa": 8.8,
       "bezr_razem": 2906,
       "bezr_kobiety": 1315,
       "zarej_razem": 326,
@@ -3349,7 +3349,7 @@
       "zarej_delta": 9,
       "wyrej_delta": 118,
       "oferty_delta": 105,
-      "aktywizacja_pct": 72.9,
+      "aktywizacja_pct": 236.0,
       "trend_stopa_13m": [
         8.9,
         8.8,
@@ -3363,7 +3363,7 @@
         8.2,
         8.3,
         8.7,
-        null
+        8.8
       ],
       "trend_zarej_13m": [
         327,
@@ -3519,7 +3519,7 @@
       "zarej_delta": -77,
       "wyrej_delta": 37,
       "oferty_delta": 6,
-      "aktywizacja_pct": 68.3,
+      "aktywizacja_pct": 14200.0,
       "trend_stopa_13m": [
         9.1,
         8.8,
@@ -3533,7 +3533,7 @@
         9.0,
         9.1,
         9.5,
-        null
+        9.5
       ],
       "trend_zarej_13m": [
         274,
@@ -3689,7 +3689,7 @@
       "zarej_delta": -59,
       "wyrej_delta": 12,
       "oferty_delta": -30,
-      "aktywizacja_pct": 55.5,
+      "aktywizacja_pct": 223.5,
       "trend_stopa_13m": [
         12.0,
         11.0,
@@ -3703,7 +3703,7 @@
         11.6,
         12.2,
         12.7,
-        null
+        12.7
       ],
       "trend_zarej_13m": [
         191,
@@ -3741,7 +3741,7 @@
     {
       "wgm": "1405",
       "nazwa": "Grodziski",
-      "stopa": 3.4,
+      "stopa": 3.6,
       "bezr_razem": 1420,
       "bezr_kobiety": 666,
       "zarej_razem": 216,
@@ -3859,7 +3859,7 @@
       "zarej_delta": 15,
       "wyrej_delta": 32,
       "oferty_delta": 18,
-      "aktywizacja_pct": 68.0,
+      "aktywizacja_pct": 693.3,
       "trend_stopa_13m": [
         2.9,
         2.8,
@@ -3873,7 +3873,7 @@
         3.2,
         3.2,
         3.4,
-        null
+        3.6
       ],
       "trend_zarej_13m": [
         199,
@@ -3911,7 +3911,7 @@
     {
       "wgm": "1406",
       "nazwa": "Grójecki",
-      "stopa": 3.4,
+      "stopa": 3.5,
       "bezr_razem": 1414,
       "bezr_kobiety": 671,
       "zarej_razem": 154,
@@ -4029,7 +4029,7 @@
       "zarej_delta": 3,
       "wyrej_delta": 22,
       "oferty_delta": -80,
-      "aktywizacja_pct": 67.3,
+      "aktywizacja_pct": 7200.0,
       "trend_stopa_13m": [
         3.0,
         3.0,
@@ -4043,7 +4043,7 @@
         3.2,
         3.2,
         3.4,
-        null
+        3.5
       ],
       "trend_zarej_13m": [
         151,
@@ -4081,7 +4081,7 @@
     {
       "wgm": "1407",
       "nazwa": "Kozienicki",
-      "stopa": 10.0,
+      "stopa": 9.8,
       "bezr_razem": 1886,
       "bezr_kobiety": 963,
       "zarej_razem": 176,
@@ -4199,7 +4199,7 @@
       "zarej_delta": -62,
       "wyrej_delta": 77,
       "oferty_delta": 33,
-      "aktywizacja_pct": 59.9,
+      "aktywizacja_pct": 427.6,
       "trend_stopa_13m": [
         10.0,
         9.8,
@@ -4213,7 +4213,7 @@
         9.5,
         9.5,
         10.0,
-        null
+        9.8
       ],
       "trend_zarej_13m": [
         197,
@@ -4251,7 +4251,7 @@
     {
       "wgm": "1408",
       "nazwa": "Legionowski",
-      "stopa": 6.8,
+      "stopa": 6.9,
       "bezr_razem": 2650,
       "bezr_kobiety": 1204,
       "zarej_razem": 297,
@@ -4369,7 +4369,7 @@
       "zarej_delta": -9,
       "wyrej_delta": 23,
       "oferty_delta": -30,
-      "aktywizacja_pct": 55.4,
+      "aktywizacja_pct": 604.5,
       "trend_stopa_13m": [
         6.1,
         6.1,
@@ -4383,7 +4383,7 @@
         6.6,
         6.5,
         6.8,
-        null
+        6.9
       ],
       "trend_zarej_13m": [
         286,
@@ -4421,7 +4421,7 @@
     {
       "wgm": "1409",
       "nazwa": "Lipski",
-      "stopa": 13.5,
+      "stopa": 13.1,
       "bezr_razem": 1437,
       "bezr_kobiety": 602,
       "zarej_razem": 77,
@@ -4539,7 +4539,7 @@
       "zarej_delta": -73,
       "wyrej_delta": 36,
       "oferty_delta": 18,
-      "aktywizacja_pct": 58.6,
+      "aktywizacja_pct": 226.7,
       "trend_stopa_13m": [
         13.2,
         12.6,
@@ -4553,7 +4553,7 @@
         12.7,
         12.9,
         13.5,
-        null
+        13.1
       ],
       "trend_zarej_13m": [
         116,
@@ -4591,7 +4591,7 @@
     {
       "wgm": "1410",
       "nazwa": "Łosicki",
-      "stopa": 5.9,
+      "stopa": 6.1,
       "bezr_razem": 693,
       "bezr_kobiety": 313,
       "zarej_razem": 72,
@@ -4709,7 +4709,7 @@
       "zarej_delta": -14,
       "wyrej_delta": 2,
       "oferty_delta": 7,
-      "aktywizacja_pct": 56.8,
+      "aktywizacja_pct": 2500.0,
       "trend_stopa_13m": [
         5.6,
         5.7,
@@ -4723,7 +4723,7 @@
         5.3,
         5.5,
         5.9,
-        null
+        6.1
       ],
       "trend_zarej_13m": [
         82,
@@ -4761,7 +4761,7 @@
     {
       "wgm": "1411",
       "nazwa": "Makowski",
-      "stopa": 17.0,
+      "stopa": 16.9,
       "bezr_razem": 2671,
       "bezr_kobiety": 1189,
       "zarej_razem": 143,
@@ -4879,7 +4879,7 @@
       "zarej_delta": -89,
       "wyrej_delta": 51,
       "oferty_delta": 44,
-      "aktywizacja_pct": 74.3,
+      "aktywizacja_pct": 452.2,
       "trend_stopa_13m": [
         16.3,
         15.7,
@@ -4893,7 +4893,7 @@
         15.9,
         16.1,
         17.0,
-        null
+        16.9
       ],
       "trend_zarej_13m": [
         196,
@@ -5049,7 +5049,7 @@
       "zarej_delta": -94,
       "wyrej_delta": 5,
       "oferty_delta": 12,
-      "aktywizacja_pct": 63.0,
+      "aktywizacja_pct": 3700.0,
       "trend_stopa_13m": [
         4.6,
         4.5,
@@ -5063,7 +5063,7 @@
         4.7,
         4.7,
         5.0,
-        null
+        5.0
       ],
       "trend_zarej_13m": [
         210,
@@ -5101,7 +5101,7 @@
     {
       "wgm": "1413",
       "nazwa": "Mławski",
-      "stopa": 7.2,
+      "stopa": 7.3,
       "bezr_razem": 2000,
       "bezr_kobiety": 1045,
       "zarej_razem": 250,
@@ -5219,7 +5219,7 @@
       "zarej_delta": -10,
       "wyrej_delta": 1,
       "oferty_delta": 17,
-      "aktywizacja_pct": 68.0,
+      "aktywizacja_pct": 552.0,
       "trend_stopa_13m": [
         6.5,
         6.4,
@@ -5233,7 +5233,7 @@
         6.8,
         6.9,
         7.2,
-        null
+        7.3
       ],
       "trend_zarej_13m": [
         223,
@@ -5389,7 +5389,7 @@
       "zarej_delta": 27,
       "wyrej_delta": 55,
       "oferty_delta": 34,
-      "aktywizacja_pct": 74.7,
+      "aktywizacja_pct": 886.7,
       "trend_stopa_13m": [
         5.5,
         5.4,
@@ -5403,7 +5403,7 @@
         6.1,
         6.0,
         6.3,
-        null
+        6.3
       ],
       "trend_zarej_13m": [
         191,
@@ -5441,7 +5441,7 @@
     {
       "wgm": "1415",
       "nazwa": "Ostrołęcki",
-      "stopa": 9.6,
+      "stopa": 9.8,
       "bezr_razem": 2941,
       "bezr_kobiety": 1403,
       "zarej_razem": 239,
@@ -5559,7 +5559,7 @@
       "zarej_delta": -34,
       "wyrej_delta": -39,
       "oferty_delta": -1,
-      "aktywizacja_pct": 60.1,
+      "aktywizacja_pct": 494.4,
       "trend_stopa_13m": [
         9.7,
         9.6,
@@ -5573,7 +5573,7 @@
         9.2,
         9.3,
         9.6,
-        null
+        9.8
       ],
       "trend_zarej_13m": [
         282,
@@ -5729,7 +5729,7 @@
       "zarej_delta": -39,
       "wyrej_delta": 27,
       "oferty_delta": -11,
-      "aktywizacja_pct": 67.9,
+      "aktywizacja_pct": 1388.9,
       "trend_stopa_13m": [
         9.1,
         9.0,
@@ -5743,7 +5743,7 @@
         9.0,
         8.9,
         9.3,
-        null
+        9.3
       ],
       "trend_zarej_13m": [
         233,
@@ -5899,7 +5899,7 @@
       "zarej_delta": -29,
       "wyrej_delta": -18,
       "oferty_delta": 36,
-      "aktywizacja_pct": 52.7,
+      "aktywizacja_pct": 9700.0,
       "trend_stopa_13m": [
         3.6,
         3.6,
@@ -5913,7 +5913,7 @@
         4.2,
         4.1,
         4.2,
-        null
+        4.2
       ],
       "trend_zarej_13m": [
         215,
@@ -6069,7 +6069,7 @@
       "zarej_delta": 22,
       "wyrej_delta": 25,
       "oferty_delta": -12,
-      "aktywizacja_pct": 60.9,
+      "aktywizacja_pct": 565.7,
       "trend_stopa_13m": [
         3.6,
         3.6,
@@ -6083,7 +6083,7 @@
         3.6,
         3.7,
         3.8,
-        null
+        3.8
       ],
       "trend_zarej_13m": [
         340,
@@ -6121,7 +6121,7 @@
     {
       "wgm": "1419",
       "nazwa": "Płocki",
-      "stopa": 10.5,
+      "stopa": 10.8,
       "bezr_razem": 3519,
       "bezr_kobiety": 1875,
       "zarej_razem": 356,
@@ -6239,7 +6239,7 @@
       "zarej_delta": 41,
       "wyrej_delta": 6,
       "oferty_delta": 16,
-      "aktywizacja_pct": 67.1,
+      "aktywizacja_pct": 2214.3,
       "trend_stopa_13m": [
         10.7,
         10.3,
@@ -6253,7 +6253,7 @@
         10.0,
         10.3,
         10.5,
-        null
+        10.8
       ],
       "trend_zarej_13m": [
         337,
@@ -6291,7 +6291,7 @@
     {
       "wgm": "1420",
       "nazwa": "Płoński",
-      "stopa": 10.6,
+      "stopa": 10.8,
       "bezr_razem": 3335,
       "bezr_kobiety": 1598,
       "zarej_razem": 319,
@@ -6409,7 +6409,7 @@
       "zarej_delta": 21,
       "wyrej_delta": 9,
       "oferty_delta": -47,
-      "aktywizacja_pct": 62.7,
+      "aktywizacja_pct": 1900.0,
       "trend_stopa_13m": [
         9.9,
         9.8,
@@ -6423,7 +6423,7 @@
         10.2,
         10.2,
         10.6,
-        null
+        10.8
       ],
       "trend_zarej_13m": [
         310,
@@ -6461,7 +6461,7 @@
     {
       "wgm": "1421",
       "nazwa": "Pruszkowski",
-      "stopa": 2.7,
+      "stopa": 2.8,
       "bezr_razem": 2258,
       "bezr_kobiety": 1020,
       "zarej_razem": 283,
@@ -6579,7 +6579,7 @@
       "zarej_delta": -12,
       "wyrej_delta": 27,
       "oferty_delta": -40,
-      "aktywizacja_pct": 67.0,
+      "aktywizacja_pct": 3700.0,
       "trend_stopa_13m": [
         2.3,
         2.3,
@@ -6593,7 +6593,7 @@
         2.5,
         2.6,
         2.7,
-        null
+        2.8
       ],
       "trend_zarej_13m": [
         264,
@@ -6631,7 +6631,7 @@
     {
       "wgm": "1422",
       "nazwa": "Przasnyski",
-      "stopa": 10.3,
+      "stopa": 10.2,
       "bezr_razem": 1816,
       "bezr_kobiety": 888,
       "zarej_razem": 124,
@@ -6749,7 +6749,7 @@
       "zarej_delta": -21,
       "wyrej_delta": 40,
       "oferty_delta": 35,
-      "aktywizacja_pct": 68.4,
+      "aktywizacja_pct": 516.7,
       "trend_stopa_13m": [
         9.7,
         9.5,
@@ -6763,7 +6763,7 @@
         9.7,
         10.0,
         10.3,
-        null
+        10.2
       ],
       "trend_zarej_13m": [
         155,
@@ -6801,7 +6801,7 @@
     {
       "wgm": "1423",
       "nazwa": "Przysuski",
-      "stopa": 19.0,
+      "stopa": 18.9,
       "bezr_razem": 2589,
       "bezr_kobiety": 1078,
       "zarej_razem": 243,
@@ -6919,7 +6919,7 @@
       "zarej_delta": -36,
       "wyrej_delta": 70,
       "oferty_delta": 5,
-      "aktywizacja_pct": 66.4,
+      "aktywizacja_pct": 224.7,
       "trend_stopa_13m": [
         18.9,
         18.6,
@@ -6933,7 +6933,7 @@
         17.9,
         18.3,
         19.0,
-        null
+        18.9
       ],
       "trend_zarej_13m": [
         227,
@@ -6971,7 +6971,7 @@
     {
       "wgm": "1424",
       "nazwa": "Pułtuski",
-      "stopa": 15.2,
+      "stopa": 15.0,
       "bezr_razem": 2697,
       "bezr_kobiety": 1209,
       "zarej_razem": 200,
@@ -7089,7 +7089,7 @@
       "zarej_delta": -67,
       "wyrej_delta": 133,
       "oferty_delta": 72,
-      "aktywizacja_pct": 64.8,
+      "aktywizacja_pct": 177.2,
       "trend_stopa_13m": [
         13.8,
         13.5,
@@ -7103,7 +7103,7 @@
         14.1,
         14.3,
         15.2,
-        null
+        15.0
       ],
       "trend_zarej_13m": [
         235,
@@ -7259,7 +7259,7 @@
       "zarej_delta": -172,
       "wyrej_delta": 58,
       "oferty_delta": -7,
-      "aktywizacja_pct": 65.8,
+      "aktywizacja_pct": 1400.0,
       "trend_stopa_13m": [
         16.8,
         16.6,
@@ -7273,7 +7273,7 @@
         16.7,
         16.8,
         17.4,
-        null
+        17.4
       ],
       "trend_zarej_13m": [
         635,
@@ -7311,7 +7311,7 @@
     {
       "wgm": "1426",
       "nazwa": "Siedlecki",
-      "stopa": 5.8,
+      "stopa": 5.9,
       "bezr_razem": 1578,
       "bezr_kobiety": 718,
       "zarej_razem": 172,
@@ -7429,7 +7429,7 @@
       "zarej_delta": 7,
       "wyrej_delta": 47,
       "oferty_delta": -21,
-      "aktywizacja_pct": 74.0,
+      "aktywizacja_pct": 940.0,
       "trend_stopa_13m": [
         5.5,
         5.3,
@@ -7443,7 +7443,7 @@
         5.4,
         5.5,
         5.8,
-        null
+        5.9
       ],
       "trend_zarej_13m": [
         185,
@@ -7481,7 +7481,7 @@
     {
       "wgm": "1427",
       "nazwa": "Sierpecki",
-      "stopa": 12.7,
+      "stopa": 12.8,
       "bezr_razem": 2189,
       "bezr_kobiety": 1133,
       "zarej_razem": 202,
@@ -7599,7 +7599,7 @@
       "zarej_delta": 46,
       "wyrej_delta": 49,
       "oferty_delta": -6,
-      "aktywizacja_pct": 72.5,
+      "aktywizacja_pct": 442.9,
       "trend_stopa_13m": [
         12.7,
         12.3,
@@ -7613,7 +7613,7 @@
         12.1,
         12.5,
         12.7,
-        null
+        12.8
       ],
       "trend_zarej_13m": [
         303,
@@ -7651,7 +7651,7 @@
     {
       "wgm": "1428",
       "nazwa": "Sochaczewski",
-      "stopa": 3.7,
+      "stopa": 3.8,
       "bezr_razem": 1186,
       "bezr_kobiety": 546,
       "zarej_razem": 190,
@@ -7769,7 +7769,7 @@
       "zarej_delta": -45,
       "wyrej_delta": 24,
       "oferty_delta": 136,
-      "aktywizacja_pct": 49.1,
+      "aktywizacja_pct": 279.3,
       "trend_stopa_13m": [
         3.1,
         3.0,
@@ -7783,7 +7783,7 @@
         3.4,
         3.4,
         3.7,
-        null
+        3.8
       ],
       "trend_zarej_13m": [
         187,
@@ -7939,7 +7939,7 @@
       "zarej_delta": 1,
       "wyrej_delta": 36,
       "oferty_delta": 29,
-      "aktywizacja_pct": 68.4,
+      "aktywizacja_pct": 371.4,
       "trend_stopa_13m": [
         5.5,
         5.4,
@@ -7953,7 +7953,7 @@
         5.4,
         5.5,
         5.8,
-        null
+        5.8
       ],
       "trend_zarej_13m": [
         118,
@@ -8109,7 +8109,7 @@
       "zarej_delta": -41,
       "wyrej_delta": 103,
       "oferty_delta": 32,
-      "aktywizacja_pct": 57.5,
+      "aktywizacja_pct": 125.5,
       "trend_stopa_13m": [
         23.9,
         23.0,
@@ -8123,7 +8123,7 @@
         21.8,
         22.1,
         23.2,
-        null
+        23.2
       ],
       "trend_zarej_13m": [
         251,
@@ -8279,7 +8279,7 @@
       "zarej_delta": -20,
       "wyrej_delta": 17,
       "oferty_delta": 14,
-      "aktywizacja_pct": 68.1,
+      "aktywizacja_pct": 1044.4,
       "trend_stopa_13m": [
         1.8,
         1.8,
@@ -8293,7 +8293,7 @@
         1.8,
         1.9,
         2.0,
-        null
+        2.0
       ],
       "trend_zarej_13m": [
         166,
@@ -8331,7 +8331,7 @@
     {
       "wgm": "1433",
       "nazwa": "Węgrowski",
-      "stopa": 5.8,
+      "stopa": 6.0,
       "bezr_razem": 1303,
       "bezr_kobiety": 568,
       "zarej_razem": 143,
@@ -8449,7 +8449,7 @@
       "zarej_delta": 0,
       "wyrej_delta": 28,
       "oferty_delta": 21,
-      "aktywizacja_pct": 79.8,
+      "aktywizacja_pct": 1975.0,
       "trend_stopa_13m": [
         5.5,
         5.4,
@@ -8463,7 +8463,7 @@
         5.5,
         5.5,
         5.8,
-        null
+        6.0
       ],
       "trend_zarej_13m": [
         180,
@@ -8501,7 +8501,7 @@
     {
       "wgm": "1434",
       "nazwa": "Wołomiński",
-      "stopa": 6.7,
+      "stopa": 6.8,
       "bezr_razem": 6149,
       "bezr_kobiety": 2678,
       "zarej_razem": 619,
@@ -8619,7 +8619,7 @@
       "zarej_delta": -72,
       "wyrej_delta": 44,
       "oferty_delta": 15,
-      "aktywizacja_pct": 68.1,
+      "aktywizacja_pct": 4916.7,
       "trend_stopa_13m": [
         5.5,
         5.5,
@@ -8633,7 +8633,7 @@
         6.3,
         6.3,
         6.7,
-        null
+        6.8
       ],
       "trend_zarej_13m": [
         609,
@@ -8671,7 +8671,7 @@
     {
       "wgm": "1435",
       "nazwa": "Wyszkowski",
-      "stopa": 4.8,
+      "stopa": 4.7,
       "bezr_razem": 1362,
       "bezr_kobiety": 629,
       "zarej_razem": 136,
@@ -8789,7 +8789,7 @@
       "zarej_delta": -74,
       "wyrej_delta": 80,
       "oferty_delta": 50,
-      "aktywizacja_pct": 44.7,
+      "aktywizacja_pct": 139.2,
       "trend_stopa_13m": [
         3.9,
         3.6,
@@ -8803,7 +8803,7 @@
         4.4,
         4.4,
         4.8,
-        null
+        4.7
       ],
       "trend_zarej_13m": [
         252,
@@ -8841,7 +8841,7 @@
     {
       "wgm": "1436",
       "nazwa": "Zwoleński",
-      "stopa": 13.8,
+      "stopa": 13.6,
       "bezr_razem": 1573,
       "bezr_kobiety": 764,
       "zarej_razem": 93,
@@ -8959,7 +8959,7 @@
       "zarej_delta": -102,
       "wyrej_delta": 44,
       "oferty_delta": 36,
-      "aktywizacja_pct": 60.5,
+      "aktywizacja_pct": 164.3,
       "trend_stopa_13m": [
         13.2,
         12.6,
@@ -8973,7 +8973,7 @@
         12.2,
         12.8,
         13.8,
-        null
+        13.6
       ],
       "trend_zarej_13m": [
         138,
@@ -9011,7 +9011,7 @@
     {
       "wgm": "1437",
       "nazwa": "Żuromiński",
-      "stopa": 15.1,
+      "stopa": 15.0,
       "bezr_razem": 1992,
       "bezr_kobiety": 988,
       "zarej_razem": 141,
@@ -9129,7 +9129,7 @@
       "zarej_delta": -34,
       "wyrej_delta": 22,
       "oferty_delta": 29,
-      "aktywizacja_pct": 61.6,
+      "aktywizacja_pct": 197.7,
       "trend_stopa_13m": [
         14.3,
         13.9,
@@ -9143,7 +9143,7 @@
         14.8,
         14.6,
         15.1,
-        null
+        15.0
       ],
       "trend_zarej_13m": [
         161,
@@ -9299,7 +9299,7 @@
       "zarej_delta": -4,
       "wyrej_delta": 48,
       "oferty_delta": -17,
-      "aktywizacja_pct": 55.0,
+      "aktywizacja_pct": 866.7,
       "trend_stopa_13m": [
         8.9,
         8.7,
@@ -9313,7 +9313,7 @@
         8.8,
         8.9,
         9.3,
-        null
+        9.3
       ],
       "trend_zarej_13m": [
         209,
@@ -9351,7 +9351,7 @@
     {
       "wgm": "1461",
       "nazwa": "m. Ostrołęka",
-      "stopa": 8.0,
+      "stopa": 8.1,
       "bezr_razem": 1864,
       "bezr_kobiety": 947,
       "zarej_razem": 142,
@@ -9469,7 +9469,7 @@
       "zarej_delta": -64,
       "wyrej_delta": -12,
       "oferty_delta": 15,
-      "aktywizacja_pct": 52.5,
+      "aktywizacja_pct": 441.7,
       "trend_stopa_13m": [
         7.4,
         7.5,
@@ -9483,7 +9483,7 @@
         7.5,
         7.5,
         8.0,
-        null
+        8.1
       ],
       "trend_zarej_13m": [
         190,
@@ -9521,7 +9521,7 @@
     {
       "wgm": "1462",
       "nazwa": "m. Płock",
-      "stopa": 5.5,
+      "stopa": 5.6,
       "bezr_razem": 3283,
       "bezr_kobiety": 1781,
       "zarej_razem": 348,
@@ -9639,7 +9639,7 @@
       "zarej_delta": -69,
       "wyrej_delta": -68,
       "oferty_delta": -31,
-      "aktywizacja_pct": 61.4,
+      "aktywizacja_pct": 1611.1,
       "trend_stopa_13m": [
         5.4,
         5.2,
@@ -9653,7 +9653,7 @@
         5.3,
         5.3,
         5.5,
-        null
+        5.6
       ],
       "trend_zarej_13m": [
         393,
@@ -9691,7 +9691,7 @@
     {
       "wgm": "1463",
       "nazwa": "m. Radom",
-      "stopa": 10.5,
+      "stopa": 10.7,
       "bezr_razem": 9125,
       "bezr_kobiety": 4152,
       "zarej_razem": 820,
@@ -9809,7 +9809,7 @@
       "zarej_delta": 175,
       "wyrej_delta": 228,
       "oferty_delta": -54,
-      "aktywizacja_pct": 53.8,
+      "aktywizacja_pct": 30000.0,
       "trend_stopa_13m": [
         9.9,
         9.8,
@@ -9823,7 +9823,7 @@
         10.0,
         10.2,
         10.5,
-        null
+        10.7
       ],
       "trend_zarej_13m": [
         753,
@@ -9861,7 +9861,7 @@
     {
       "wgm": "1464",
       "nazwa": "m. Siedlce",
-      "stopa": 4.6,
+      "stopa": 4.8,
       "bezr_razem": 1742,
       "bezr_kobiety": 824,
       "zarej_razem": 205,
@@ -9979,7 +9979,7 @@
       "zarej_delta": 2,
       "wyrej_delta": 27,
       "oferty_delta": -1,
-      "aktywizacja_pct": 56.4,
+      "aktywizacja_pct": 937.5,
       "trend_stopa_13m": [
         4.0,
         4.0,
@@ -9993,7 +9993,7 @@
         4.3,
         4.3,
         4.6,
-        null
+        4.8
       ],
       "trend_zarej_13m": [
         184,
@@ -10149,7 +10149,7 @@
       "zarej_delta": -13,
       "wyrej_delta": -402,
       "oferty_delta": 283,
-      "aktywizacja_pct": 50.5,
+      "aktywizacja_pct": 5279.2,
       "trend_stopa_13m": [
         1.4,
         1.4,
@@ -10163,7 +10163,7 @@
         1.5,
         1.5,
         1.5,
-        null
+        1.5
       ],
       "trend_zarej_13m": [
         2634,
