@@ -274,9 +274,9 @@ export default function Porownywarka({ initialPowiat = null }) {
       </div>
 
       <Card
-        title={mode === 'powiaty' ? 'Wybór jednostek i mapa A/B' : 'Wybór województw i mapa A/B'}
+        title={mode === 'powiaty' ? 'Wybór jednostek A/B' : 'Wybór województw i mapa A/B'}
         badge={formatOkresAbbr(meta?.stopa_okres)}
-        exportTitle={mode === 'powiaty' ? 'porownywarka_mapa_powiaty' : 'porownywarka_mapa_woj'}
+        exportTitle={mode === 'powiaty' ? 'porownywarka_wybor_powiaty' : 'porownywarka_mapa_woj'}
         style={{ marginBottom: 10 }}
       >
         <div style={{ fontSize: '0.72rem', color: 'var(--muted)', marginBottom: 10 }}>
@@ -332,14 +332,7 @@ export default function Porownywarka({ initialPowiat = null }) {
           )}
         </div>
 
-        {mode === 'powiaty' ? (
-          <MapMazowieckie
-            selectedWgms={[powA, powB].filter(Boolean)}
-            selectionColors={[A_COLOR, B_COLOR]}
-            onSelectWgm={(pow) => setPowSlot(activeSlot, pow.wgm)}
-            subtitle={`Woj. mazowieckie · stopa bezrobocia (%) · ${formatOkresAbbr(meta?.stopa_okres)}`}
-          />
-        ) : (
+        {mode === 'woj' && (
           <MapPoland
             selectedWoj={[wojA, wojB].filter(Boolean)}
             selectionColors={[A_COLOR, B_COLOR]}
@@ -351,86 +344,108 @@ export default function Porownywarka({ initialPowiat = null }) {
 
       {mode === 'powiaty' ? (
         <>
-          <Card title="Kategorie metryk" style={{ marginBottom: 10 }}>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {POW_METRIC_GROUPS.map((g) => (
-                <button
-                  key={g.id}
-                  onClick={() => setGroupOn((prev) => ({ ...prev, [g.id]: !prev[g.id] }))}
-                  style={{
-                    border: groupOn[g.id] ? '1px solid #3b82f6' : '1px solid var(--border)',
-                    background: groupOn[g.id] ? 'rgba(59,130,246,0.12)' : 'var(--bg3)',
-                    color: groupOn[g.id] ? '#bfdbfe' : 'var(--muted)',
-                    borderRadius: 999,
-                    padding: '4px 10px',
-                    fontSize: '0.7rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {g.label}
-                </button>
-              ))}
+          <Card title="Kategorie metryk i różnice A/B" exportTitle="porownywarka_tabela_powiaty" style={{ marginBottom: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, alignItems: 'start' }}>
+
+              {/* Lewa: kategorie + tabela */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div>
+                  <div style={{ fontSize: '0.66rem', color: 'var(--muted)', letterSpacing: '0.07em', fontWeight: 700, marginBottom: 6 }}>KATEGORIE METRYK</div>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {POW_METRIC_GROUPS.map((g) => (
+                      <button
+                        key={g.id}
+                        onClick={() => setGroupOn((prev) => ({ ...prev, [g.id]: !prev[g.id] }))}
+                        style={{
+                          border: groupOn[g.id] ? '1px solid #3b82f6' : '1px solid var(--border)',
+                          background: groupOn[g.id] ? 'rgba(59,130,246,0.12)' : 'var(--bg3)',
+                          color: groupOn[g.id] ? '#bfdbfe' : 'var(--muted)',
+                          borderRadius: 999,
+                          padding: '4px 10px',
+                          fontSize: '0.7rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {g.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ fontSize: '0.66rem', color: 'var(--muted)', letterSpacing: '0.07em', fontWeight: 700, marginBottom: 6 }}>RÓŻNICE A/B — METRYKI POWIATOWE</div>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 4px' }}>
+                      <thead>
+                        <tr style={{ fontSize: '0.63rem', color: 'var(--muted)' }}>
+                          <th style={{ textAlign: 'left', padding: '0 6px' }}>Wskaźnik</th>
+                          <th style={{ textAlign: 'right', padding: '0 6px', color: A_COLOR, maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {powDataA?.nazwa || 'A'}
+                          </th>
+                          <th style={{ textAlign: 'right', padding: '0 6px', color: B_COLOR, maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {powDataB?.nazwa || 'B'}
+                          </th>
+                          <th style={{ textAlign: 'right', padding: '0 6px' }}>Δ (B-A)</th>
+                          <th style={{ textAlign: 'right', padding: '0 6px' }}>Δ %</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {powRows.map((r) => (
+                          <tr key={r.metric.id} style={{ background: 'rgba(255,255,255,0.03)' }}>
+                            <td style={{ padding: '6px', fontSize: '0.73rem', color: 'var(--text)' }}>{r.metric.label}</td>
+                            <td style={{ padding: '6px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.72rem', color: A_COLOR }}>
+                              {formatByUnit(r.a, r.metric.unit)}
+                            </td>
+                            <td style={{ padding: '6px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.72rem', color: B_COLOR }}>
+                              {formatByUnit(r.b, r.metric.unit)}
+                            </td>
+                            <td style={{ padding: '6px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.71rem', color: r.delta > 0 ? '#16a34a' : (r.delta < 0 ? '#dc2626' : 'var(--muted)') }}>
+                              {formatDelta(r.delta, r.metric.unit)}
+                            </td>
+                            <td style={{ padding: '6px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.71rem', color: 'var(--muted)' }}>
+                              {r.deltaPct == null ? '—' : `${r.deltaPct > 0 ? '+' : ''}${r.deltaPct.toFixed(1).replace('.', ',')}%`}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              {/* Prawa: mapa (połowa szerokości karty) */}
+              <div>
+                <MapMazowieckie
+                  selectedWgms={[powA, powB].filter(Boolean)}
+                  selectionColors={[A_COLOR, B_COLOR]}
+                  onSelectWgm={(pow) => setPowSlot(activeSlot, pow.wgm)}
+                  subtitle={`Woj. mazowieckie · stopa bezrobocia (%) · ${formatOkresAbbr(meta?.stopa_okres)}`}
+                />
+              </div>
             </div>
           </Card>
 
-          <Card title="Różnice A/B — metryki powiatowe" exportTitle="porownywarka_tabela_powiaty" style={{ marginBottom: 10 }}>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 6px' }}>
-                <thead>
-                  <tr style={{ fontSize: '0.66rem', color: 'var(--muted)' }}>
-                    <th style={{ textAlign: 'left', padding: '0 8px' }}>Wskaźnik</th>
-                    <th style={{ textAlign: 'right', padding: '0 8px', color: A_COLOR }}>A</th>
-                    <th style={{ textAlign: 'right', padding: '0 8px', color: B_COLOR }}>B</th>
-                    <th style={{ textAlign: 'right', padding: '0 8px' }}>Δ (B-A)</th>
-                    <th style={{ textAlign: 'right', padding: '0 8px' }}>Δ %</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {powRows.map((r) => (
-                    <tr key={r.metric.id} style={{ background: 'rgba(255,255,255,0.03)' }}>
-                      <td style={{ padding: '8px', fontSize: '0.76rem', color: 'var(--text)' }}>{r.metric.label}</td>
-                      <td style={{ padding: '8px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.75rem', color: A_COLOR }}>
-                        {formatByUnit(r.a, r.metric.unit)}
-                      </td>
-                      <td style={{ padding: '8px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.75rem', color: B_COLOR }}>
-                        {formatByUnit(r.b, r.metric.unit)}
-                      </td>
-                      <td style={{ padding: '8px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.74rem', color: r.delta > 0 ? '#16a34a' : (r.delta < 0 ? '#dc2626' : 'var(--muted)') }}>
-                        {formatDelta(r.delta, r.metric.unit)}
-                      </td>
-                      <td style={{ padding: '8px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.74rem', color: 'var(--muted)' }}>
-                        {r.deltaPct == null ? '—' : `${r.deltaPct > 0 ? '+' : ''}${r.deltaPct.toFixed(1).replace('.', ',')}%`}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <Card title={`Trend stopy bezrobocia — ${powDataA?.nazwa || 'A'} / ${powDataB?.nazwa || 'B'}`} exportTitle="porownywarka_trend_stopa" style={{ marginBottom: 10 }}>
+            <LineChartSVG
+              datasets={stopaDatasets}
+              labels={trendLabels}
+              height={200}
+              width={900}
+              showValueLabels
+            />
           </Card>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <Card title="Trend stopy bezrobocia — A/B" exportTitle="porownywarka_trend_stopa">
-              <LineChartSVG
-                datasets={stopaDatasets}
-                labels={trendLabels}
-                height={190}
-                width={900}
-                showValueLabels
-              />
-            </Card>
-
-            <Card title="Napływ i odpływ (12m) — A/B" exportTitle="porownywarka_trend_naplyw_odplyw">
-              <LineChartSVG
-                datasets={flowDatasets}
-                labels={napLabels}
-                height={190}
-                width={900}
-                showValueLabels
-                valueFormatter={(v) => fmtNumber(v)}
-              />
-            </Card>
-          </div>
+          <Card title={`Napływ i odpływ (12m) — ${powDataA?.nazwa || 'A'} / ${powDataB?.nazwa || 'B'}`} exportTitle="porownywarka_trend_naplyw_odplyw">
+            <LineChartSVG
+              datasets={flowDatasets}
+              labels={napLabels}
+              height={200}
+              width={900}
+              showValueLabels
+              valueFormatter={(v) => fmtNumber(v)}
+            />
+          </Card>
         </>
       ) : (
         <>
