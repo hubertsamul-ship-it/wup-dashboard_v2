@@ -1,5 +1,5 @@
 WUP Dashboard — Raport walidacji
-Wygenerowano: 2026-03-24 12:42:34
+Wygenerowano: 2026-03-25 07:21:34
 Okres danych: 2026-02
 =======================================================
 

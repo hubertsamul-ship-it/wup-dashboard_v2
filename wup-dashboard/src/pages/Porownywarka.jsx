@@ -24,7 +24,7 @@ const POW_METRIC_GROUPS = [
       { id: 'zarej', label: 'Napływ bezrobotnych', unit: 'number', get: (p) => p?.zarej_razem },
       { id: 'wyrej', label: 'Odpływ bezrobotnych', unit: 'number', get: (p) => p?.wyrej_razem },
       { id: 'oferty', label: 'Oferty pracy', unit: 'number', get: (p) => p?.oferty_pracy },
-      { id: 'aktywizacja', label: 'Skuteczność aktywizacji', unit: 'percent', get: (p) => p?.aktywizacja_pct },
+      { id: 'aktywizacja', label: 'Intensywność aktywizacji', unit: 'percent', get: (p) => p?.aktywizacja_pct },
     ],
   },
   {

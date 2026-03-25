@@ -61,7 +61,7 @@ export default function KpiCard({
       border: '1px solid var(--card-br)',
       borderRadius: '16px', padding: pad,
       boxShadow: 'var(--card-shadow)',
-      position: 'relative', overflow: 'hidden',
+      position: 'relative', overflow: 'visible',
       transition: 'border-color 0.2s, box-shadow 0.2s, transform 0.2s',
       cursor: 'default',
       ...extraStyle,

@@ -264,11 +264,7 @@ const d = (powiaty || []).find(p => p.wgm === wgm) || {};
   const trendZarej  = (d.trend_zarej_13m || []).slice(-SHOW_N);
   const trendWyrej  = (d.trend_wyrej_13m || []).slice(-SHOW_N);
   const wyrejTop5  = (d.wyrej_reasons || []).slice(0, 5);
-  const aktywizacjaProgramowaPct = (() => {
-    const row = (d.wyrej_reasons || []).find((r) => (r.label || '').toLowerCase().includes('szkolenie i staż'));
-    if (row && typeof row.pct === 'number') return row.pct;
-    return d.aktywizacja_pct ?? 0;
-  })();
+  const aktywizacjaProgramowaPct = d.aktywizacja_pct ?? 0;
 
   // Stopa bezrobocia powiatu + delta vs poprzedni miesiąc
   const stopaArr   = (d.trend_stopa_13m || []).filter(v => v != null);
@@ -342,9 +338,9 @@ const d = (powiaty || []).find(p => p.wgm === wgm) || {};
             variant={stopaDelta != null && stopaDelta > 0 ? 'red' : 'green'}
           />
           <KpiCard compact
-            flag="Skuteczność aktywizacji" flagColor="green"
+            flag="Intensywność aktywizacji" flagColor="green"
             target={Math.round((d.aktywizacja_pct ?? 0) * 10)} decimals={1} suffix="%"
-            label="podjęli pracę / objęci aktywizacją"
+            label="w aktywnych formach (koniec mies.)"
             variant="green"
           />
           <Card title={`Płeć · ${d.nazwa || ''}`} grow>

@@ -291,10 +291,10 @@ def extract_mrpips(filename: str, stopa_dict: dict) -> dict:
         dzieci           = m.get_value(p, '1', '1', '010', 'R5')
 
         # Aktywne formy (D1 T3 / sekcja 1.3) — NRW 073-100 nowy, 069-096 stary
-        # Kolumna R1 = "rozpoczynający udział w wybranej formie w miesiącu" (ogółem)
+        # Kolumna R5 = "stan na koniec miesiąca" (bezrobotni objęci aktywnymi formami)
         at = lambda n: str(n - (4 if old_fmt else 0)).zfill(3)
-        aktywizacja_total = sum(
-            m.get_value(p, '1', '3', at(n), 'R1') for n in range(73, 101)
+        aktywizacja_koniec = sum(
+            m.get_value(p, '1', '3', at(n), 'R5') for n in range(73, 101)
         )
 
         # Przyczyny wyrejestrowania (D1 T2) — offset -4 w starym formacie
@@ -343,7 +343,7 @@ def extract_mrpips(filename: str, stopa_dict: dict) -> dict:
             'wyrej_psu':         wyrej_psu,
             'wyrej_reintegracja': wyrej_reintegracja,
             'wyrej_agencja':     wyrej_agencja,
-            'aktywizacja_total': aktywizacja_total,
+            'aktywizacja_koniec': aktywizacja_koniec,
             'd5_staz':          d5_staz,
             'rok':              m.rok,
             'miesiac':          m.miesiac,
@@ -1004,10 +1004,9 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
             'zarej_delta':  (v.get('zarej_razem') or 0) - (v_prv.get('zarej_razem') or 0),
             'wyrej_delta':  (v.get('wyrej_razem') or 0) - (v_prv.get('wyrej_razem') or 0),
             'oferty_delta': (v.get('oferty_pracy') or 0) - (v_prv.get('oferty_pracy') or 0),
-            # Intensywność aktywizacji (programowa):
-            # udział odpływu do działań aktywizacyjnych (szkolenia/staże, PSU, reintegracja, agencje).
+            # Intensywność aktywizacji: bezrobotni w aktywnych formach (stan na koniec) / bezrobotni ogółem
             'aktywizacja_pct': round(
-                (v.get('podjeli_prace') or 0) / max(v.get('aktywizacja_total') or 1, 1) * 100, 1
+                (v.get('aktywizacja_koniec') or 0) / max(v.get('bezr_razem') or 1, 1) * 100, 1
             ),
             # Trendy 13 mies.
             'trend_stopa_13m': trend_s,
@@ -1109,7 +1108,7 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
             'kategorie':   kategorie,
             'wyrej_reasons': wyrej_reasons,
             'aktywizacja_pct': round(
-                s(cur, 'podjeli_prace') / max(s(cur, 'aktywizacja_total') or 1, 1) * 100, 1
+                s(cur, 'aktywizacja_koniec') / max(bezr_cur or 1, 1) * 100, 1
             ),
             'trend_13m': [
                 {'label': t['label'], 'zarej': t['zarej'], 'wyrej': t['wyrej']}

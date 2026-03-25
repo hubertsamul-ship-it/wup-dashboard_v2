@@ -179,11 +179,7 @@ export default function Bezrobotni() {
   const trendWyrej  = trend_13m.map(t => t.wyrej);
   const wyrejTop5   = wyrej_reasons.slice(0, 5);
   const total       = kobiety + mezczyzni;
-  const aktywizacjaProgramowaPct = (() => {
-    const row = (wyrej_reasons || []).find((r) => (r.label || '').toLowerCase().includes('szkolenie i staż'));
-    if (row && typeof row.pct === 'number') return row.pct;
-    return aktywizacja_pct ?? 0;
-  })();
+  const aktywizacjaProgramowaPct = aktywizacja_pct ?? 0;
 
   const COLOR_F = '#29b6a8';  // teal — kobiety
   const COLOR_M = '#4895ef';  // niebieski — mężczyźni
@@ -241,7 +237,7 @@ export default function Bezrobotni() {
           flag="Intensywność aktywizacji" flagColor="green"
           target={loading ? 0 : Math.round((aktywizacjaProgramowaPct ?? 0) * 10)}
           decimals={1} suffix="%"
-          label={<>podjęli pracę / objęci aktywizacją<InfoTooltip text="Liczba osób, które podjęły pracę, podzielona przez łączną liczbę osób objętych aktywnymi formami przeciwdziałania bezrobociu (dział 1.3 MRPiPS-01, kol. 1)." source="MRPiPS-01" /></>}
+          label={<>w aktywnych formach (koniec mies.)<InfoTooltip text="Formuła: bezrobotni w aktywnych formach na koniec mies. ÷ bezrobotni ogółem × 100. Licznik: suma kol. 5 działu 1.3 MRPiPS-01 (stan na koniec miesiąca)." source="MRPiPS-01" /></>}
           variant="green"
         />
       </div>
