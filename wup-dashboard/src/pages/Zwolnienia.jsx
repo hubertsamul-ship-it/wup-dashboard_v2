@@ -3,6 +3,7 @@ import KpiCard from '../components/KpiCard';
 import Card, { SectionHeader, Grid } from '../components/Card';
 import LineChartSVG from '../components/LineChartSVG';
 import RankTable from '../components/RankTable';
+import CustomSelect, { RangeSelector } from '../components/CustomSelect';
 import { useAppData } from '../context/DataContext';
 
 const PKD_NAMES = {
@@ -27,42 +28,6 @@ const PKD_NAMES = {
 
 const pkdLabel = (kod) => PKD_NAMES[kod] || `PKD ${kod}`;
 
-// ── Selektor zakresu dat ──────────────────────────────────────────────────
-
-function RangeSelector({ labels, from, to, onChange }) {
-  const selectStyle = {
-    background: 'rgba(255,255,255,0.07)',
-    border: '1px solid rgba(255,255,255,0.14)',
-    borderRadius: '6px',
-    color: 'var(--text)',
-    padding: '4px 8px',
-    fontSize: 'var(--font-sm)',
-    fontFamily: 'Outfit, sans-serif',
-    cursor: 'pointer',
-  };
-
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-      <span style={{ fontSize: 'var(--font-xs)', color: 'var(--muted)' }}>Od:</span>
-      <select
-        value={from}
-        onChange={e => onChange(e.target.value, to)}
-        style={selectStyle}
-      >
-        {labels.map(l => <option key={l} value={l}>{l}</option>)}
-      </select>
-      <span style={{ fontSize: 'var(--font-xs)', color: 'var(--muted)' }}>Do:</span>
-      <select
-        value={to}
-        onChange={e => onChange(from, e.target.value)}
-        style={selectStyle}
-      >
-        {labels.map(l => <option key={l} value={l}>{l}</option>)}
-      </select>
-    </div>
-  );
-}
-
 // ── Strona ────────────────────────────────────────────────────────────────
 
 export default function Zwolnienia() {
@@ -73,7 +38,7 @@ export default function Zwolnienia() {
   const [rangeFrom, setRangeFrom] = useState(null);
   const [rangeTo,   setRangeTo]   = useState(null);
   const [pkdMiesiac, setPkdMiesiac] = useState(null);
-  const [chartMode,  setChartMode]  = useState('zgl');
+  const [activeSeries, setActiveSeries] = useState(['zgl']);
   const [chartFrom,  setChartFrom]  = useState(null);
   const [chartTo,    setChartTo]    = useState(null);
 
@@ -110,17 +75,6 @@ export default function Zwolnienia() {
   const pkdMEntry = trend_13m.find(t => t.label === pkdLabel_) ?? trend_13m[trend_13m.length - 1];
   const pkdZglData  = (pkdMEntry?.pkd      || []).slice(0, 5).map(d => ({ label: pkdLabel(d.pkd), value: d.n }));
   const pkdFaktData = (pkdMEntry?.pkd_fakt || []).slice(0, 5).map(d => ({ label: pkdLabel(d.pkd), value: d.n }));
-
-  const selectStyle = {
-    background: 'rgba(255,255,255,0.07)',
-    border: '1px solid rgba(255,255,255,0.14)',
-    borderRadius: '6px',
-    color: 'var(--text)',
-    padding: '4px 8px',
-    fontSize: 'var(--font-sm)',
-    fontFamily: 'Outfit, sans-serif',
-    cursor: 'pointer',
-  };
 
   return (
     <div className="page-enter">
@@ -169,9 +123,18 @@ export default function Zwolnienia() {
         const cWyd  = wydData.slice(cLo, cHi + 1);
         const cFakt = faktData.slice(cLo, cHi + 1);
         const cMon  = monData.slice(cLo, cHi + 1);
-        const datasets = chartMode === 'zgl'
-          ? [{ data: cZgl, color: '#e63946', label: 'Zgłoszenia' }, { data: cWyd, color: '#4895ef', label: 'Wypow. zmieniające' }]
-          : [{ data: cFakt, color: '#f4a261', label: 'Faktyczne' }, { data: cMon, color: '#52b788', label: 'Monitorowane' }];
+        const SERIES = [
+          { id: 'zgl',  data: cZgl,  color: '#e63946', label: 'Zgłoszenia' },
+          { id: 'fakt', data: cFakt, color: '#f4a261', label: 'Zwolnienia' },
+          { id: 'wyd',  data: cWyd,  color: '#4895ef', label: 'Wypow. zm.' },
+          { id: 'mon',  data: cMon,  color: '#52b788', label: 'Monitorowane' },
+        ];
+        const datasets = SERIES.filter(s => activeSeries.includes(s.id));
+        const toggleSeries = (id) => setActiveSeries(prev =>
+          prev.includes(id)
+            ? prev.length > 1 ? prev.filter(x => x !== id) : prev
+            : [...prev, id]
+        );
         return (
           <Card
             title="Trend zwolnień grupowych"
@@ -179,22 +142,23 @@ export default function Zwolnienia() {
             badge={
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', gap: '4px' }}>
-                  {[
-                    { id: 'zgl',  label: 'Zgłoszenia / Wypow.' },
-                    { id: 'fakt', label: 'Faktyczne / Monit.' },
-                  ].map(opt => (
-                    <button
-                      key={opt.id}
-                      onClick={() => setChartMode(opt.id)}
-                      style={{
-                        padding: '3px 10px', borderRadius: '6px', border: 'none', cursor: 'pointer',
-                        fontSize: '0.68rem', fontWeight: chartMode === opt.id ? 700 : 500,
-                        fontFamily: 'Outfit, sans-serif',
-                        background: chartMode === opt.id ? 'var(--nav-active)' : 'var(--bg3)',
-                        color: chartMode === opt.id ? '#fff' : 'var(--muted)',
-                      }}
-                    >{opt.label}</button>
-                  ))}
+                  {SERIES.map(opt => {
+                    const active = activeSeries.includes(opt.id);
+                    return (
+                      <button
+                        key={opt.id}
+                        onClick={() => toggleSeries(opt.id)}
+                        style={{
+                          padding: '3px 10px', borderRadius: '6px', border: 'none', cursor: 'pointer',
+                          fontSize: '0.68rem', fontWeight: active ? 700 : 500,
+                          fontFamily: 'Outfit, sans-serif',
+                          background: active ? `${opt.color}22` : 'var(--bg3)',
+                          color: active ? opt.color : 'var(--muted)',
+                          outline: active ? `1px solid ${opt.color}66` : 'none',
+                        }}
+                      >{opt.label}</button>
+                    );
+                  })}
                 </div>
                 <RangeSelector
                   labels={tLabels}
@@ -217,9 +181,7 @@ export default function Zwolnienia() {
           <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text)' }}>Ranking PKD · miesiąc</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: 'var(--font-xs)', color: 'var(--muted)' }}>Miesiąc:</span>
-            <select value={pkdLabel_} onChange={e => setPkdMiesiac(e.target.value)} style={selectStyle}>
-              {labels.map(l => <option key={l} value={l}>{l}</option>)}
-            </select>
+            <CustomSelect value={pkdLabel_} onChange={v => setPkdMiesiac(v)} options={labels} minWidth={100} />
           </div>
         </div>
         <Grid cols={2} grow>

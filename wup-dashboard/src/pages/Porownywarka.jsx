@@ -5,6 +5,7 @@ import HorizontalBar, { stopaColor } from '../components/HorizontalBar';
 import MapMazowieckie from '../components/MapMazowieckie';
 import MapPoland from '../components/MapPoland';
 import { useAppData } from '../context/DataContext';
+import CustomSelect, { RangeSelector } from '../components/CustomSelect';
 
 const A_COLOR = '#e63946';
 const B_COLOR = '#fbbf24';
@@ -72,30 +73,13 @@ function formatDelta(value, unit) {
   return `${sign}${Math.round(value).toLocaleString('pl-PL')}`;
 }
 
-function SelectUnit({ label, value, options, onChange, color }) {
+function SelectUnit({ label, value, options, onChange }) {
   return (
     <label style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 220 }}>
       <span style={{ fontSize: '0.66rem', color: 'var(--muted)', letterSpacing: '0.07em', fontWeight: 700 }}>
         {label}
       </span>
-      <select
-        value={value || ''}
-        onChange={(e) => onChange(e.target.value)}
-        style={{
-          borderRadius: 10,
-          border: `1px solid ${color}88`,
-          background: `${color}10`,
-          color: 'var(--text)',
-          fontSize: '0.78rem',
-          padding: '8px 10px',
-          fontFamily: 'Outfit, sans-serif',
-          outline: 'none',
-        }}
-      >
-        {options.map((o) => (
-          <option key={o.value} value={o.value} style={{ background: '#1e293b', color: '#e2e8f0' }}>{o.label}</option>
-        ))}
-      </select>
+      <CustomSelect value={value || ''} onChange={onChange} options={options} minWidth={220} />
     </label>
   );
 }
@@ -143,7 +127,7 @@ function PowiatSelector({ selected, onChange, allPowiaty, max = 6 }) {
           display: 'flex', alignItems: 'center', gap: '5px',
           padding: '3px 8px 3px 10px', borderRadius: '20px',
           background: `${POW_COLORS[i % POW_COLORS.length]}22`,
-          border: `1px solid ${POW_COLORS[i % POW_COLORS.length]}66`,
+          border: '1px solid rgba(255,255,255,0.18)',
           fontSize: '0.72rem', color: 'var(--text)',
         }}>
           <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: POW_COLORS[i % POW_COLORS.length], flexShrink: 0 }} />
@@ -292,6 +276,10 @@ export default function Porownywarka({ initialPowiat = null }) {
   const [groupOn, setGroupOn] = useState(() => (
     Object.fromEntries(POW_METRIC_GROUPS.map((g) => [g.id, true]))
   ));
+  const [napFrom,    setNapFrom]    = useState(null);
+  const [napTo,      setNapTo]      = useState(null);
+  const [showNaplyw, setShowNaplyw] = useState(true);
+  const [showOdplyw, setShowOdplyw] = useState(true);
 
   const powOptions = useMemo(
     () => [...(powiaty || [])]
@@ -451,7 +439,7 @@ export default function Porownywarka({ initialPowiat = null }) {
       <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
         {[
           { id: 'powiaty', label: 'Powiaty' },
-          { id: 'woj', label: 'Województwa (stopa)' },
+          { id: 'woj', label: 'Województwa' },
         ].map((t) => (
           <button
             key={t.id}
@@ -623,16 +611,52 @@ export default function Porownywarka({ initialPowiat = null }) {
             />
           </Card>
 
-          <Card title={`Napływ i odpływ (12m) — ${powDataA?.nazwa || 'A'} / ${powDataB?.nazwa || 'B'}`} exportTitle="porownywarka_trend_naplyw_odplyw">
-            <LineChartSVG
-              datasets={flowDatasets}
-              labels={napLabels}
-              height={200}
-              width={900}
-              showValueLabels
-              valueFormatter={(v) => fmtNumber(v)}
-            />
-          </Card>
+          {(() => {
+            const napF = napFrom ?? napLabels[0] ?? '';
+            const napT = napTo   ?? napLabels[napLabels.length - 1] ?? '';
+            const nfi  = napLabels.indexOf(napF);
+            const nti  = napLabels.indexOf(napT);
+            const nlo  = Math.min(nfi < 0 ? 0 : nfi, nti < 0 ? napLabels.length - 1 : nti);
+            const nhi  = Math.max(nfi < 0 ? 0 : nfi, nti < 0 ? napLabels.length - 1 : nti);
+            const slNapLabels = napLabels.slice(nlo, nhi + 1);
+            const allFlowDs = [
+              { data: (powDataA?.trend_zarej_13m || []).slice(-SHOW_N).slice(nlo, nhi + 1), color: A_COLOR, label: `${powDataA?.nazwa || 'A'} napływ` },
+              { data: (powDataA?.trend_wyrej_13m || []).slice(-SHOW_N).slice(nlo, nhi + 1), color: A_COLOR, label: `${powDataA?.nazwa || 'A'} odpływ`, ghost: true },
+              { data: (powDataB?.trend_zarej_13m || []).slice(-SHOW_N).slice(nlo, nhi + 1), color: B_COLOR, label: `${powDataB?.nazwa || 'B'} napływ` },
+              { data: (powDataB?.trend_wyrej_13m || []).slice(-SHOW_N).slice(nlo, nhi + 1), color: B_COLOR, label: `${powDataB?.nazwa || 'B'} odpływ`, ghost: true },
+            ];
+            const visibleFlowDs = allFlowDs.filter((_, i) => i % 2 === 0 ? showNaplyw : showOdplyw);
+            const btnStyle = (active, label) => ({
+              padding: '3px 10px', borderRadius: '6px', border: 'none', cursor: 'pointer',
+              fontSize: '0.68rem', fontWeight: active ? 700 : 500, fontFamily: 'Outfit, sans-serif',
+              background: active ? 'var(--nav-active)' : 'var(--bg3)',
+              color: active ? '#fff' : 'var(--muted)',
+            });
+            return (
+              <Card
+                title={`Napływ i odpływ — ${powDataA?.nazwa || 'A'} / ${powDataB?.nazwa || 'B'}`}
+                exportTitle="porownywarka_trend_naplyw_odplyw"
+                badge={
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      <button style={btnStyle(showNaplyw)} onClick={() => setShowNaplyw(v => !v)}>Napływ</button>
+                      <button style={btnStyle(showOdplyw)} onClick={() => setShowOdplyw(v => !v)}>Odpływ</button>
+                    </div>
+                    <RangeSelector labels={napLabels} from={napF} to={napT} onChange={(f, t) => { setNapFrom(f); setNapTo(t); }} />
+                  </div>
+                }
+              >
+                <LineChartSVG
+                  datasets={visibleFlowDs}
+                  labels={slNapLabels}
+                  height={200}
+                  width={900}
+                  showValueLabels
+                  valueFormatter={(v) => fmtNumber(v)}
+                />
+              </Card>
+            );
+          })()}
         </>
       ) : (
         <>

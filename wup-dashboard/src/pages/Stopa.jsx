@@ -6,27 +6,7 @@ import HorizontalBar, { stopaColor, greenColor } from '../components/HorizontalB
 import LineChartSVG from '../components/LineChartSVG';
 import InfoTooltip from '../components/InfoTooltip';
 import { useAppData } from '../context/DataContext';
-
-function RangeSelector({ labels, from, to, onChange }) {
-  const sel = {
-    background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)',
-    borderRadius: '6px', color: 'var(--text)', padding: '4px 8px',
-    fontSize: 'var(--font-sm)', fontFamily: 'Outfit, sans-serif', cursor: 'pointer',
-    option: { background: '#1e293b', color: '#e2e8f0' },
-  };
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-      <span style={{ fontSize: 'var(--font-xs)', color: 'var(--muted)' }}>Od:</span>
-      <select value={from} onChange={e => onChange(e.target.value, to)} style={sel}>
-        {labels.map(l => <option key={l} value={l} style={{ background: '#1e293b', color: '#e2e8f0' }}>{l}</option>)}
-      </select>
-      <span style={{ fontSize: 'var(--font-xs)', color: 'var(--muted)' }}>Do:</span>
-      <select value={to} onChange={e => onChange(from, e.target.value)} style={sel}>
-        {labels.map(l => <option key={l} value={l} style={{ background: '#1e293b', color: '#e2e8f0' }}>{l}</option>)}
-      </select>
-    </div>
-  );
-}
+import { RangeSelector } from '../components/CustomSelect';
 
 
 // ── Strona ─────────────────────────────────────────────────────────────────
@@ -138,7 +118,7 @@ export default function Stopa() {
       {/* Ranking powiatów */}
       <Grid cols={2} grow>
         <Card title="Powiaty mazowieckie — najwyższa stopa" badge="Top 5" grow>
-          <RankTable data={pow_top5} unit="%" accentColor="#e63946" avgLine={stopa.stopa_maz} avgLabel="śr. MAZ" />
+          <RankTable data={pow_top5} unit="%" accentColor="#e63946" />
         </Card>
         <Card title="Powiaty mazowieckie — najniższa stopa" badge="Bot 5" grow>
           <RankTable data={pow_bot5} unit="%" accentColor="#52b788" reverse avgLine={stopa.stopa_maz} avgLabel="śr. MAZ" />

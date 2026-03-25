@@ -8,6 +8,7 @@ import WyrejDonut from '../components/WyrejDonut';
 import StatsSelector from '../components/StatsSelector';
 import { useAppData } from '../context/DataContext';
 import InfoTooltip from '../components/InfoTooltip';
+import { RangeSelector } from '../components/CustomSelect';
 
 // Hook mierzący rozmiar kontenera — chart wypełnia dostępną przestrzeń
 function useContainerSize(defaultW = 560, defaultH = 200) {
@@ -140,6 +141,10 @@ function CategoryRow({ item }) {
 export default function Bezrobotni() {
   const { bezrobotni, stopa, meta, loading } = useAppData();
   const [chartRef, chartSize] = useContainerSize();
+  const [napFrom,    setNapFrom]    = useState(null);
+  const [napTo,      setNapTo]      = useState(null);
+  const [showZarej,  setShowZarej]  = useState(true);
+  const [showWyrej,  setShowWyrej]  = useState(true);
 
   if (!bezrobotni) return null;
 
@@ -289,21 +294,53 @@ export default function Bezrobotni() {
         gap: '10px', marginBottom: '10px',
       }}>
 
-        <Card title="Napływ i odpływ bezrobotnych — ostatnie 13 miesięcy" grow exportTitle="naplyw_odplyw_bezrobotnych">
-          <div ref={chartRef} style={{ height: '240px', overflow: 'hidden' }}>
-            {trendZarej.some(v => v != null) && (
-              <LineChartSVG
-                datasets={[
-                  { data: trendZarej, color: '#e63946', label: 'Zarejestrowani' },
-                  { data: trendWyrej, color: '#4895ef', label: 'Wyrejestrowani' },
-                ]}
-                labels={trendLabels}
-                height={Math.max(chartSize.h - 4, 100)}
-                width={Math.max(chartSize.w, 10)}
-              />
-            )}
-          </div>
-        </Card>
+        {(() => {
+          const napF = napFrom ?? trendLabels[0] ?? '';
+          const napT = napTo   ?? trendLabels[trendLabels.length - 1] ?? '';
+          const nfi  = trendLabels.indexOf(napF);
+          const nti  = trendLabels.indexOf(napT);
+          const nlo  = Math.min(nfi < 0 ? 0 : nfi, nti < 0 ? trendLabels.length - 1 : nti);
+          const nhi  = Math.max(nfi < 0 ? 0 : nfi, nti < 0 ? trendLabels.length - 1 : nti);
+          const napLabels = trendLabels.slice(nlo, nhi + 1);
+          const napDatasets = [
+            showZarej && { data: trendZarej.slice(nlo, nhi + 1), color: '#e63946', label: 'Zarejestrowani' },
+            showWyrej && { data: trendWyrej.slice(nlo, nhi + 1), color: '#4895ef', label: 'Wyrejestrowani' },
+          ].filter(Boolean);
+          const btnStyle = (active, color) => ({
+            padding: '3px 10px', borderRadius: '6px', border: 'none', cursor: 'pointer',
+            fontSize: '0.68rem', fontWeight: active ? 700 : 500, fontFamily: 'Outfit, sans-serif',
+            background: active ? `${color}22` : 'var(--bg3)',
+            color: active ? color : 'var(--muted)',
+            outline: active ? `1px solid ${color}66` : 'none',
+          });
+          return (
+            <Card
+              title="Napływ i odpływ bezrobotnych"
+              grow
+              exportTitle="naplyw_odplyw_bezrobotnych"
+              badge={
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <button style={btnStyle(showZarej, '#e63946')} onClick={() => setShowZarej(v => !v)}>Zarejestrowani</button>
+                    <button style={btnStyle(showWyrej, '#4895ef')} onClick={() => setShowWyrej(v => !v)}>Wyrejestrowani</button>
+                  </div>
+                  <RangeSelector labels={trendLabels} from={napF} to={napT} onChange={(f, t) => { setNapFrom(f); setNapTo(t); }} />
+                </div>
+              }
+            >
+              <div ref={chartRef} style={{ height: '220px', overflow: 'hidden' }}>
+                {napDatasets.length > 0 && trendZarej.some(v => v != null) && (
+                  <LineChartSVG
+                    datasets={napDatasets}
+                    labels={napLabels}
+                    height={Math.max(chartSize.h - 4, 100)}
+                    width={Math.max(chartSize.w, 10)}
+                  />
+                )}
+              </div>
+            </Card>
+          );
+        })()}
 
         <Card title={`Przyczyny wyrejestrowania · ${okresAbbr}`} grow exportTitle="przyczyny_wyrejestrowania">
           <WyrejDonut

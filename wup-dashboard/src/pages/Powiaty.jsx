@@ -7,6 +7,7 @@ import WyrejDonut from '../components/WyrejDonut';
 import StatsSelector from '../components/StatsSelector';
 import GenderFigure from '../components/GenderFigures';
 import { useAppData } from '../context/DataContext';
+import { RangeSelector } from '../components/CustomSelect';
 
 const POW_COLORS = ['#e63946', '#4895ef', '#f4a261', '#52b788', '#a78bfa', '#fbbf24'];
 
@@ -221,6 +222,10 @@ export default function Powiaty({ initialPowiat = null }) {
     .map(p => ({ value: p.wgm, label: p.nazwa }));
 
   const [selWgm, setSelWgm] = useState(initialPowiat);
+  const [napFrom,   setNapFrom]   = useState(null);
+  const [napTo,     setNapTo]     = useState(null);
+  const [showZarej, setShowZarej] = useState(true);
+  const [showWyrej, setShowWyrej] = useState(true);
 
   const defaultWgm = (powiaty || []).find(p => p.wgm === '1465')?.wgm || options[0]?.value || null;
   const wgm = selWgm || defaultWgm;
@@ -374,21 +379,53 @@ const d = (powiaty || []).find(p => p.wgm === wgm) || {};
         gap: '10px', minHeight: '290px', marginBottom: '10px',
       }}>
 
-        <Card title="Napływ i odpływ — ostatnie 12 miesięcy" grow exportTitle={`naplyw_odplyw_${d.nazwa || 'powiat'}`}>
-          <div ref={chartRef} style={{ height: '240px', overflow: 'hidden' }}>
-            {trendZarej.some(v => v != null) && (
-              <LineChartSVG
-                datasets={[
-                  { data: trendZarej, color: '#e63946', label: 'Zarejestrowani' },
-                  { data: trendWyrej, color: '#4895ef', label: 'Wyrejestrowani' },
-                ]}
-                labels={napodLabels}
-                height={Math.max(chartSize.h - 4, 100)}
-                width={Math.max(chartSize.w, 10)}
-              />
-            )}
-          </div>
-        </Card>
+        {(() => {
+          const napF = napFrom ?? napodLabels[0] ?? '';
+          const napT = napTo   ?? napodLabels[napodLabels.length - 1] ?? '';
+          const nfi  = napodLabels.indexOf(napF);
+          const nti  = napodLabels.indexOf(napT);
+          const nlo  = Math.min(nfi < 0 ? 0 : nfi, nti < 0 ? napodLabels.length - 1 : nti);
+          const nhi  = Math.max(nfi < 0 ? 0 : nfi, nti < 0 ? napodLabels.length - 1 : nti);
+          const slicedLabels = napodLabels.slice(nlo, nhi + 1);
+          const napDatasets = [
+            showZarej && { data: trendZarej.slice(nlo, nhi + 1), color: '#e63946', label: 'Zarejestrowani' },
+            showWyrej && { data: trendWyrej.slice(nlo, nhi + 1), color: '#4895ef', label: 'Wyrejestrowani' },
+          ].filter(Boolean);
+          const btnStyle = (active, color) => ({
+            padding: '3px 10px', borderRadius: '6px', border: 'none', cursor: 'pointer',
+            fontSize: '0.68rem', fontWeight: active ? 700 : 500, fontFamily: 'Outfit, sans-serif',
+            background: active ? `${color}22` : 'var(--bg3)',
+            color: active ? color : 'var(--muted)',
+            outline: active ? `1px solid ${color}66` : 'none',
+          });
+          return (
+            <Card
+              title="Napływ i odpływ"
+              grow
+              exportTitle={`naplyw_odplyw_${d.nazwa || 'powiat'}`}
+              badge={
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <button style={btnStyle(showZarej, '#e63946')} onClick={() => setShowZarej(v => !v)}>Zarejestrowani</button>
+                    <button style={btnStyle(showWyrej, '#4895ef')} onClick={() => setShowWyrej(v => !v)}>Wyrejestrowani</button>
+                  </div>
+                  <RangeSelector labels={napodLabels} from={napF} to={napT} onChange={(f, t) => { setNapFrom(f); setNapTo(t); }} />
+                </div>
+              }
+            >
+              <div ref={chartRef} style={{ height: '220px', overflow: 'hidden' }}>
+                {napDatasets.length > 0 && trendZarej.some(v => v != null) && (
+                  <LineChartSVG
+                    datasets={napDatasets}
+                    labels={slicedLabels}
+                    height={Math.max(chartSize.h - 4, 100)}
+                    width={Math.max(chartSize.w, 10)}
+                  />
+                )}
+              </div>
+            </Card>
+          );
+        })()}
 
         {wyrejTop5.length > 0 && (
           <Card title={`Przyczyny wyrejestrowania · ${d.nazwa || ''}`} grow>
