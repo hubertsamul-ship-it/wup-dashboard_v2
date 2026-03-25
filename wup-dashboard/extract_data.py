@@ -1005,6 +1005,7 @@ def build_dashboard_final(mrpips_data: dict, wynagr_data: dict, zwolnienia_data:
             'wyrej_delta':  (v.get('wyrej_razem') or 0) - (v_prv.get('wyrej_razem') or 0),
             'oferty_delta': (v.get('oferty_pracy') or 0) - (v_prv.get('oferty_pracy') or 0),
             # Intensywność aktywizacji: bezrobotni w aktywnych formach (stan na koniec) / bezrobotni ogółem
+            'aktywizacja_koniec': v.get('aktywizacja_koniec') or 0,
             'aktywizacja_pct': round(
                 (v.get('aktywizacja_koniec') or 0) / max(v.get('bezr_razem') or 1, 1) * 100, 1
             ),
