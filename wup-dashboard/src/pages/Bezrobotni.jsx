@@ -237,7 +237,7 @@ export default function Bezrobotni() {
           flag="Intensywność aktywizacji" flagColor="green"
           target={loading ? 0 : Math.round((aktywizacjaProgramowaPct ?? 0) * 10)}
           decimals={1} suffix="%"
-          label={<>w aktywnych formach (koniec mies.)<InfoTooltip text="Formuła: bezrobotni w aktywnych formach na koniec mies. ÷ bezrobotni ogółem × 100. Licznik: suma kol. 5 działu 1.3 MRPiPS-01 (stan na koniec miesiąca)." source="MRPiPS-01" /></>}
+          label={<>w aktywnych formach (koniec mies.)<InfoTooltip text="bezrobotni w aktywnych formach (koniec mies.) ÷ bezrobotni ogółem" source="MRPiPS-01" /></>}
           variant="green"
         />
       </div>
