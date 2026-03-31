@@ -2,13 +2,16 @@
   "name": "wup-mazowsze",
   "private": true,
   "scripts": {
-    "dev:backend":  "C:/Users/HSamul/AppData/Local/Python/bin/python.exe -m uvicorn backend.api.main:app --reload --port 8000",
+    "dev:backend": "C:/Users/HSamul/AppData/Local/Python/bin/python.exe -m uvicorn backend.api.main:app --reload --port 8000",
     "dev:frontend": "cd wup-dashboard && npm run dev",
-    "dev":          "concurrently -n backend,frontend -c cyan,magenta \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev": "concurrently -n backend,frontend -c cyan,magenta \"npm run dev:backend\" \"npm run dev:frontend\"",
     "build:vercel": "cd wup-dashboard && npm install && npm run build",
-    "install:all":  "npm install && cd wup-dashboard && npm install"
+    "install:all": "npm install && cd wup-dashboard && npm install"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "react": "^19.2.4"
   }
 }
