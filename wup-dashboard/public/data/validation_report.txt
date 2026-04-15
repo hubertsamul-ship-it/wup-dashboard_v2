@@ -1,6 +1,6 @@
 WUP Dashboard — Raport walidacji
-Wygenerowano: 2026-03-25 07:34:37
-Okres danych: 2026-02
+Wygenerowano: 2026-04-15 07:12:10
+Okres danych: 2026-03
 =======================================================
 
 OSTRZEŻENIA: brak — dane wyglądają poprawnie ✓
@@ -9,5 +9,5 @@ INFORMACJE:
   •  Liczba powiatów w danych: 42 (oczekiwane: 42)
   •  Wynagrodzenia: dane dla wszystkich powiatów OK
   •  Stopy bezrobocia: dane dla wszystkich powiatów OK
-  •  Bezrobotni 2026-01→2026-02: 122,636→124,941 (+1.9%)
+  •  Bezrobotni 2026-02→2026-03: 124,941→124,707 (+0.2%)
   •  Zwolnienia: 14 miesięcy danych OK
